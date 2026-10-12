@@ -1,8 +1,8 @@
 # Database
 
-**Status:** Proposed 2026-10-11. Only the pgvector extension migration exists so far. Tables are
-added through Alembic migrations as features need them. Update this file when a migration changes
-the schema.
+**Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12). Every other table is
+*Proposed*. Tables are added through Alembic migrations as features need them. Update this file
+when a migration changes the schema.
 
 ## Where the database lives
 
@@ -14,6 +14,11 @@ to develop the schema. Dummy data comes from a seed script, so every local datab
 ## Conventions
 
 - Primary keys are `id bigint generated always as identity`.
+- `Base.metadata` has a naming convention (`app/db.py`), so constraints get predictable names
+  like `pk_users`, `uq_users_onyen` and `ck_users_role_valid`. Name CHECK constraints
+  explicitly (`name="role_valid"`); the convention adds the prefix.
+- Every model module is imported in `app/models/__init__.py`, which is how Alembic finds it.
+  Add new models there.
 - Timestamps are `timestamptz`, and `created_at` defaults to `now()`.
 - Enums are stored as text with a CHECK constraint, which is easier to migrate than Postgres
   enum types.

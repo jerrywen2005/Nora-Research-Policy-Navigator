@@ -1,7 +1,11 @@
 # Authentication and roles
 
-**Status:** Proposed 2026-10-11. Frontend built 2026-10-12 (running on fake auth); backend not yet built. UNC SSO access has been requested but not granted
-(contact: David Cowig).
+**Status:** The backend mock provider is **Current** (built 2026-10-12), and so is the
+frontend sign-in. The Shibboleth provider is *Proposed*. UNC SSO access was requested by email to
+David Cowig; there's no reply yet.
+
+Code: backend `app/auth/` (`get_current_user`, `require_role`, `record_login`), `app/api/auth.py`
+(endpoints) and `app/seed/users.py` (`researcher1`, `admin1`); frontend `src/auth/`.
 
 ## Principle
 
@@ -21,13 +25,17 @@ headers themselves.
 - The frontend sign-in page (`/signin`) takes an Onyen and has "Researcher demo" and "Admin demo"
   buttons for the seeded accounts. It uses Nora's own UNC-colored theme, is labeled "Demo sign-in.
   UNC SSO will replace this.", and deliberately doesn't imitate UNC's real Onyen/SSO login page.
-- Until the backend endpoints exist, `VITE_FAKE_AUTH=true` makes the frontend fake them
-  (`frontend/src/auth/fakeAuth.ts`, in memory, `researcher1` and `admin1` only). Delete it once the
-  real endpoints are on dev.
-- `POST /api/auth/mock-login {onyen}` sets a signed, HTTP-only session cookie (secret from
-  `SESSION_SECRET`).
+- `VITE_FAKE_AUTH=true` (`frontend/src/auth/fakeAuth.ts`) fakes the endpoints in the frontend. It
+  was needed before the backend existed and should now be deleted.
+- `POST /api/auth/mock-login {onyen}` sets a signed, HTTP-only session cookie named
+  `nora_session`. It's signed with `SESSION_SECRET`, lasts 8 hours, is `SameSite=Lax`, and is
+  HTTPS-only in production. The cookie stores only the user id; the user and role are re-read
+  from the database on every request, so disabling a user or changing their role takes effect
+  immediately.
+- Onyens are trimmed and lowercased, and may contain only `[a-z0-9._-]` (max 64).
 - Unknown Onyens are created as `researcher`.
-- The app refuses to start with `AUTH_PROVIDER=mock` when `ENVIRONMENT=production`.
+- The app refuses to start with `ENVIRONMENT=production` if `AUTH_PROVIDER=mock` or if
+  `SESSION_SECRET` is still the development default.
 
 ### `shibboleth` (later)
 
@@ -47,7 +55,9 @@ headers themselves.
 ## Admins
 
 - New users default to `researcher`.
-- Admins are granted by the seed script or an `ADMIN_ONYENS` env list at startup. Later, existing
-  admins can grant it from the Users & Roles admin page.
-- Admin-only routes live under `/api/admin/*` and use `require_role("admin")`.
+- For now, admins come from the seed script. Later, existing admins can grant the role from the
+  Users & Roles admin page. An `ADMIN_ONYENS` env list for bootstrapping production admins is a
+  possible addition, not yet built.
+- Admin-only routes live under `/api/admin/*` and use
+  `Depends(require_role(Role.ADMIN))`. Disabled users (`is_active = false`) get 401.
 - The frontend hides admin UI for researchers, but the backend check is what enforces access.

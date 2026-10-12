@@ -30,6 +30,9 @@ docker compose up --build
 - API docs: http://localhost:8000/api/docs
 - Postgres: `localhost:5432`, user/password `postgres`/`postgres`, database `policy_navigator`
 
+Migrations and dummy seed data are applied on startup. Sign in with the mock login as
+`researcher1` or `admin1` (no password).
+
 Code changes hot-reload in both the frontend and backend. Stop with `Ctrl+C`. To wipe the
 database, run `docker compose down -v`.
 
@@ -43,6 +46,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e "./backend[dev]"
 cd backend
 alembic upgrade head
+python -m app.seed                  # dummy users and data
 uvicorn app.main:app --reload       # http://localhost:8000
 
 # Frontend (separate terminal)
