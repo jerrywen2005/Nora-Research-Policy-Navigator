@@ -82,6 +82,9 @@ Run the relevant tests and lint before saying a change is done.
 - **API paths:** every FastAPI route is under `/api`. The frontend only uses relative `/api/...`
   paths through `frontend/src/api/client.ts`. Vite (dev) and nginx (prod) proxy `/api`. Don't
   hardcode backend URLs or add CORS workarounds.
+- **API contract:** [docs/api.md](docs/api.md) defines every endpoint's shapes. It's mirrored in
+  `backend/app/schemas/` (Pydantic) and `frontend/src/api/types.ts`. Change all three in the
+  same PR, and add new endpoints to `api.md` before building them.
 - **Database:** PostgreSQL + pgvector, accessed only through SQLAlchemy 2.0. Schema changes go
   through Alembic migrations, never manual SQL. Any Postgres works through `DATABASE_URL`, with no
   Supabase SDK or Supabase Auth. Schema design: [docs/database.md](docs/database.md).
