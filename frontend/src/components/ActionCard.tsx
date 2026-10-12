@@ -19,7 +19,7 @@ export function ActionCard({ icon, title, description, actionLabel, tone, onActi
       </span>
       <h2 className="action-card__title">{title}</h2>
       <p className="action-card__description">{description}</p>
-      <button type="button" className="button button--outline" onClick={onAction}>
+      <button type="button" className="button button--secondary" onClick={onAction}>
         {actionLabel} <Icon name="arrowRight" size={16} />
       </button>
     </section>

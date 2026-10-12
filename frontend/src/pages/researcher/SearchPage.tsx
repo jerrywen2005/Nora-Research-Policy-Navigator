@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router'
 import { DocumentResultCard } from '../../components/DocumentResultCard'
 import { Icon } from '../../components/Icon'
 import { SearchBar } from '../../components/SearchBar'
@@ -6,14 +7,11 @@ import './researcher.css'
 import { getDocuments } from './researcherApi'
 import { useLoad } from './useLoad'
 
-interface SearchPageProps {
-  query: string
-  onSearch: (query: string) => void
-  onBack: () => void
-}
-
-// Keyword search over policies, guidance and FAQs. An empty query shows just the search box.
-export function SearchPage({ query, onSearch, onBack }: SearchPageProps) {
+// Keyword search over policies, guidance and FAQs. Route: /search?q=
+// An empty query shows just the search box.
+export default function SearchPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const query = searchParams.get('q') ?? ''
   const inputRef = useRef<HTMLInputElement>(null)
   const results = useLoad(query, () =>
     query ? getDocuments({ q: query }) : Promise.resolve(null),
@@ -26,11 +24,7 @@ export function SearchPage({ query, onSearch, onBack }: SearchPageProps) {
   }, [query])
 
   return (
-    <div className="researcher researcher-page">
-      <button type="button" className="button button--link back-link" onClick={onBack}>
-        <Icon name="arrowLeft" size={16} /> Home
-      </button>
-
+    <div className="researcher">
       <header className="page-header">
         <span className="page-header__icon">
           <Icon name="search" size={36} />
@@ -49,7 +43,7 @@ export function SearchPage({ query, onSearch, onBack }: SearchPageProps) {
           submitLabel="Search"
           initialValue={query}
           inputRef={inputRef}
-          onSubmit={onSearch}
+          onSubmit={(q) => setSearchParams({ q })}
         />
 
         <div aria-live="polite">

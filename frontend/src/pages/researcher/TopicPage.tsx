@@ -1,26 +1,23 @@
+import { Link, useParams } from 'react-router'
 import { ApiError } from '../../api/client'
 import { DocumentResultCard } from '../../components/DocumentResultCard'
 import { Icon } from '../../components/Icon'
-import { topicIcon } from '../../components/topicIcon'
 import { OfficeContact } from '../../components/OfficeContact'
+import { topicIcon } from '../../components/topicIcon'
 import './researcher.css'
 import { getDocuments, getTopic } from './researcherApi'
 import { useLoad } from './useLoad'
 
-interface TopicPageProps {
-  slug: string
-  onBack: () => void
-}
-
-// A topic's documents, plus the office that owns the topic.
-export function TopicPage({ slug, onBack }: TopicPageProps) {
+// A topic's documents, plus the office that owns the topic. Route: /browse/:slug
+export default function TopicPage() {
+  const slug = useParams().slug ?? ''
   const page = useLoad(slug, () => Promise.all([getTopic(slug), getDocuments({ topic: slug })]))
 
   return (
-    <div className="researcher researcher-page">
-      <button type="button" className="button button--link back-link" onClick={onBack}>
+    <div className="researcher">
+      <Link to="/browse" className="text-link back-link">
         <Icon name="arrowLeft" size={16} /> All topics
-      </button>
+      </Link>
 
       {page.status === 'loading' && <p className="status">Loading…</p>}
       {page.status === 'error' && (

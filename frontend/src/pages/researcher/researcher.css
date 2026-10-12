@@ -1,17 +1,5 @@
 /* Page layout for the researcher pages. Colors come from the tokens in components/components.css. */
 
-.researcher-page {
-  box-sizing: border-box;
-  min-height: 100%;
-  padding: 1.5rem;
-}
-
-.researcher-page *,
-.researcher-page *::before,
-.researcher-page *::after {
-  box-sizing: inherit;
-}
-
 .hero {
   margin-bottom: 1.5rem;
   padding: 1.75rem 2rem;
@@ -22,6 +10,7 @@
 
 .hero__title {
   margin: 0;
+  color: #fff;
   font-size: clamp(1.6rem, 3vw, 2.2rem);
 }
 
@@ -84,31 +73,27 @@
   list-style: none;
 }
 
-.rail-list button {
+.rail-list a {
   display: flex;
   align-items: center;
   gap: 0.6rem;
   width: 100%;
   padding: 0.5rem 0;
-  font: inherit;
   font-size: 0.9rem;
-  text-align: left;
   color: var(--rp-text);
-  background: none;
-  border: none;
+  text-decoration: none;
   border-bottom: 1px solid var(--rp-border);
-  cursor: pointer;
 }
 
-.rail-list button span {
+.rail-list a span {
   flex: 1;
 }
 
-.rail-list button svg {
+.rail-list a svg {
   color: var(--rp-accent);
 }
 
-.rail-list button:hover span {
+.rail-list a:hover span {
   text-decoration: underline;
 }
 
@@ -119,7 +104,7 @@
 }
 
 .back-link {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
 }
 
 .page-header {
@@ -172,10 +157,6 @@
 }
 
 @media (max-width: 640px) {
-  .researcher-page {
-    padding: 1rem;
-  }
-
   .action-cards {
     grid-template-columns: minmax(0, 1fr);
   }

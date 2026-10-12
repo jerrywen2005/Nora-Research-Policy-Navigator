@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** Current as of 2026-10-11. Update the checkboxes and "Now" section as work lands.
+**Status:** Current as of 2026-10-12. Update the checkboxes and "Now" section as work lands.
 
 ## Milestones
 
@@ -42,13 +42,19 @@ Merge order:
 - Each backend person adds their own `include_router` line in `app/main.py`.
 - Each person writes the tests for their own code.
 
+Shared prerequisite:
+- [x] Frontend app shell: react-router, layout, theme, placeholder routes
+  ([frontend.md](frontend.md))
+
 
 Workflow 1, mock login with role-based views:
 - [ ] `users` table + migration, seed script with `researcher1` and `admin1`
 - [ ] `POST /api/auth/mock-login`, `POST /api/auth/logout`, `GET /api/me`
 - [ ] `require_role("admin")` dependency; a researcher calling admin endpoints gets 403
-- [ ] Frontend: sign-in page → researcher home or admin page (stub) by role; admin routes are
-  guarded
+- [x] Frontend: sign-in page → researcher home or admin page (stub) by role; admin routes are
+  guarded. Runs on `VITE_FAKE_AUTH=true` until the backend endpoints land; then test against them
+  and delete `src/auth/fakeAuth.ts`.
+- [x] Frontend: admin Overview dashboard mockup with sample data
 
 Workflow 2, browse topics → search:
 - [ ] `offices`, `topics`, `documents`, `document_topics` tables + migration
@@ -56,10 +62,9 @@ Workflow 2, browse topics → search:
 - [ ] `GET /api/topics`, `GET /api/documents?topic=&q=` (Postgres full-text search)
 - [ ] Frontend: researcher home with Browse / Search / Ask given equal weight; topic cards →
   document list; search box; each result shows its citation and source link
-  - Built against fake data in `src/pages/researcher/` (`ResearcherHome`, `TopicPage`,
-    `SearchPage`, plus `AnswerCard` for Ask). Still to do: swap the bodies in
-    `researcherApi.ts` for real calls, and mount the pages on the router's routes in place of the
-    temporary `ResearcherPortal`.
+  - Built and routed on fake data (Home, Browse, Topic, Search and Ask pages; see
+    [frontend.md](frontend.md#researcher-pages)). Still to do: swap the bodies in
+    `researcherApi.ts` for real calls once the endpoints land, then delete `fakeData.ts`.
 
 Stretch, ask:
 - [ ] `POST /api/ask` level 2: keyword retrieval, return the top sources, or a referral to the

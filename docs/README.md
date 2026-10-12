@@ -11,6 +11,7 @@ rules; these files hold the detail. [README.md](../README.md) at the repo root c
 | [decisions.md](decisions.md) | Dated decision log and open questions |
 | [database.md](database.md) | Schema: tables, columns, and why |
 | [auth.md](auth.md) | Mock login now, UNC SSO later, roles |
+| [frontend.md](frontend.md) | Routes, layout, navigation and styling conventions |
 | [rag.md](rag.md) | Ingestion, retrieval, the ask pipeline and evaluation |
 | [deployment.md](deployment.md) | Environments, Carolina CloudApps (OKD), interim hosting |
 

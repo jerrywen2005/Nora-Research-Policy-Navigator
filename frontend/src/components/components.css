@@ -1,29 +1,21 @@
-/* Styles for the researcher components. Colors are tokens on .researcher so they can later point
-   at the app-wide theme (src/theme.css) instead of these fallbacks. */
+/* Styles for the researcher components. The --rp-* tokens map onto the app theme (src/theme.css);
+   the few colors the theme doesn't have are defined here. .button and .badge come from theme.css. */
 .researcher {
-  --rp-navy: #13294b;
-  --rp-blue: #4b9cd3;
-  --rp-text: light-dark(#1f2937, #e5e7eb);
-  --rp-muted: light-dark(#5b6472, #a3acb9);
-  --rp-bg: light-dark(#f4f7fb, #0f1724);
-  --rp-surface: light-dark(#ffffff, #18233a);
-  --rp-border: light-dark(#dde3ec, #2c3a55);
-  --rp-accent: light-dark(#13294b, #9fcbea);
-  --rp-browse: light-dark(#e8f1fb, #1b2d4a);
-  --rp-search: light-dark(#e6f4ee, #17342c);
-  --rp-ask: light-dark(#efeafb, #2a2346);
-  --rp-success: light-dark(#1f7a4d, #6fd3a2);
-  --rp-success-bg: light-dark(#eef8f2, #15302a);
-  --rp-warning: light-dark(#9a5b00, #f2bf6b);
-  --rp-warning-bg: light-dark(#fdf5e8, #33281a);
+  --rp-navy: var(--color-navy);
+  --rp-blue: var(--color-carolina-blue);
+  --rp-text: var(--color-text);
+  --rp-muted: var(--color-text-muted);
+  --rp-bg: var(--color-bg-subtle);
+  --rp-surface: var(--color-bg);
+  --rp-border: var(--color-border);
+  --rp-accent: var(--color-link);
+  --rp-browse: var(--color-accent-soft);
+  --rp-search: #e6f4ee;
+  --rp-ask: #efeafb;
+  --rp-success: #1f7a4d;
+  --rp-success-bg: #eef8f2;
+  --rp-warning: #9a5b00;
   --rp-radius: 12px;
-
-  color: var(--rp-text);
-  background: var(--rp-bg);
-}
-
-.researcher a {
-  color: var(--rp-accent);
 }
 
 .researcher a svg,
@@ -40,35 +32,18 @@
   white-space: nowrap;
 }
 
-/* ---- Buttons and small pieces ---- */
+/* ---- Links and small pieces ---- */
 
-.button {
+.text-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font: inherit;
+  gap: var(--space-1);
   font-weight: 600;
-  cursor: pointer;
+  text-decoration: none;
 }
 
-.button--outline {
-  color: var(--rp-accent);
-  background: var(--rp-surface);
-  border: 1.5px solid var(--rp-accent);
-}
-
-.button--outline:hover {
-  color: var(--rp-surface);
-  background: var(--rp-accent);
-}
-
-.button--link {
-  padding: 0;
-  color: var(--rp-accent);
-  background: none;
-  border: none;
+.text-link:hover {
+  text-decoration: underline;
 }
 
 .chip {
@@ -83,23 +58,13 @@
 }
 
 .chip:hover:not(:disabled) {
-  border-color: var(--rp-accent);
-}
-
-.badge {
-  padding: 0.1rem 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--rp-muted);
-  background: var(--rp-bg);
-  border: 1px solid var(--rp-border);
-  border-radius: 999px;
+  border-color: var(--rp-blue);
+  background: var(--rp-browse);
 }
 
 .badge--authoritative {
   color: var(--rp-success);
   background: var(--rp-success-bg);
-  border-color: transparent;
 }
 
 /* ---- Action cards ---- */
