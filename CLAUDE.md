@@ -1,33 +1,65 @@
 # CLAUDE.md
 
-Shared instructions for Claude Code on this project. Every team member's Claude reads this file, so
-keep it current when a convention or decision changes. Setup commands are in [README.md](README.md).
+Shared instructions for Claude Code on this project. Every team member's Claude reads this file.
+It holds the general rules. Details live in [docs/](docs/README.md), and setup is in
+[README.md](README.md).
+
+## Keep the docs current (required)
+
+CLAUDE.md and `docs/` are the project's only memory. A fresh session knows nothing that isn't
+written down, so updating the docs is part of every task, not an extra step:
+
+- **When a decision is made or new information arrives** (the user mentions a client or coach
+  meeting outcome, an answered open question, a changed requirement or deadline, a new
+  convention), update the docs in the same session without being asked:
+  - add a dated entry to [docs/decisions.md](docs/decisions.md), and move answered open questions
+    into its log;
+  - update the detailed doc it affects (schema → `database.md`, auth → `auth.md`, and so on);
+  - update this file only if a general rule or convention changed.
+- **When code changes something documented** (schema, endpoints, auth flow, commands), update the
+  doc in the same change. Tick off finished items in [docs/roadmap.md](docs/roadmap.md).
+- Keep this file short and general. Put detail in `docs/` and link to it.
+- If the docs and the code disagree, say so and ask which is intended. Don't silently pick one.
+- When finishing a task, tell the user which docs you updated.
+
+**Starting a task:** read [docs/roadmap.md](docs/roadmap.md) for current status, plus the
+`docs/` file for the area you're touching.
 
 ## Project
 
-UNC Research Policy Navigator (COMP 523). Clients: Jeanne Lovmo and Quinton Johnson, UNC Office of
-the Vice Chancellor for Research, Research Compliance Services.
+**Nora, the Research Policy Navigator** (COMP 523) for UNC Research (Office of the Vice Chancellor
+for Research). Clients: Jeanne Lovmo and Quinton Johnson. Requirements, content standards and
+testing come from the client's **Research Policy Navigator Link** working group. We build what they
+specify; anything unclear goes on the open-questions list instead of being decided by us. See
+[docs/product.md](docs/product.md).
 
-Researchers **browse topics**, **search policies** (keyword), or **ask a question** (RAG answer with
-citations). Admins manage policy content, FAQs and topics, and view analytics (questions asked,
-unanswered questions, feedback). Two roles: `researcher` and `admin`.
+Researchers **browse topics**, **search** (keyword), or **ask a question** (an answer grounded in
+the Research Policy Repository, with citations). Admins manage content and view analytics. There
+are two roles: `researcher` and `admin`.
 
 Product rules that affect code:
-- Every AI answer must cite the policy source(s) it used. It is not an open-ended chatbot.
-- If retrieval can't support a confident answer, say so and refer the user to the relevant
-  compliance office. Never guess.
-- Answers are informational guidance, not compliance determinations, and the UI must say so.
-- Browse, Search and Ask are equally prominent entry points; none is the "main" one.
-- Only curated, public or client-approved documents. No confidential records, no live
-  integration with IRB, COI or other enterprise systems.
-- Admins can mark documents authoritative. Documents are archived, never hard-deleted without
-  explicit admin confirmation.
+- Every AI answer cites its sources. Nora is not an open-ended chatbot.
+- If the sources can't support a confident answer, say so and refer the user to the responsible
+  office. Never guess, and never present an interpretation as policy.
+- Answers are informational guidance, not compliance determinations, and the UI says so.
+- Browse, Search and Ask are equally prominent; none is the "main" one.
+- Only curated public or client-approved documents. No confidential records and no enterprise
+  integrations (IRB, COI and so on).
+- Content is archived, never hard-deleted without explicit admin confirmation. Every source has an
+  owning office.
+
+## Current situation
+
+UNC SSO and Carolina CloudApps (OKD) access are **requested but not granted**. Build and demo on
+the local Docker stack with the mock auth provider. Interim hosts get public documents and fake
+users only. Milestones and status are in [docs/roadmap.md](docs/roadmap.md).
 
 ## Layout
 
 ```
 backend/    FastAPI app (app/), Alembic migrations (alembic/), pytest tests (tests/)
 frontend/   React + TypeScript + Vite; nginx.conf.template for production
+docs/       detailed design docs, roadmap, decision log
 docker-compose.yml   local dev stack: db (Postgres + pgvector), backend, frontend
 .github/workflows/   ci.yml (lint, tests, builds), branch-rules.yml (PR source/branch names)
 ```
@@ -38,34 +70,32 @@ The Python venv is at the **repo root** (`.venv`), not in `backend/`. Use `.venv
 activated venv; run backend commands from `backend/`.
 
 - Full stack: `docker compose up --build` (app on 5173, API on 8000, Postgres on 5432)
-- Backend tests: `cd backend && pytest`. Coverage must stay at **100%**, and CI fails otherwise.
+- Backend tests: `cd backend && pytest`. Coverage must stay at **100%**; CI fails otherwise.
 - Backend lint: `cd backend && ruff check . && ruff format --check .`
-- Frontend: `cd frontend && npm run lint && npm run build` (build includes the type-check)
+- Frontend: `cd frontend && npm run lint && npm run build` (the build includes the type-check)
 - New migration: `cd backend && alembic revision --autogenerate -m "..."`, then review the file.
 
 Run the relevant tests and lint before saying a change is done.
 
-## Architecture decisions
+## Architecture rules
 
 - **API paths:** every FastAPI route is under `/api`. The frontend only uses relative `/api/...`
-  paths through `frontend/src/api/client.ts`. Vite proxies `/api` in dev; nginx does it in
-  production. Don't hardcode backend URLs or add CORS workarounds in the frontend.
-- **Database:** plain PostgreSQL + pgvector, accessed only through SQLAlchemy 2.0 in the backend.
-  Schema changes go through Alembic migrations, never manual SQL. Supabase, if used at all, is
-  just a hosted Postgres: no Supabase client SDK, Supabase Auth or row-level security. The app
-  must run against any Postgres via `DATABASE_URL`.
-- **Auth:** authentication (who you are) is separate from authorization (your role).
-  - Semester build: a mock login provider that models UNC Onyen login.
-  - Later: UNC Shibboleth SSO (sso.unc.edu), likely a proxy in front of the app passing identity
-    in headers. Contact: David Cowig.
-  - Either way, the backend resolves the user, then reads their role from our own users/roles
-    tables. Keep the auth provider behind an interface so it can be swapped.
-- **Config:** settings come from environment variables via `app/config.py` (pydantic-settings).
-  Never commit secrets; `.env` is gitignored and `.env.example` documents the variables.
-- **External AI calls** (LLM, embeddings) go behind interfaces so tests can mock them. Tests must
-  never call real AI APIs.
-- **Deployment target:** Carolina CloudApps (OpenShift). Images must run as non-root with an
-  arbitrary UID; the frontend prod image is nginx-unprivileged on port 8080.
+  paths through `frontend/src/api/client.ts`. Vite (dev) and nginx (prod) proxy `/api`. Don't
+  hardcode backend URLs or add CORS workarounds.
+- **Database:** PostgreSQL + pgvector, accessed only through SQLAlchemy 2.0. Schema changes go
+  through Alembic migrations, never manual SQL. Any Postgres works through `DATABASE_URL`, with no
+  Supabase SDK or Supabase Auth. Schema design: [docs/database.md](docs/database.md).
+- **Auth:** authentication is separate from authorization. The provider is chosen by
+  `AUTH_PROVIDER` (`mock` now, `shibboleth` later). Roles come from our own `users` table. Routes
+  use `get_current_user()` / `require_role()` and never read cookies or headers directly. Details:
+  [docs/auth.md](docs/auth.md).
+- **Config:** env vars via `app/config.py` (pydantic-settings). Never commit secrets. Document new
+  variables in `.env.example`.
+- **External AI calls** (LLM, embeddings) go behind interfaces with fake implementations. Tests
+  never call real AI APIs. Pipeline design: [docs/rag.md](docs/rag.md).
+- **Deployment:** images must run on OpenShift as non-root with an arbitrary UID; the frontend
+  prod image listens on 8080. The same images run everywhere, configured by env vars. Details:
+  [docs/deployment.md](docs/deployment.md).
 
 ## Git conventions
 
@@ -76,12 +106,3 @@ Run the relevant tests and lint before saying a change is done.
   why. Only trivial changes (typos, formatting) may skip the description.
 - Prefer several focused commits over one large one.
 - Don't push, open PRs or merge unless the user asks.
-
-## Open questions
-
-Update this list as they get answered.
-- Can telemetry (researchers' questions, Onyens) be stored off UNC infrastructure, e.g. in
-  Supabase cloud?
-- Which LLM and embedding providers are approved for UNC use?
-- Exact SSO integration pattern on CloudApps, and the access timeline.
-- Whether the repo must move to a UNC GitHub organization.
