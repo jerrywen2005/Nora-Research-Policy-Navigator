@@ -6,6 +6,7 @@ rules; these files hold the detail. [README.md](../README.md) at the repo root c
 | File | What it covers |
 |---|---|
 | [product.md](product.md) | Clients, the Link, users, product rules and requirements |
+| [api.md](api.md) | API contract: every endpoint's request and response shape |
 | [roadmap.md](roadmap.md) | Milestones, phases, current status and what's next |
 | [decisions.md](decisions.md) | Dated decision log and open questions |
 | [database.md](database.md) | Schema: tables, columns, and why |

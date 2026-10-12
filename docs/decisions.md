@@ -23,6 +23,12 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-10-11: API contract and team split
+[api.md](api.md) and `frontend/src/api/types.ts` define the shapes for auth, topics, documents and
+ask, so backend and frontend can be built in parallel. JSON is snake_case, the session is a cookie,
+and errors are FastAPI's `{"detail": ...}`. The work is split four ways by folder ownership (see
+[roadmap.md](roadmap.md)).
+
 ### 2026-10-11: database schema proposal
 Proposed schema in [database.md](database.md):
 - a single `users.role` column

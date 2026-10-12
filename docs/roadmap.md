@@ -22,6 +22,27 @@ is built and demoed on the local Docker stack, with mock login. See
 
 ## Phase 1: Oct 14 demo
 
+Agree on the shapes in [api.md](api.md) first. The frontend builds against fake data typed with
+`frontend/src/api/types.ts` until the endpoints exist.
+
+Team split (four people; each owns separate folders to avoid merge conflicts):
+
+| # | Task | Owns |
+|---|---|---|
+| 1 | Auth backend | `app/models/user.py`, `app/auth/`, `app/api/auth.py`, `app/schemas/user.py`, `app/seed/users.py`, `app/seed/__main__.py` |
+| 2 | Content and search backend, plus the Ask stretch | `app/models/content.py`, `app/api/{topics,documents,ask}.py`, `app/schemas/content.py`, `app/seed/content.py` |
+| 3 | Frontend shell, sign-in, admin mockup | `src/main.tsx`, `src/App.tsx`, `src/layout/`, `src/theme.css`, `src/auth/`, `src/pages/SignIn*`, `src/pages/admin/` |
+| 4 | Frontend researcher pages | `src/pages/researcher/`, `src/components/` |
+
+Merge order:
+- Person 3's app shell (router, layout, empty routes, the react-router dependency) and person 1's
+  `users` migration merge first.
+- Person 2 then sets their migration's `down_revision` to person 1's revision, so Alembic doesn't
+  end up with two heads.
+- Each backend person adds their own `include_router` line in `app/main.py`.
+- Each person writes the tests for their own code.
+
+
 Workflow 1, mock login with role-based views:
 - [ ] `users` table + migration, seed script with `researcher1` and `admin1`
 - [ ] `POST /api/auth/mock-login`, `POST /api/auth/logout`, `GET /api/me`
