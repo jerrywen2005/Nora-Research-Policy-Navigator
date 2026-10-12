@@ -18,7 +18,12 @@ headers themselves.
 
 ### `mock` (now: local, CI and demos)
 
-- The frontend sign-in page is styled after UNC's Onyen login and takes an Onyen.
+- The frontend sign-in page (`/signin`) takes an Onyen and has "Researcher demo" and "Admin demo"
+  buttons for the seeded accounts. It uses Nora's own UNC-colored theme, is labeled "Demo sign-in.
+  UNC SSO will replace this.", and deliberately doesn't imitate UNC's real Onyen/SSO login page.
+- Until the backend endpoints exist, `VITE_FAKE_AUTH=true` makes the frontend fake them
+  (`frontend/src/auth/fakeAuth.ts`, in memory, `researcher1` and `admin1` only). Delete it once the
+  real endpoints are on dev.
 - `POST /api/auth/mock-login {onyen}` sets a signed, HTTP-only session cookie (secret from
   `SESSION_SECRET`).
 - Unknown Onyens are created as `researcher`.
