@@ -20,9 +20,11 @@ services:
 
   backend:
     build: ./backend
-    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    # Migrate, load the dummy seed data (idempotent), then serve with hot reload.
+    command: sh -c "alembic upgrade head && python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-policy_navigator}
+      AUTH_PROVIDER: mock # sign in as any Onyen; see docs/auth.md
     ports:
       - "8000:8000" # API docs at http://localhost:8000/api/docs
     volumes:
