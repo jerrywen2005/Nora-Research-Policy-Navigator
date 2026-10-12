@@ -35,6 +35,20 @@ backend tests run against real Postgres, inside a transaction that is rolled bac
 Jerry: auth backend. Anton: content and search backend (plus the Ask stretch). Andy: frontend
 shell, sign-in and admin mockup. Adithi: frontend researcher pages.
 
+### 2026-10-12: demo sign-in page doesn't imitate UNC's login
+The mock sign-in page uses Nora's own theme and is labeled "Demo sign-in. UNC SSO will replace
+this." It doesn't copy the look of UNC's real Onyen/SSO page, so the demo can't be mistaken for (or
+used as) a real UNC login. This replaces the earlier plan in [auth.md](auth.md) to style it after
+the Onyen login. A temporary `VITE_FAKE_AUTH` mode lets the frontend run before the backend auth
+endpoints land. (Andy, person 3)
+
+### 2026-10-12: frontend shell
+React Router v7 in declarative mode, one shared `AppLayout` for the researcher and admin areas,
+and plain CSS with UNC colors as variables in `theme.css` (no CSS framework). Navy is used for
+text and links, and Carolina Blue only for accents, because Carolina Blue on white is too low
+contrast to read. Nav items without a page show disabled with a "Soon" tag. See
+[frontend.md](frontend.md). (Andy, person 3)
+
 ### 2026-10-11: API contract and team split
 [api.md](api.md) and `frontend/src/api/types.ts` define the shapes for auth, topics, documents and
 ask, so backend and frontend can be built in parallel. JSON is snake_case, the session is a cookie,

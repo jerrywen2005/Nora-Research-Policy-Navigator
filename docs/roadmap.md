@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** Current as of 2026-10-11. Update the checkboxes and "Now" section as work lands.
+**Status:** Current as of 2026-10-12. Update the checkboxes and "Now" section as work lands.
 
 ## Milestones
 
@@ -45,13 +45,20 @@ Merge order:
 - Anton: import your models in `app/models/__init__.py`, and call `seed_content(session)` from
   `run()` in `app/seed/__init__.py`.
 
+Shared prerequisite:
+- [x] Frontend app shell: react-router, layout, theme, placeholder routes
+  ([frontend.md](frontend.md))
+
 
 Workflow 1, mock login with role-based views:
 - [x] `users` table + migration, seed script with `researcher1` and `admin1` (Jerry)
 - [x] `POST /api/auth/mock-login`, `POST /api/auth/logout`, `GET /api/me` (Jerry)
 - [x] `require_role(Role.ADMIN)` dependency; a researcher calling admin endpoints gets 403 (Jerry)
-- [ ] Frontend: sign-in page → researcher home or admin page (stub) by role; admin routes are
-  guarded
+- [x] Frontend: sign-in page → researcher home or admin page (stub) by role; admin routes are
+  guarded (Andy)
+- [ ] Test the frontend against the real auth endpoints, then delete `src/auth/fakeAuth.ts` and
+  `VITE_FAKE_AUTH` (Andy)
+- [x] Frontend: admin Overview dashboard mockup with sample data (Andy)
 
 Workflow 2, browse topics → search:
 - [ ] `offices`, `topics`, `documents`, `document_topics` tables + migration

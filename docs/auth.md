@@ -1,10 +1,11 @@
 # Authentication and roles
 
-**Status:** The mock provider is **Current** (built 2026-10-12). The Shibboleth provider is
-*Proposed*. UNC SSO access was requested by email to David Cowig; there's no reply yet.
+**Status:** The backend mock provider is **Current** (built 2026-10-12), and so is the
+frontend sign-in. The Shibboleth provider is *Proposed*. UNC SSO access was requested by email to
+David Cowig; there's no reply yet.
 
-Code: `app/auth/` (`get_current_user`, `require_role`, `record_login`), `app/api/auth.py`
-(endpoints), and `app/seed/users.py` (`researcher1`, `admin1`).
+Code: backend `app/auth/` (`get_current_user`, `require_role`, `record_login`), `app/api/auth.py`
+(endpoints) and `app/seed/users.py` (`researcher1`, `admin1`); frontend `src/auth/`.
 
 ## Principle
 
@@ -21,7 +22,11 @@ headers themselves.
 
 ### `mock` (now: local, CI and demos)
 
-- The frontend sign-in page is styled after UNC's Onyen login and takes an Onyen.
+- The frontend sign-in page (`/signin`) takes an Onyen and has "Researcher demo" and "Admin demo"
+  buttons for the seeded accounts. It uses Nora's own UNC-colored theme, is labeled "Demo sign-in.
+  UNC SSO will replace this.", and deliberately doesn't imitate UNC's real Onyen/SSO login page.
+- `VITE_FAKE_AUTH=true` (`frontend/src/auth/fakeAuth.ts`) fakes the endpoints in the frontend. It
+  was needed before the backend existed and should now be deleted.
 - `POST /api/auth/mock-login {onyen}` sets a signed, HTTP-only session cookie named
   `nora_session`. It's signed with `SESSION_SECRET`, lasts 8 hours, is `SameSite=Lax`, and is
   HTTPS-only in production. The cookie stores only the user id; the user and role are re-read
