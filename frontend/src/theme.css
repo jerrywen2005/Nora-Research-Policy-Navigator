@@ -86,3 +86,60 @@ a {
 .skip-link:focus {
   top: var(--space-2);
 }
+
+/* ---- Buttons ---- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-navy);
+  border-radius: var(--radius);
+  background: var(--color-navy);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: #1d3a66;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button--secondary {
+  background: var(--color-bg);
+  color: var(--color-navy);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background: var(--color-accent-soft);
+}
+
+/* ---- Misc ---- */
+
+.loading-screen {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  color: var(--color-text-muted);
+}
+
+/* A small pill label, e.g. a role or "Sample data". */
+.badge {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.6;
+  white-space: nowrap;
+  background: var(--color-accent-soft);
+  color: var(--color-navy);
+}
