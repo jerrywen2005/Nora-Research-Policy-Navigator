@@ -1,0 +1,227 @@
+/* Shared chart styles. Series colors were checked for color-blind separation
+   and contrast against white; Carolina Blue on its own is too light for a
+   data mark, so series 1 is a deeper blue. */
+
+:root {
+  --chart-series-1: #2a78d6;
+  --chart-series-2: #eb6834;
+  --chart-grid: #e6e9ee;
+  --chart-text: var(--color-text-muted);
+}
+
+/* ---- Axes and labels ---- */
+
+.chart-grid line {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.chart-grid text,
+.chart-axis text {
+  fill: var(--chart-text);
+  font-size: 0.75rem;
+}
+
+.chart-label {
+  fill: var(--color-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* ---- Line chart ---- */
+
+.line-chart {
+  position: relative;
+}
+
+.line-chart__line {
+  fill: none;
+  stroke: var(--chart-series-1);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.line-chart__area {
+  fill: var(--chart-series-1);
+  opacity: 0.1;
+}
+
+.line-chart__dot {
+  fill: var(--chart-series-1);
+  stroke: var(--color-bg);
+  stroke-width: 2;
+}
+
+.line-chart__crosshair {
+  stroke: var(--color-text-muted);
+  stroke-width: 1;
+}
+
+.line-chart__hit {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 12px));
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgb(19 41 75 / 0.12);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.chart-tooltip__title {
+  color: var(--color-text-muted);
+}
+
+/* ---- Bar chart ---- */
+
+.bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bar-chart__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 40%) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.875rem;
+}
+
+.bar-chart__track {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.bar-chart__bar {
+  flex: none;
+  height: 16px;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--chart-series-1);
+}
+
+.bar-chart__row:hover .bar-chart__bar {
+  background: #1c5cab;
+}
+
+.bar-chart__value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 30rem) {
+  .bar-chart__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+}
+
+/* ---- Donut chart ---- */
+
+.donut-chart {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.donut-chart svg {
+  flex: none;
+}
+
+.donut-chart__slice {
+  fill: none;
+  transition: stroke-width 0.15s;
+}
+
+.donut-chart__value {
+  fill: var(--color-navy);
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.donut-chart__caption {
+  fill: var(--chart-text);
+  font-size: 0.8125rem;
+}
+
+.chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.chart-legend__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-2);
+  align-items: center;
+}
+
+.chart-legend__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.chart-legend__item.is-active .chart-legend__label {
+  font-weight: 600;
+}
+
+.chart-legend__value {
+  grid-column: 2;
+  color: var(--color-text-muted);
+}
+
+/* ---- Data table toggle ---- */
+
+.chart-data {
+  margin-top: var(--space-4);
+  font-size: 0.875rem;
+}
+
+.chart-data summary {
+  color: var(--color-link);
+  cursor: pointer;
+}
+
+.chart-data table {
+  margin-top: var(--space-2);
+  border-collapse: collapse;
+}
+
+.chart-data caption {
+  text-align: left;
+  color: var(--color-text-muted);
+}
+
+.chart-data th,
+.chart-data td {
+  padding: var(--space-1) var(--space-4) var(--space-1) 0;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.chart-data td:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
