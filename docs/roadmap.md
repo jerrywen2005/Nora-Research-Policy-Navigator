@@ -29,10 +29,10 @@ Team split (four people; each owns separate folders to avoid merge conflicts):
 
 | # | Task | Owns |
 |---|---|---|
-| 1 | Auth backend | `app/models/user.py`, `app/auth/`, `app/api/auth.py`, `app/schemas/user.py`, `app/seed/users.py`, `app/seed/__main__.py` |
-| 2 | Content and search backend, plus the Ask stretch | `app/models/content.py`, `app/api/{topics,documents,ask}.py`, `app/schemas/content.py`, `app/seed/content.py` |
-| 3 | Frontend shell, sign-in, admin mockup | `src/main.tsx`, `src/App.tsx`, `src/layout/`, `src/theme.css`, `src/auth/`, `src/pages/SignIn*`, `src/pages/admin/` |
-| 4 | Frontend researcher pages | `src/pages/researcher/`, `src/components/` |
+| 1 | Auth backend (**Jerry**) | `app/models/user.py`, `app/auth/`, `app/api/auth.py`, `app/schemas/user.py`, `app/seed/users.py`, `app/seed/__main__.py` |
+| 2 | Content and search backend, plus the Ask stretch (**Anton**) | `app/models/content.py`, `app/api/{topics,documents,ask}.py`, `app/schemas/content.py`, `app/seed/content.py` |
+| 3 | Frontend shell, sign-in, admin mockup (**Andy**) | `src/main.tsx`, `src/App.tsx`, `src/layout/`, `src/theme.css`, `src/auth/`, `src/pages/SignIn*`, `src/pages/admin/` |
+| 4 | Frontend researcher pages (**Adithi**) | `src/pages/researcher/`, `src/components/` |
 
 Merge order:
 - Person 3's app shell (router, layout, empty routes, the react-router dependency) and person 1's
@@ -40,13 +40,16 @@ Merge order:
 - Person 2 then sets their migration's `down_revision` to person 1's revision, so Alembic doesn't
   end up with two heads.
 - Each backend person adds their own `include_router` line in `app/main.py`.
-- Each person writes the tests for their own code.
+- Each person writes the tests for their own code. Backend tests share the fixtures in
+  `backend/tests/conftest.py` (`db_session`, `client`, `make_user`, `login`).
+- Anton: import your models in `app/models/__init__.py`, and call `seed_content(session)` from
+  `run()` in `app/seed/__init__.py`.
 
 
 Workflow 1, mock login with role-based views:
-- [ ] `users` table + migration, seed script with `researcher1` and `admin1`
-- [ ] `POST /api/auth/mock-login`, `POST /api/auth/logout`, `GET /api/me`
-- [ ] `require_role("admin")` dependency; a researcher calling admin endpoints gets 403
+- [x] `users` table + migration, seed script with `researcher1` and `admin1` (Jerry)
+- [x] `POST /api/auth/mock-login`, `POST /api/auth/logout`, `GET /api/me` (Jerry)
+- [x] `require_role(Role.ADMIN)` dependency; a researcher calling admin endpoints gets 403 (Jerry)
 - [ ] Frontend: sign-in page → researcher home or admin page (stub) by role; admin routes are
   guarded
 

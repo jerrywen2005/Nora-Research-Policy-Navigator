@@ -11,7 +11,8 @@ an open question is answered, move it into the log.
 - **AI providers:** which LLM and embedding providers are approved for UNC use? This determines the
   embedding dimension in `document_chunks`. *(clients / ITS)*
 - **SSO:** the integration pattern on CloudApps, which attributes come through (Onyen/eppn, name,
-  email, affiliation), and the access timeline. *(David Cowig)*
+  email, affiliation), and the access timeline. *(David Cowig; emailed 2026-10-12, awaiting
+  reply)*
 - **OKD:** Postgres + pgvector availability, outbound API access, image registry, hostname,
   secrets. *(ITS)*
 - **Repo:** must the repo move to a UNC GitHub organization? *(coach / ITS)*
@@ -22,6 +23,17 @@ an open question is answered, move it into the log.
 - **Answer standards:** the exact disclaimer wording and the confidence/referral criteria. *(Link)*
 
 ## Log
+
+### 2026-10-12: mock auth built; SSO request sent
+Jerry emailed David Cowig to request UNC SSO access; there's no reply yet. Mock auth is
+implemented: a signed session cookie holding only the user id, and role re-read from the
+database on every request. Production refuses mock auth and the default session secret. The
+backend tests run against real Postgres, inside a transaction that is rolled back after each test
+(`tests/conftest.py`).
+
+### 2026-10-12: Oct 14 task owners
+Jerry: auth backend. Anton: content and search backend (plus the Ask stretch). Andy: frontend
+shell, sign-in and admin mockup. Adithi: frontend researcher pages.
 
 ### 2026-10-11: API contract and team split
 [api.md](api.md) and `frontend/src/api/types.ts` define the shapes for auth, topics, documents and

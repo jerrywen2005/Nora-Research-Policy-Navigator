@@ -70,7 +70,10 @@ The Python venv is at the **repo root** (`.venv`), not in `backend/`. Use `.venv
 activated venv; run backend commands from `backend/`.
 
 - Full stack: `docker compose up --build` (app on 5173, API on 8000, Postgres on 5432)
-- Backend tests: `cd backend && pytest`. Coverage must stay at **100%**; CI fails otherwise.
+- Backend tests: `cd backend && pytest`. They need Postgres running (`docker compose up -d db`)
+  and migrate it themselves. Coverage must stay at **100%**; CI fails otherwise.
+- Seed dummy data: `cd backend && python -m app.seed` (docker compose does this on startup). Sign
+  in as `researcher1` or `admin1`.
 - Backend lint: `cd backend && ruff check . && ruff format --check .`
 - Frontend: `cd frontend && npm run lint && npm run build` (the build includes the type-check)
 - New migration: `cd backend && alembic revision --autogenerate -m "..."`, then review the file.

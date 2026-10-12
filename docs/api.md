@@ -1,6 +1,7 @@
 # API contract
 
-**Status:** Agreed shapes for the Oct 14 demo (2026-10-11). Not yet implemented.
+**Status:** Agreed shapes for the Oct 14 demo (2026-10-11). The **Auth** endpoints are
+implemented (2026-10-12); the rest are not yet.
 
 This is the agreement between backend and frontend about what each endpoint accepts and returns.
 The same shapes appear in three places, and they must change together in the same PR:
