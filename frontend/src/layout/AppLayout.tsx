@@ -1,6 +1,7 @@
-import { Link, Outlet } from 'react-router'
+import { Outlet } from 'react-router'
 import AppHeader from './AppHeader'
 import SideNav from './SideNav'
+import UserMenu from './UserMenu'
 import type { NavItem } from './navItems'
 import './layout.css'
 
@@ -17,8 +18,7 @@ export default function AppLayout({ navLabel, nav }: AppLayoutProps) {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      {/* Placeholder until sign-in lands; the auth work replaces it with the user menu. */}
-      <AppHeader userMenu={<Link to="/signin">Sign in</Link>} />
+      <AppHeader userMenu={<UserMenu />} />
       <div className="app-body">
         <SideNav label={navLabel} items={nav} />
         <main id="main" className="app-main">
