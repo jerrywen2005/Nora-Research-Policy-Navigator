@@ -1,6 +1,7 @@
 # Frontend
 
-**Status:** Current as of 2026-10-12. The app shell is built; pages are placeholders.
+**Status:** Current as of 2026-10-12. Shell, sign-in and the admin Overview mockup are built;
+researcher pages are placeholders.
 
 React + TypeScript + Vite, with React Router v7 in declarative mode (`<BrowserRouter>` +
 `<Routes>`). API calls go through `src/api/client.ts` (see [api.md](api.md)).
@@ -12,7 +13,7 @@ src/main.tsx        BrowserRouter, loads theme.css
 src/App.tsx         every route
 src/theme.css       UNC colors and spacing as CSS variables, base element styles
 src/layout/         AppLayout (header + sidebar + page), AppHeader, SideNav, navItems.ts, NotFound
-src/auth/           sign-in state and route guards (not built yet)
+src/auth/           AuthProvider/useAuth, RequireAuth, RequireRole, temporary fakeAuth.ts
 src/pages/SignIn*   sign-in page
 src/pages/admin/    admin pages
 src/pages/researcher/  researcher pages
@@ -34,7 +35,27 @@ src/components/     shared components for the researcher pages
 | anything else | `layout/NotFound` | inside the area it falls under |
 
 Researcher and admin pages render inside `AppLayout`, which takes the nav items for its area.
-Admin routes aren't guarded yet; that comes with sign-in.
+Every route except `/signin` sits under `RequireAuth`, and `/admin` also under
+`RequireRole role="admin"`.
+
+## Auth
+
+- `useAuth()` gives `user`, `loading`, `signIn(onyen)` and `signOut()`. `AuthProvider` calls
+  `GET /api/me` once on load; a 401 means signed out.
+- Signed-out users are sent to `/signin` with the page they wanted in router state, and go back
+  there after signing in. Otherwise admins land on `/admin` and researchers on `/`.
+- `RequireRole` only hides UI. The backend's `require_role()` is what enforces access.
+- **Temporary:** `VITE_FAKE_AUTH=true` swaps the API calls for `src/auth/fakeAuth.ts`
+  (`researcher1` and `admin1`, session in memory, so a reload signs you out). Run it with
+  `VITE_FAKE_AUTH=true npm run dev`, or set it in `.env` for docker compose. Once the backend
+  endpoints are on dev, delete that file and its import in `AuthProvider.tsx`.
+
+## Admin Overview
+
+`src/pages/admin/AdminOverview.tsx` is a mockup. All of its numbers are in `sampleData.ts`, and the
+page shows a "Sample data" badge. The charts in `src/pages/admin/charts/` are plain SVG/CSS (no
+chart library). Their series colors are `--chart-series-1`/`-2` in `charts.css`; they passed a
+color-blind and contrast check, which Carolina Blue on its own doesn't.
 
 ## Navigation
 

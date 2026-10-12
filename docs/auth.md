@@ -1,6 +1,6 @@
 # Authentication and roles
 
-**Status:** Proposed 2026-10-11. Not yet built. UNC SSO access has been requested but not granted
+**Status:** Proposed 2026-10-11. Frontend built 2026-10-12 (running on fake auth); backend not yet built. UNC SSO access has been requested but not granted
 (contact: David Cowig).
 
 ## Principle

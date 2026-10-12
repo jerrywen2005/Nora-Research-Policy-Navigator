@@ -51,8 +51,10 @@ Workflow 1, mock login with role-based views:
 - [ ] `users` table + migration, seed script with `researcher1` and `admin1`
 - [ ] `POST /api/auth/mock-login`, `POST /api/auth/logout`, `GET /api/me`
 - [ ] `require_role("admin")` dependency; a researcher calling admin endpoints gets 403
-- [ ] Frontend: sign-in page → researcher home or admin page (stub) by role; admin routes are
-  guarded
+- [x] Frontend: sign-in page → researcher home or admin page (stub) by role; admin routes are
+  guarded. Runs on `VITE_FAKE_AUTH=true` until the backend endpoints land; then test against them
+  and delete `src/auth/fakeAuth.ts`.
+- [x] Frontend: admin Overview dashboard mockup with sample data
 
 Workflow 2, browse topics → search:
 - [ ] `offices`, `topics`, `documents`, `document_topics` tables + migration
