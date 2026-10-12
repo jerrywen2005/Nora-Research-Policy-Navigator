@@ -7,6 +7,8 @@ with citations. UNC Research staff use an admin portal to manage content and see
 Built for COMP 523 with the UNC Office of the Vice Chancellor for Research (Research Compliance
 Services).
 
+Design docs, the roadmap and the decision log are in [docs/](docs/README.md).
+
 ## Stack
 
 | Layer | Tech |
