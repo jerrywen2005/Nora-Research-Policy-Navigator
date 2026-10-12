@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** Current as of 2026-10-11. Update the checkboxes and "Now" section as work lands.
+**Status:** Current as of 2026-10-12. Update the checkboxes and "Now" section as work lands.
 
 ## Milestones
 
@@ -41,6 +41,10 @@ Merge order:
   end up with two heads.
 - Each backend person adds their own `include_router` line in `app/main.py`.
 - Each person writes the tests for their own code.
+
+Shared prerequisite:
+- [x] Frontend app shell: react-router, layout, theme, placeholder routes
+  ([frontend.md](frontend.md))
 
 
 Workflow 1, mock login with role-based views:

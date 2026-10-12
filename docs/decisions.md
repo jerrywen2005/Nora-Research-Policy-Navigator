@@ -23,6 +23,13 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-10-12: frontend shell
+React Router v7 in declarative mode, one shared `AppLayout` for the researcher and admin areas,
+and plain CSS with UNC colors as variables in `theme.css` (no CSS framework). Navy is used for
+text and links, and Carolina Blue only for accents, because Carolina Blue on white is too low
+contrast to read. Nav items without a page show disabled with a "Soon" tag. See
+[frontend.md](frontend.md). (Andy, person 3)
+
 ### 2026-10-11: API contract and team split
 [api.md](api.md) and `frontend/src/api/types.ts` define the shapes for auth, topics, documents and
 ask, so backend and frontend can be built in parallel. JSON is snake_case, the session is a cookie,
