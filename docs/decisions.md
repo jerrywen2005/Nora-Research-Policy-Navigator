@@ -24,6 +24,14 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-10-12: admins are one in-app list
+There is one admin list that admins (Jeanne, to start) edit from the Users & Roles page; everyone
+else is a researcher. The list is `users.role = 'admin'`. Admins can be added by Onyen before that
+person's first sign-in. The last admin can't be removed. `ADMIN_ONYENS` only bootstraps the first
+admin on a new deployment. Design: [auth.md](auth.md#admins); endpoints:
+[api.md](api.md#admin-managing-admins-proposed-not-built). Not built yet; planned for the admin
+portal phase. (Jerry)
+
 ### 2026-10-12: frontend fake auth removed
 The real auth endpoints are on dev, so `frontend/src/auth/fakeAuth.ts` and `VITE_FAKE_AUTH` are
 deleted. Sign-in always goes through the backend. This was cleanup, not a security fix: the fake

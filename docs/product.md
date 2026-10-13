@@ -61,7 +61,8 @@ Admins (UNC Research staff) manage the knowledge base and see analytics on what 
 7. Most frequently accessed or cited resources
 8. Downloadable data and analytics (export)
 
-It also includes content management: add, review, update and archive policies, guidance, FAQs,
+Admins are a single list that admins (Jeanne, to start) maintain in the app; everyone else is
+a researcher. It also includes content management: add, review, update and archive policies, guidance, FAQs,
 topics and other sources.
 
 ## Evaluation
