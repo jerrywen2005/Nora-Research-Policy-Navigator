@@ -9,6 +9,7 @@ const authApi = fakeAuthEnabled ? fakeAuthApi : realAuthApi
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [signedOut, setSignedOut] = useState(false)
 
   useEffect(() => {
     // 401 means signed out. Any other failure (backend down, 500) is treated
@@ -23,6 +24,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = useCallback(async (onyen: string) => {
     const signedIn = await authApi.mockLogin(onyen)
     setUser(signedIn)
+    setSignedOut(false)
     return signedIn
   }, [])
 
@@ -31,12 +33,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
       await authApi.logout()
     } finally {
       setUser(null)
+      setSignedOut(true)
     }
   }, [])
 
   const value = useMemo<AuthState>(
-    () => ({ user, loading, signIn, signOut }),
-    [user, loading, signIn, signOut],
+    () => ({ user, loading, signedOut, signIn, signOut }),
+    [user, loading, signedOut, signIn, signOut],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
