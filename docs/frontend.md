@@ -13,7 +13,7 @@ src/main.tsx        BrowserRouter, loads theme.css
 src/App.tsx         every route
 src/theme.css       UNC colors and spacing as CSS variables, base element styles
 src/layout/         AppLayout (header + sidebar + page), AppHeader, SideNav, navItems.ts, NotFound
-src/auth/           AuthProvider/useAuth, RequireAuth, RequireRole, temporary fakeAuth.ts
+src/auth/           AuthProvider/useAuth, RequireAuth, RequireRole, authApi.ts (the auth calls)
 src/pages/SignIn*   sign-in page
 src/pages/admin/    admin pages
 src/pages/researcher/  researcher pages
@@ -45,10 +45,8 @@ Every route except `/signin` sits under `RequireAuth`, and `/admin` also under
 - Signed-out users are sent to `/signin` with the page they wanted in router state, and go back
   there after signing in. Otherwise admins land on `/admin` and researchers on `/`.
 - `RequireRole` only hides UI. The backend's `require_role()` is what enforces access.
-- **Temporary:** `VITE_FAKE_AUTH=true` swaps the API calls for `src/auth/fakeAuth.ts`
-  (`researcher1` and `admin1`, session in memory, so a reload signs you out). Run it with
-  `VITE_FAKE_AUTH=true npm run dev`, or set it in `.env` for docker compose. Once the backend
-  endpoints are on dev, delete that file and its import in `AuthProvider.tsx`.
+- Sign-in always uses the real backend. Run the full stack (`docker compose up`) and sign in as
+  `researcher1` or `admin1`. The temporary frontend-only fake auth was removed on 2026-10-12.
 
 ## Admin Overview
 

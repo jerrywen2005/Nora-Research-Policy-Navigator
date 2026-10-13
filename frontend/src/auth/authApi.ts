@@ -1,5 +1,4 @@
-// The three auth calls from docs/api.md, behind one interface so the
-// temporary fake (fakeAuth.ts) can stand in for them.
+// The three auth calls from docs/api.md (backend: app/api/auth.py).
 import { apiGet, apiPost } from '../api/client'
 import type { MockLoginRequest, User } from '../api/types'
 
@@ -9,7 +8,7 @@ export interface AuthApi {
   logout(): Promise<void>
 }
 
-export const realAuthApi: AuthApi = {
+export const authApi: AuthApi = {
   me: () => apiGet<User>('/me'),
   mockLogin: (onyen) => apiPost<User>('/auth/mock-login', { onyen } satisfies MockLoginRequest),
   logout: () => apiPost<void>('/auth/logout'),

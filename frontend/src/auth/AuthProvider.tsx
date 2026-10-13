@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { User } from '../api/types'
 import { AuthContext, type AuthState } from './AuthContext'
-import { realAuthApi } from './authApi'
-import { fakeAuthApi, fakeAuthEnabled } from './fakeAuth'
-
-const authApi = fakeAuthEnabled ? fakeAuthApi : realAuthApi
+import { authApi } from './authApi'
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)

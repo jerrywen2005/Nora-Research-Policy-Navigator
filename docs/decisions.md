@@ -24,6 +24,11 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-10-12: frontend fake auth removed
+The real auth endpoints are on dev, so `frontend/src/auth/fakeAuth.ts` and `VITE_FAKE_AUTH` are
+deleted. Sign-in always goes through the backend. This was cleanup, not a security fix: the fake
+only changed what the browser showed, and the backend has always enforced sessions and roles.
+
 ### 2026-10-12: mock auth built; SSO request sent
 Jerry emailed David Cowig to request UNC SSO access; there's no reply yet. Mock auth is
 implemented: a signed session cookie holding only the user id, and role re-read from the
