@@ -1,7 +1,8 @@
 # API contract
 
 **Status:** Agreed shapes for the Oct 14 demo (2026-10-11). The **Auth** endpoints are
-implemented (2026-10-12); the rest are not yet.
+implemented (2026-10-12), and so are **Topics** and **Documents** (2026-10-13); the rest are not
+yet.
 
 This is the agreement between backend and frontend about what each endpoint accepts and returns.
 The same shapes appear in three places, and they must change together in the same PR:
@@ -63,6 +64,8 @@ decide which view to show.
 
 ## Topics
 
+Topics and documents require sign-in (any role); signed out, they return `401`.
+
 ### `GET /api/topics`
 Response `200`: a list of [Topic](#topic) for the active topics, ordered for display.
 
@@ -116,7 +119,11 @@ Query parameters, all optional:
 | `limit` | default 20, max 100 |
 | `offset` | default 0 |
 
-With `q`, results are ordered by relevance; without it, by title.
+With `q`, results are ordered by relevance (title matches rank above summary matches, which rank
+above body matches); without it, by title. `q` uses web-search syntax: every word must match
+(with stemming, so "exemptions" finds "exempt"), `"quoted phrases"` match in order, `or` gives
+alternatives and `-word` excludes. A blank `q` is ignored. An unknown `topic` returns no results,
+not `404`.
 
 Response `200`:
 ```json

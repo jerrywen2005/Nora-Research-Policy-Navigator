@@ -61,9 +61,13 @@ Workflow 1, mock login with role-based views:
 - [x] Frontend: admin Overview dashboard mockup with sample data (Andy)
 
 Workflow 2, browse topics → search:
-- [ ] `offices`, `topics`, `documents`, `document_topics` tables + migration
-- [ ] Seed: the 9 categories and about 15 short public policy excerpts with citations and URLs
-- [ ] `GET /api/topics`, `GET /api/documents?topic=&q=` (Postgres full-text search)
+- [x] `offices`, `topics`, `documents`, `document_topics` tables + migration (Anton)
+- [x] Seed: the 9 categories and 16 real public policies from the
+  [UNC Policies Research knowledge base](https://policies.unc.edu/TDClient/2833/Portal/KB/Category/21680/Research),
+  full text, with source URLs and the responsible offices' public contacts (Anton). The
+  documents are in `backend/app/seed/data/research_policies.json`.
+- [x] `GET /api/topics`, `GET /api/topics/{slug}`, `GET /api/documents?topic=&q=` (Postgres
+  full-text search) and `GET /api/documents/{id}` (Anton)
 - [ ] Frontend: researcher home with Browse / Search / Ask given equal weight; topic cards →
   document list; search box; each result shows its citation and source link
   - Built and routed on fake data (Home, Browse, Topic, Search and Ask pages; see
