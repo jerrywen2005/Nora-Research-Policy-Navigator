@@ -1,7 +1,8 @@
 # Frontend
 
-**Status:** Current as of 2026-10-12. Shell, sign-in and the admin Overview mockup are built.
-Researcher pages are built on fake data; `DocumentPage` is still a placeholder.
+**Status:** Current as of 2026-10-13. Shell, sign-in and the admin Overview mockup are built.
+Researcher Browse, Topic and Search pages use the real API; Ask still uses fake data, and
+`DocumentPage` is still a placeholder.
 
 React + TypeScript + Vite, with React Router v7 in declarative mode (`<BrowserRouter>` +
 `<Routes>`). API calls go through `src/api/client.ts` (see [api.md](api.md)).
@@ -64,9 +65,9 @@ Browse, Search and Ask cards that link to `/browse`, `/search` and `/ask`, plus 
 panel, the topic grid and a right rail. Search keeps its query in the URL (`/search?q=`).
 
 - **Data:** pages get data only through `researcherApi.ts`, which has one function per endpoint in
-  [api.md](api.md). Until the backend endpoints exist, those functions return `fakeData.ts`;
-  each has a comment with the `apiGet`/`apiPost` call that replaces it. Then delete
-  `fakeData.ts`.
+  [api.md](api.md). `getTopics`, `getTopic` and `getDocuments` call the real API. `ask()` still
+  returns `fakeData.ts` until `POST /api/ask` exists; then replace its body with the `apiPost`
+  call in its comment and delete `fakeData.ts`.
 - **Ask:** `components/AnswerCard.tsx` renders every `AskResponse` outcome (answer with `[n]`
   citations, sources only, referral) and always shows the disclaimer.
 - **Styles:** `components/components.css` defines `--rp-*` tokens on `.researcher`, mapped onto
