@@ -56,8 +56,8 @@ Workflow 1, mock login with role-based views:
 - [x] `require_role(Role.ADMIN)` dependency; a researcher calling admin endpoints gets 403 (Jerry)
 - [x] Frontend: sign-in page → researcher home or admin page (stub) by role; admin routes are
   guarded (Andy)
-- [ ] Test the frontend against the real auth endpoints, then delete `src/auth/fakeAuth.ts` and
-  `VITE_FAKE_AUTH` (Andy)
+- [x] Test the frontend against the real auth endpoints, then delete `src/auth/fakeAuth.ts` and
+  `VITE_FAKE_AUTH`
 - [x] Frontend: admin Overview dashboard mockup with sample data (Andy)
 
 Workflow 2, browse topics → search:
