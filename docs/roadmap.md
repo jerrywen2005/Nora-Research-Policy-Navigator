@@ -66,6 +66,9 @@ Workflow 2, browse topics → search:
 - [ ] `GET /api/topics`, `GET /api/documents?topic=&q=` (Postgres full-text search)
 - [ ] Frontend: researcher home with Browse / Search / Ask given equal weight; topic cards →
   document list; search box; each result shows its citation and source link
+  - Built and routed on fake data (Home, Browse, Topic, Search and Ask pages; see
+    [frontend.md](frontend.md#researcher-pages)). Still to do: swap the bodies in
+    `researcherApi.ts` for real calls once the endpoints land, then delete `fakeData.ts`.
 
 Stretch, ask:
 - [ ] `POST /api/ask` level 2: keyword retrieval, return the top sources, or a referral to the

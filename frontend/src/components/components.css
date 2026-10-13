@@ -1,0 +1,359 @@
+/* Styles for the researcher components. The --rp-* tokens map onto the app theme (src/theme.css);
+   the few colors the theme doesn't have are defined here. .button and .badge come from theme.css. */
+.researcher {
+  --rp-navy: var(--color-navy);
+  --rp-blue: var(--color-carolina-blue);
+  --rp-text: var(--color-text);
+  --rp-muted: var(--color-text-muted);
+  --rp-bg: var(--color-bg-subtle);
+  --rp-surface: var(--color-bg);
+  --rp-border: var(--color-border);
+  --rp-accent: var(--color-link);
+  --rp-browse: var(--color-accent-soft);
+  --rp-search: #e6f4ee;
+  --rp-ask: #efeafb;
+  --rp-success: #1f7a4d;
+  --rp-success-bg: #eef8f2;
+  --rp-warning: #9a5b00;
+  --rp-radius: 12px;
+}
+
+.researcher a svg,
+.researcher button svg {
+  vertical-align: -0.15em;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- Links and small pieces ---- */
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.chip {
+  padding: 0.35rem 0.8rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--rp-accent);
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.chip:hover:not(:disabled) {
+  border-color: var(--rp-blue);
+  background: var(--rp-browse);
+}
+
+.badge--authoritative {
+  color: var(--rp-success);
+  background: var(--rp-success-bg);
+}
+
+/* ---- Action cards ---- */
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-radius);
+}
+
+.action-card--browse {
+  background: var(--rp-browse);
+}
+
+.action-card--search {
+  background: var(--rp-search);
+}
+
+.action-card--ask {
+  background: var(--rp-ask);
+}
+
+.action-card__icon {
+  color: var(--rp-accent);
+}
+
+.action-card__title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.action-card__description {
+  flex: 1;
+  margin: 0 0 0.5rem;
+  color: var(--rp-muted);
+  font-size: 0.9rem;
+}
+
+/* ---- Topic grid ---- */
+
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topic-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  padding: 1rem 0.5rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--rp-text);
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-radius);
+  cursor: pointer;
+}
+
+.topic-tile:hover {
+  border-color: var(--rp-accent);
+}
+
+.topic-tile__icon {
+  color: var(--rp-accent);
+}
+
+/* ---- Search bar ---- */
+
+.search-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.35rem 0.35rem 0.35rem 1rem;
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: 999px;
+}
+
+.search-bar:focus-within {
+  border-color: var(--rp-accent);
+  outline: 2px solid color-mix(in srgb, var(--rp-blue) 40%, transparent);
+}
+
+.search-bar input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.search-bar__submit {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #fff;
+  background: var(--rp-navy);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.search-bar__submit:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+/* ---- Ask panel ---- */
+
+.ask-panel__note {
+  margin: 0.4rem 0 1rem 1rem;
+  font-size: 0.8rem;
+  color: var(--rp-muted);
+}
+
+.ask-panel__examples-label {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.ask-panel__examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---- Answer card ---- */
+
+.answer-card {
+  padding: 1.25rem;
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-left: 4px solid var(--rp-success);
+  border-radius: var(--rp-radius);
+}
+
+.answer-card--referred {
+  border-left-color: var(--rp-warning);
+}
+
+.answer-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  color: var(--rp-success);
+}
+
+.answer-card--referred .answer-card__heading {
+  color: var(--rp-warning);
+}
+
+.answer-card__text {
+  margin: 0 0 1rem;
+}
+
+.answer-card__text sup a {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.answer-card__label {
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.answer-card__sources {
+  margin: 0 0 1rem;
+  padding-left: 1.4rem;
+}
+
+.answer-card__sources li + li {
+  margin-top: 0.5rem;
+}
+
+.answer-card__sources li:target {
+  background: color-mix(in srgb, var(--rp-blue) 15%, transparent);
+}
+
+.answer-card__section,
+.answer-card__snippet {
+  color: var(--rp-muted);
+  font-size: 0.9rem;
+}
+
+.answer-card__snippet {
+  margin: 0.2rem 0 0;
+}
+
+.answer-card__disclaimer {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--rp-muted);
+  background: var(--rp-bg);
+  border-radius: 8px;
+}
+
+.answer-card__disclaimer svg {
+  flex: none;
+  margin-top: 0.15rem;
+}
+
+/* ---- Office contact ---- */
+
+.office-contact {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--rp-bg);
+  border-radius: 8px;
+}
+
+.office-contact__icon {
+  color: var(--rp-accent);
+}
+
+.office-contact__name {
+  margin: 0 0 0.2rem;
+  font-weight: 600;
+}
+
+.office-contact__details {
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+  list-style: none;
+}
+
+/* ---- Result card ---- */
+
+.result-card {
+  padding: 1rem 1.25rem;
+  background: var(--rp-surface);
+  border: 1px solid var(--rp-border);
+  border-radius: var(--rp-radius);
+}
+
+.result-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.result-card__citation {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--rp-muted);
+}
+
+.result-card__title {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.result-card__summary {
+  margin: 0 0 0.5rem;
+}
+
+.result-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--rp-muted);
+}

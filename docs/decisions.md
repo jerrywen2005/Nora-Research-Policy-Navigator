@@ -21,6 +21,11 @@ an open question is answered, move it into the log.
 - **Referrals:** which office handles which topic, and what contact details should be shown?
   *(Link)*
 - **Answer standards:** the exact disclaimer wording and the confidence/referral criteria. *(Link)*
+- **Researcher home mockup:** the mockup puts a large inline Ask panel and answer below the three
+  Browse/Search/Ask cards, which gives Ask more weight than the "equal prominence" rule allows.
+  Is that intended? The mockup also has no disclaimer on its answer; we show one anyway. Its
+  feedback buttons, Related Resources, Announcements and FAQs have no endpoints yet. The 9 topic
+  names currently come from the mockup. *(Link)*
 
 ## Log
 

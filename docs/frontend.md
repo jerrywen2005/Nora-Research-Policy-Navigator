@@ -1,7 +1,7 @@
 # Frontend
 
-**Status:** Current as of 2026-10-12. Shell, sign-in and the admin Overview mockup are built;
-researcher pages are placeholders.
+**Status:** Current as of 2026-10-12. Shell, sign-in and the admin Overview mockup are built.
+Researcher pages are built on fake data; `DocumentPage` is still a placeholder.
 
 React + TypeScript + Vite, with React Router v7 in declarative mode (`<BrowserRouter>` +
 `<Routes>`). API calls go through `src/api/client.ts` (see [api.md](api.md)).
@@ -56,6 +56,22 @@ Every route except `/signin` sits under `RequireAuth`, and `/admin` also under
 page shows a "Sample data" badge. The charts in `src/pages/admin/charts/` are plain SVG/CSS (no
 chart library). Their series colors are `--chart-series-1`/`-2` in `charts.css`; they passed a
 color-blind and contrast check, which Carolina Blue on its own doesn't.
+
+## Researcher pages
+
+The pages in `src/pages/researcher/` follow the client mockup. The home page has equal-weight
+Browse, Search and Ask cards that link to `/browse`, `/search` and `/ask`, plus an inline ask
+panel, the topic grid and a right rail. Search keeps its query in the URL (`/search?q=`).
+
+- **Data:** pages get data only through `researcherApi.ts`, which has one function per endpoint in
+  [api.md](api.md). Until the backend endpoints exist, those functions return `fakeData.ts`;
+  each has a comment with the `apiGet`/`apiPost` call that replaces it. Then delete
+  `fakeData.ts`.
+- **Ask:** `components/AnswerCard.tsx` renders every `AskResponse` outcome (answer with `[n]`
+  citations, sources only, referral) and always shows the disclaimer.
+- **Styles:** `components/components.css` defines `--rp-*` tokens on `.researcher`, mapped onto
+  `theme.css`, and uses the theme's `.button` and `.badge`.
+- Topic icons are picked by slug in `components/topicIcon.ts`, since the API has no icon field.
 
 ## Navigation
 
