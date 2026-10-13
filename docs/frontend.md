@@ -43,7 +43,9 @@ Every route except `/signin` sits under `RequireAuth`, and `/admin` also under
 - `useAuth()` gives `user`, `loading`, `signIn(onyen)` and `signOut()`. `AuthProvider` calls
   `GET /api/me` once on load; a 401 means signed out.
 - Signed-out users are sent to `/signin` with the page they wanted in router state, and go back
-  there after signing in. Otherwise admins land on `/admin` and researchers on `/`.
+  there after signing in. Otherwise admins land on `/admin` and researchers on `/`. After an
+  explicit sign-out (`signedOut` in `useAuth()`), the page isn't remembered, so the next person
+  lands on their own home page instead of the previous user's page.
 - `RequireRole` only hides UI. The backend's `require_role()` is what enforces access.
 - Sign-in always uses the real backend. Run the full stack (`docker compose up`) and sign in as
   `researcher1` or `admin1`. The temporary frontend-only fake auth was removed on 2026-10-12.

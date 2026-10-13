@@ -6,6 +6,9 @@ export interface AuthState {
   user: User | null
   // True until the first GET /api/me finishes.
   loading: boolean
+  // True after the user clicks Sign out, until the next sign-in. Route guards
+  // use it so the next person isn't sent back to the previous user's page.
+  signedOut: boolean
   // Throws ApiError if sign-in fails; its `detail` is the message to show.
   signIn(onyen: string): Promise<User>
   signOut(): Promise<void>
