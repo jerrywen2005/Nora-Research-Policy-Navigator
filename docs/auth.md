@@ -52,10 +52,21 @@ headers themselves.
 
 ## Admins
 
+**Rule (decided 2026-10-12):** there is one admin list, and admins (Jeanne, to start) maintain it
+in the app. Everyone not on it is a researcher.
+
 - New users default to `researcher`.
-- For now, admins come from the seed script. Later, existing admins can grant the role from the
-  Users & Roles admin page. An `ADMIN_ONYENS` env list for bootstrapping production admins is a
-  possible addition, not yet built.
+- **The list is the database:** the users whose `role = 'admin'`. There's no separate admin table.
+- **Editing it** *(Proposed, not built)*: the Users & Roles admin page lists admins and lets an
+  admin add one by Onyen or remove one.
+  - Adding an Onyen that has never signed in creates their `users` row as an admin ahead of time,
+    so their first sign-in already shows the admin view.
+  - Removing an admin sets them back to `researcher`; their account stays.
+  - The last remaining admin can't be removed (409), so the app can't be locked out.
+- **Bootstrap** *(Proposed, not built)*: an `ADMIN_ONYENS` setting (comma-separated) makes those
+  Onyens admins when they sign in. It's only for getting the first admin (Jeanne) onto a fresh
+  deployment; after that, the list is managed in the app. Locally, the seed script's `admin1`
+  plays this role.
 - Admin-only routes live under `/api/admin/*` and use
   `Depends(require_role(Role.ADMIN))`. Disabled users (`is_active = false`) get 401.
 - The frontend hides admin UI for researchers, but the backend check is what enforces access.

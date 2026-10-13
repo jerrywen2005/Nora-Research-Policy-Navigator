@@ -90,6 +90,9 @@ Stretch, ask:
 
 ## Phase 4: Nov 20 – end of November, admin portal
 
+- [ ] Users & Roles: admin list editable in the app, plus the `ADMIN_ONYENS` bootstrap
+  ([auth.md](auth.md#admins), [api.md](api.md#admin-managing-admins-proposed-not-built))
+
 - [ ] Content management: documents, FAQs, topics, offices; authoritative flag, archive and
   replace, review dates
 - [ ] Analytics: everything on the must-have list in [product.md](product.md#admin-dashboard-must-have), plus CSV export

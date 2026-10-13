@@ -196,7 +196,26 @@ Response `200`:
 ### `GET /api/health`
 `{ "status": "ok" }`
 
+## Admin: managing admins (proposed, not built)
+
+All three require the admin role (`401` signed out, `403` researcher). See
+[auth.md](auth.md#admins).
+
+### `GET /api/admin/admins`
+Response `200`: a list of [User](#user), ordered by Onyen.
+
+### `POST /api/admin/admins`
+Request: `{ "onyen": "jlovmo" }`. Makes that Onyen an admin, creating the user if they've never
+signed in (with `display_name` and `email` set to `null` until they do). Adding an existing
+admin is a no-op.
+Response `200`: the [User](#user).
+
+### `DELETE /api/admin/admins/{onyen}`
+Sets that user back to `researcher`.
+Response `204`; `404` if the Onyen isn't an admin; `409` with
+`{"detail": "Can't remove the last admin"}` if it's the only one.
+
 ## Not yet defined
 
-Feedback, saved items, FAQs and all `/api/admin/*` endpoints. The admin page is a mockup with fake
+Feedback, saved items, FAQs and the other `/api/admin/*` endpoints. The admin page is a mockup with fake
 data for Oct 14. Add those endpoints here before building them.
