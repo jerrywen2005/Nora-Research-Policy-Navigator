@@ -1,7 +1,8 @@
 # Database
 
-**Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12). Every other table is
-*Proposed*. Tables are added through Alembic migrations as features need them. Update this file
+**Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12), and so are
+`offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13).
+Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
 ## Where the database lives
@@ -78,7 +79,7 @@ analytics line up with the content.
 | replaced_by_id | nullable self-reference when a newer document supersedes this one |
 | effective_date, last_reviewed_at, review_due_at | for review cycles and "stale content" alerts |
 | created_by, updated_by, created_at, updated_at | admin audit |
-| search_vector | generated `tsvector` with a GIN index, for keyword search |
+| search_vector | generated `tsvector` with a GIN index, for keyword search. Weighted: title (A) > summary (B) > content_text (C) |
 
 **document_topics** (document_id, topic_id): a document can belong to several topics.
 

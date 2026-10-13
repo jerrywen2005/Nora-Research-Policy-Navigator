@@ -61,14 +61,17 @@ Workflow 1, mock login with role-based views:
 - [x] Frontend: admin Overview dashboard mockup with sample data (Andy)
 
 Workflow 2, browse topics → search:
-- [ ] `offices`, `topics`, `documents`, `document_topics` tables + migration
-- [ ] Seed: the 9 categories and about 15 short public policy excerpts with citations and URLs
-- [ ] `GET /api/topics`, `GET /api/documents?topic=&q=` (Postgres full-text search)
-- [ ] Frontend: researcher home with Browse / Search / Ask given equal weight; topic cards →
-  document list; search box; each result shows its citation and source link
-  - Built and routed on fake data (Home, Browse, Topic, Search and Ask pages; see
-    [frontend.md](frontend.md#researcher-pages)). Still to do: swap the bodies in
-    `researcherApi.ts` for real calls once the endpoints land, then delete `fakeData.ts`.
+- [x] `offices`, `topics`, `documents`, `document_topics` tables + migration (Anton)
+- [x] Seed: the 9 categories and 16 real public policies from the
+  [UNC Policies Research knowledge base](https://policies.unc.edu/TDClient/2833/Portal/KB/Category/21680/Research),
+  full text, with source URLs and the responsible offices' public contacts (Anton). The
+  documents are in `backend/app/seed/data/research_policies.json`.
+- [x] `GET /api/topics`, `GET /api/topics/{slug}`, `GET /api/documents?topic=&q=` (Postgres
+  full-text search) and `GET /api/documents/{id}` (Anton)
+- [x] Frontend: researcher home with Browse / Search / Ask given equal weight; topic cards →
+  document list; search box; each result shows its citation and source link (Adithi; switched
+  to the real API by Anton). See [frontend.md](frontend.md#researcher-pages). Ask stays on
+  fake data until `POST /api/ask` exists; then delete `fakeData.ts`.
 
 Stretch, ask:
 - [ ] `POST /api/ask` level 2: keyword retrieval, return the top sources, or a referral to the

@@ -1,7 +1,7 @@
-// Data access for the researcher pages. Each function has the shape of its endpoint in
-// docs/api.md but returns fake data for now. When the endpoint exists, replace the body with the
-// apiGet/apiPost call in its comment; the pages shouldn't need to change.
-import { ApiError } from '../../api/client'
+// Data access for the researcher pages, one function per endpoint in docs/api.md. Topics and
+// documents call the real API. ask() still returns fake data until POST /api/ask exists; then
+// replace its body with the apiPost call in its comment and delete fakeData.ts.
+import { apiGet } from '../../api/client'
 import type {
   AskRequest,
   AskResponse,
@@ -15,29 +15,31 @@ import type {
 } from '../../api/types'
 import { fakeDisclaimer, fakeDocuments, fakeTopics, fallbackOffice } from './fakeData'
 
+export function getTopics(): Promise<Topic[]> {
+  return apiGet<Topic[]>('/topics')
+}
+
+// Rejects with an ApiError (status 404) for an unknown slug.
+export function getTopic(slug: string): Promise<TopicDetail> {
+  return apiGet<TopicDetail>(`/topics/${encodeURIComponent(slug)}`)
+}
+
+// An unknown topic slug gives an empty page, not an error.
+export function getDocuments(query: DocumentQuery): Promise<Page<DocumentSummary>> {
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(query)) {
+    if (value !== undefined && value !== '') {
+      params.set(key, String(value))
+    }
+  }
+  return apiGet<Page<DocumentSummary>>(`/documents?${params}`)
+}
+
+// ---- Fake ask() and its helpers, until POST /api/ask exists ----
+
 // A short delay so loading states show up in the demo, as they would with a real request.
 function fakeLatency(ms = 250) {
   return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-function toSummary({ content_text: _content, ...summary }: DocumentDetail): DocumentSummary {
-  return summary
-}
-
-// apiGet<Topic[]>('/topics')
-export async function getTopics(): Promise<Topic[]> {
-  await fakeLatency()
-  return fakeTopics.map(({ office: _office, ...topic }) => topic)
-}
-
-// apiGet<TopicDetail>(`/topics/${encodeURIComponent(slug)}`)
-export async function getTopic(slug: string): Promise<TopicDetail> {
-  await fakeLatency()
-  const topic = fakeTopics.find((t) => t.slug === slug)
-  if (!topic) {
-    throw new ApiError('GET', `/topics/${slug}`, 404, 'Topic not found')
-  }
-  return topic
 }
 
 const STOP_WORDS = new Set([
@@ -56,26 +58,6 @@ function keywords(text: string): string[] {
 function score(doc: DocumentDetail, terms: string[]): number {
   const haystack = `${doc.title} ${doc.summary ?? ''} ${doc.content_text}`.toLowerCase()
   return terms.filter((term) => haystack.includes(term)).length
-}
-
-// apiGet<Page<DocumentSummary>>(`/documents?${new URLSearchParams(...)}`)
-export async function getDocuments(query: DocumentQuery): Promise<Page<DocumentSummary>> {
-  await fakeLatency()
-  const { topic, q, limit = 20, offset = 0 } = query
-  let docs = fakeDocuments.filter((doc) => !topic || doc.topics.some((t) => t.slug === topic))
-  const terms = q ? keywords(q) : []
-  if (terms.length > 0) {
-    docs = docs
-      .map((doc) => ({ doc, score: score(doc, terms) }))
-      .filter((match) => match.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map((match) => match.doc)
-  } else if (q) {
-    docs = []
-  } else {
-    docs = [...docs].sort((a, b) => a.title.localeCompare(b.title))
-  }
-  return { items: docs.slice(offset, offset + limit).map(toSummary), total: docs.length }
 }
 
 function toCitation(doc: DocumentDetail, number: number): Citation {
