@@ -5,9 +5,11 @@ Each area has its own module with an idempotent `seed_*` function; `run` calls t
 
 from sqlalchemy.orm import Session
 
+from app.seed.content import seed_content
 from app.seed.users import seed_users
 
 
 def run(session: Session) -> None:
     seed_users(session)
+    seed_content(session)
     session.commit()
