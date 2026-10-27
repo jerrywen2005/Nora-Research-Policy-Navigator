@@ -1,13 +1,14 @@
 # Roadmap
 
-**Status:** Current as of 2026-10-12. Update the checkboxes and "Now" section as work lands.
+**Status:** Current as of 2026-10-27. Update the checkboxes and "Now" section as work lands.
 
 ## Milestones
 
 | Date | Milestone |
 |---|---|
 | Wed Oct 14, 11:59 pm | Demo video: at least 1 core feature and 2 workflows, dummy data |
-| Oct 30 | Quarterly client meeting |
+| ~~Oct 30~~ | ~~Quarterly client meeting~~ Cancelled (2026-10-27) |
+| Mon Nov 2 | Team tech talk on RAG (20 min); its demo is our RAG pipeline ([rag.md](rag.md#plan-2026-10-27)) |
 | Nov 19, 3–4 pm | Steering group showcase (end-to-end researcher experience) |
 | End of November | Admin portal: content management and analytics |
 
@@ -79,14 +80,17 @@ Stretch, ask:
 - [ ] Level 3, if an API key is available: an LLM writes a cited answer from the retrieved
   snippets. The LLM sits behind an interface and is mocked in tests.
 
-## Phase 2: Oct 15 – Oct 30, real knowledge base and RAG
+## Phase 2: Oct 15 – Nov 19, real knowledge base and RAG (Anton and Jerry)
 
+Build plan, stages and split: [rag.md](rag.md#plan-2026-10-27).
+
+- [ ] Tutorial RAG demo and write-up for the Nov 2 tech talk
 - [ ] Ingestion script for Research Policy Repository documents → `documents` + `document_chunks`
   with embeddings
 - [ ] Hybrid retrieval (pgvector + full-text), confidence check, referral logic
 - [ ] `POST /api/ask` writes `questions` and `question_citations`
 - [ ] Evaluation script over a set of test questions (ours first, the Link's later)
-- [ ] Oct 30: demo grounded answers on real documents
+- [ ] Nov 19: grounded answers on real documents at the steering group showcase
 
 ## Phase 3: Oct 31 – Nov 19, researcher experience
 
