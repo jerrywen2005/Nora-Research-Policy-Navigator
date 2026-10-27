@@ -29,6 +29,13 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-10-27: Oct 30 milestone cancelled; RAG doubles as the tech talk
+The Oct 30 milestone (quarterly client meeting and its grounded-answer demo) was cancelled. Anton
+and Jerry own the RAG pipeline. The team tech talk on Mon Nov 2 is about RAG, and the pipeline is
+its demo: a standalone tutorial version first, then Nora's production pipeline for the Nov 19
+showcase. The build plan and proposed split are in [rag.md](rag.md#plan-2026-10-27), pending
+Jerry's review. *(Anton)*
+
 ### 2026-10-12: admins are one in-app list
 There is one admin list that admins (Jeanne, to start) edit from the Users & Roles page; everyone
 else is a researcher. The list is `users.role = 'admin'`. Admins can be added by Onyen before that
