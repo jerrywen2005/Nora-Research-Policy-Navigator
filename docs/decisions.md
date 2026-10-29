@@ -11,10 +11,10 @@ an open question is answered, move it into the log.
 - **AI providers:** which LLM and embedding providers are approved for UNC use? This determines the
   embedding dimension in `document_chunks`. *(clients / ITS)*
 - **SSO:** the integration pattern on CloudApps, which attributes come through (Onyen/eppn, name,
-  email, affiliation), and the access timeline. *(David Cowig; emailed 2026-10-12, awaiting
-  reply)*
+  email, affiliation), and the access timeline. *(ITS / David Cowig; a reply to the auth request
+  has come in, details to be recorded)*
 - **OKD:** Postgres + pgvector availability, outbound API access, image registry, hostname,
-  secrets. *(ITS)*
+  secrets. *(client's team, who now own hosting)*
 - **Repo:** must the repo move to a UNC GitHub organization? *(coach / ITS)*
 - **Content:** which Research Policy Repository documents are approved to load, and in what format?
   *(Link)*
@@ -28,6 +28,19 @@ an open question is answered, move it into the log.
   names currently come from the mockup. *(Link)*
 
 ## Log
+
+### 2026-10-29: reply received on the SSO request
+A reply to our UNC SSO (auth) request has come back. Its details still need to be added to
+[auth.md](auth.md) and the SSO open question above. *(Jerry)*
+
+### 2026-10-27: client's team handles Kubernetes; we handle SSO
+At the client meeting, UNC Research decided their team will handle the Kubernetes (Carolina
+CloudApps / OKD) deployment. We only need to integrate Connect Carolina SSO. We keep the images
+OpenShift-ready and document what the deployment needs. See [deployment.md](deployment.md).
+
+### 2026-10-21: access requests sent to ITS
+Andy and Anton emailed ITS about UNC SSO and Kubernetes (OKD) hosting. This was in addition to
+Jerry's 2026-10-12 SSO email to David Cowig.
 
 ### 2026-10-27: Oct 30 milestone cancelled; RAG doubles as the tech talk
 The Oct 30 milestone (quarterly client meeting and its grounded-answer demo) was cancelled. Anton

@@ -17,8 +17,10 @@ put any decisions in [decisions.md](decisions.md).
 
 ## Now
 
-Carolina CloudApps (OKD) and UNC SSO access have been requested but not granted. Everything below
-is built and demoed on the local Docker stack, with mock login. See
+The client's team handles hosting on Carolina CloudApps (OKD / Kubernetes), decided 2026-10-27.
+Our only access dependency is UNC SSO (Connect Carolina): requested, and a reply to the auth
+request has come in. Until SSO is set up, everything below is built and demoed on the local Docker
+stack, with mock login. See
 [deployment.md](deployment.md) and [auth.md](auth.md).
 
 ## Phase 1: Oct 14 demo
