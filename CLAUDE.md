@@ -50,8 +50,10 @@ Product rules that affect code:
 
 ## Current situation
 
-UNC SSO and Carolina CloudApps (OKD) access are **requested but not granted**. Build and demo on
-the local Docker stack with the mock auth provider. Interim hosts get public documents and fake
+The **client's team handles hosting** on Carolina CloudApps (OKD / Kubernetes). Our only
+infrastructure dependency is **UNC SSO**, which is requested and in progress. Keep images
+OpenShift-ready and settings in env vars. Until SSO lands, build and demo on the local Docker
+stack with the mock auth provider. Interim hosts get public documents and fake
 users only. Milestones and status are in [docs/roadmap.md](docs/roadmap.md).
 
 ## Layout

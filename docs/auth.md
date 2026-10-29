@@ -1,8 +1,11 @@
 # Authentication and roles
 
 **Status:** The backend mock provider is **Current** (built 2026-10-12), and so is the
-frontend sign-in. The Shibboleth provider is *Proposed*. UNC SSO access was requested by email to
-David Cowig; there's no reply yet.
+frontend sign-in. The Shibboleth provider is *Proposed*. UNC SSO (Connect Carolina / Onyen) access
+was requested from David Cowig (Jerry, 2026-10-12) and from ITS (Andy and Anton, 2026-10-21). A
+reply to the auth request has come in; its details still need to be recorded here. SSO is now our
+only infrastructure dependency: the client's team handles hosting (see
+[deployment.md](deployment.md)).
 
 Code: backend `app/auth/` (`get_current_user`, `require_role`, `record_login`), `app/api/auth.py`
 (endpoints) and `app/seed/users.py` (`researcher1`, `admin1`); frontend `src/auth/`.
