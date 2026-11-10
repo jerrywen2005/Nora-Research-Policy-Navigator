@@ -131,14 +131,16 @@ non-functional ones.
 | NF9 | **Deployable on CloudApps:** OpenShift-compatible images, settings in env vars, deployment documented |
 | NF10 | **Maintainable and handed off:** CI enforces lint and 100% backend coverage; handoff docs cover architecture, conventions, deployment, maintenance, known limitations and next steps |
 
-**Perhaps (F13–F21):** plain-language matching in search, review-due dates, flagging
+**Perhaps (F13–F22):** plain-language matching in search, review-due dates, flagging
 conflicting or outdated content, dashboard filters by topic, UNC SSO, related questions,
-multi-turn follow-ups, grouping similar questions, document version history.
+multi-turn follow-ups, grouping similar questions, document version history, and editing the
+admin list in the app (Users & Roles).
 
-**Improbable (F22–F27, NF11–NF13):** our own MFA, live sync with the Repository, languages
+**Improbable (F23–F28, NF11–NF13):** our own MFA, live sync with the Repository, languages
 other than English, auto-published FAQs, predictive analytics, enterprise system integration,
 sub-second answers under heavy load, a formal WCAG audit, and high-availability failover.
 
-**Interfaces (I1–I10):** the LLM sits behind a provider interface (I7) and no provider is named
-until UNC approves one; embeddings and reranking run on our own server (I8). UNC SSO (I9) is a
-Perhaps.
+**Interfaces (I1–I10):** the researcher home keeps the mockup's right rail (I1), and the answer
+panel shows a confidence indicator (I2). The LLM (I7) and the embedding and reranking models (I8)
+sit behind provider interfaces, so no provider is named until UNC approves one; the RAG plan
+starts embeddings and reranking on our own server. UNC SSO (I9) is a Perhaps.
