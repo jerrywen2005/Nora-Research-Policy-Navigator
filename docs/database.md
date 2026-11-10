@@ -59,7 +59,7 @@ analytics line up with the content.
 | column | notes |
 |---|---|
 | id, slug (unique), name, description | |
-| parent_id | nullable self-reference, for optional subtopics |
+| parent_id | nullable self-reference. Not used for subtopics, which are `tags` (below) |
 | default_office_id | the office to refer to for this topic |
 | sort_order, is_active | |
 
@@ -82,6 +82,18 @@ analytics line up with the content.
 | search_vector | generated `tsvector` with a GIN index, for keyword search. Weighted: title (A) > summary (B) > content_text (C) |
 
 **document_topics** (document_id, topic_id): a document can belong to several topics.
+
+**tags** *(proposed 2026-11-10)*: subtopics. The Link defines a set of tags for each of the nine
+topics; documents in different topics can share a tag, which is how "related policies" are found.
+| column | notes |
+|---|---|
+| id, topic_id | the topic the tag is listed under |
+| slug, name | unique (topic_id, slug) |
+| sort_order | |
+
+**document_tags** *(proposed 2026-11-10)* (document_id, tag_id): a document can have several tags.
+Search also matches tag names (MF4). The tags themselves come from the Link; until they arrive,
+the tables stay empty and the tag UI is hidden.
 
 **document_chunks**: the RAG units.
 | column | notes |
