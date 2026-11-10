@@ -106,8 +106,21 @@ its endpoints to [api.md](api.md) and its tables to [database.md](database.md), 
 frontend can work in parallel against the agreed shapes, as in Phase 1. Agree on the
 `POST /api/ask` response first: B and C both need its `question_id`.
 
-The non-functional requirements are shared: whoever builds a screen covers NF8 (responsive,
-keyboard, contrast) for it, and A covers NF1–NF5.
+**Non-functional owners.** The MVP needs at least 8 of the 10. NF9 is done; the rest follow from
+the workflows, so each has one owner who makes sure it's met and checked.
+
+| | Requirement | Owner | How it's met |
+|---|---|---|---|
+| NF1 | Grounded answers only | Jerry | A: the gate and the grounding prompt |
+| NF2 | Disclaimer and next step | Jerry | A: the answer panel and referral panel |
+| NF3 | Measured answer quality | Jerry | A: the evaluation script, on the Link's questions when they arrive |
+| NF4 | Concise, plain language | Jerry | A: the prompt, checked in the evaluation |
+| NF5 | Response time | Jerry (Ask), Adithi (browse and search) | A, and D's search changes |
+| NF6 | Privacy | Andy | C: aggregate-only analytics queries |
+| NF7 | No silent deletes | Adithi | D: archive instead of delete, a confirmed hard delete |
+| NF8 | Responsive, accessible, on-brand | Each screen's frontend owner; Anton checks every page at the end | All workflows |
+| NF9 | Deployable on CloudApps | Andy | Done; keep the images and the deployment doc current |
+| NF10 | Maintainable and handed off | Anton | CI is done; Anton writes the handoff documentation |
 
 **A. Ask (Jerry).** Build plan: [rag.md](rag.md#plan-2026-10-27).
 - [x] Tutorial RAG demo and write-up for the Nov 2 tech talk
@@ -115,13 +128,14 @@ keyboard, contrast) for it, and A covers NF1–NF5.
 - [ ] Hybrid retrieval (pgvector + full-text), reranking, the confidence gate and referral to the
   topic's office
 - [ ] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
-- [ ] Ask page on the real API, with the disclaimer and citations; delete `fakeData.ts`
+- [ ] Ask page on the real API, with citations, the confidence indicator and the disclaimer;
+  delete `fakeData.ts`
 - [ ] Evaluation script over test questions (ours first, the Link's when they arrive)
 
 **B. Feedback and saved items (Andy backend, Jerry frontend).**
 - [ ] `feedback` and `saved_items` tables and endpoints
 - [ ] Helpful / not-helpful buttons on each answer
-- [ ] Save buttons on answers and documents, and a Saved page
+- [ ] Save buttons on answers and documents, a Saved page, and saved items in the right rail
 
 **C. Usage logging and admin dashboard (Andy backend, Jerry frontend).**
 - [ ] `usage_events` for topic views, document views and searches (terms, result count)
@@ -147,11 +161,28 @@ keyboard, contrast) for it, and A covers NF1–NF5.
 
 ## After the MVP
 
-- [ ] Users & Roles: admin list editable in the app, plus the `ADMIN_ONYENS` bootstrap
-  ([auth.md](auth.md#admins), [api.md](api.md#admin-managing-admins-proposed-not-built))
-- [ ] The "Perhaps" requirements in [product.md](product.md#requirements), as time allows
-- [ ] Handoff documentation for the client (architecture, conventions, deployment, maintenance,
-  known limitations, next steps)
+The "Perhaps" requirements (F13–F22), as time allows. Each goes to the people who built the
+workflow it extends, so nobody has to learn a new part of the code:
+
+| | Requirement | Owner | Extends |
+|---|---|---|---|
+| F13 | Plain-language search matching | Jerry (backend), Anton (frontend) | A's retrieval, D's search |
+| F14 | Review dates | Adithi (backend), Anton (frontend) | D |
+| F15 | Conflicting-content flags | Adithi (backend), Anton (frontend) | D; waits on the Link's decision |
+| F16 | Dashboard filters | Andy (backend), Jerry (frontend) | C |
+| F17 | UNC SSO | Jerry | The auth backend; waits on ITS ([auth.md](auth.md)) |
+| F18 | Related questions | Jerry | A |
+| F19 | Multi-turn follow-up | Jerry | A |
+| F20 | Question grouping | Andy (backend), Jerry (frontend) | C, using A's embeddings |
+| F21 | Document version history | Adithi (backend), Anton (frontend) | D |
+| F22 | Admin list management (Users & Roles), plus the `ADMIN_ONYENS` bootstrap ([auth.md](auth.md#admins), [api.md](api.md#admin-managing-admins-proposed-not-built)) | Andy (backend), Adithi (frontend) | The auth backend |
+
+Jerry's list is the longest, so if he's still on A, F18 and F19 wait and F13 goes to Adithi.
+
+Improbable items (F23–F28, NF11–NF13) have no owners: we aren't building them.
+
+- [ ] Handoff documentation for the client (Anton, NF10): architecture, conventions, deployment,
+  maintenance, known limitations, next steps
 
 ## When access arrives
 

@@ -56,6 +56,13 @@ F1–F34 list is in the website's git history. A separate MVP page was tried and
 only repeated D1. Summary: [product.md](product.md#requirements). It's our draft until the Link
 approves it. *(Jerry, after Anton suggested narrowing the list)*
 
+### 2026-11-10: owners for the non-functional and Perhaps requirements
+Each non-functional requirement has one owner who makes sure it's met (most fall to Jerry through
+Ask), and each Perhaps requirement goes to whoever built the workflow it extends. Improbable items
+have no owners. The admin list (Users & Roles) is now Perhaps F22, and D1's interfaces keep the
+mockup's right rail and the answer's confidence indicator, which the frontend already partly
+builds. Tables in [roadmap.md](roadmap.md#phase-2-nov-10--nov-15-mvp-workflows). *(Jerry)*
+
 ### 2026-11-10: MVP workflow owners
 Five workflows remain. Jerry builds Ask (RAG) end to end. The rest are split between two pairs,
 each workflow with one backend and one frontend owner: Andy (backend) and Jerry (frontend) take
