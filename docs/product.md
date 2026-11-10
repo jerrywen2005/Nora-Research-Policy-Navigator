@@ -90,54 +90,55 @@ See [rag.md](rag.md#evaluation).
 
 ## Requirements
 
-**Status:** narrowed for the MVP on 2026-11-10; our draft until the Link approves it.
+**Status:** revised 2026-11-10 to match the Link proposal and Jeanne's follow-up; our draft until
+the Link approves it.
 
-The original spec (D1 on the project website: US1–US13, F1–F34, NF1–NF13, I1–I12) is kept as
-delivered. This narrowed list replaces it for building. The MVP (due Thu Nov 12) needs every
-functional requirement and at least 8 of the 10 non-functional ones. The website's MVP Scope page
-shows the same list with live status and owners; keep the two in sync.
+The full requirements, with Perhaps and Improbable items and the interfaces, are D1 on the project
+website (`app/deliverables/product-specification/spec.ts` in the website repo). That is the version
+we submit, so change requirements there first and keep this summary in sync. The MVP (due Thu
+Nov 12) needs every Definite functional requirement and at least 8 of the 10 Definite
+non-functional ones.
 
-**Functional**
+**Functional (Definite)**
 
-| ID | Requirement | Replaces |
-|---|---|---|
-| MF1 | **Sign-in and roles:** mock Onyen sign-in sends each role to its own home; admin pages and endpoints return 403 to researchers | F1–F3 |
-| MF2 | **Three equal entry points:** Browse, Search and Ask at equal size and weight on the researcher home | F21, NF7 |
-| MF3 | **Browse by topic and subtopic:** topic → documents → a document page with summary, owning office and Repository link; subtopic tags filter a topic and link related policies | F4, F5, F9 |
-| MF4 | **Search:** keyword or phrase search over titles, text, topics and subtopics; ranked active documents with citation and link | F8 |
-| MF5 | **Ask:** a concise answer from the Repository only, with numbered citations linking to the policy and section | F6, F10, F11 |
-| MF6 | **Referral:** below the confidence threshold, no answer is generated; show the responsible office and contact as the next step | F12 |
-| MF7 | **Answer feedback:** helpful / not helpful on every answer | F15 |
-| MF8 | **FAQs:** admins write and publish FAQs; researchers browse them on an FAQ page and the matching topic page | F14, part of F20 |
-| MF9 | **Usage logging:** topic and document views, searches (terms, result count) and questions (outcome, citations) are recorded | new |
-| MF10 | **Admin dashboard:** every measure in [Admin dashboard](#admin-dashboard-must-have) for a date range, aggregates only, with CSV export | F16–F19, F27 |
-| MF11 | **Content management:** add a Repository document by link as a draft; review and publish; edit topic, subtopics, office and authoritative flag; archive and restore. No in-app text editing: the Repository stays the authoritative text | F7, F20 |
-| MF12 | **Saved items:** save a question and answer, or a document, and see them on a Saved page | F13 |
+| ID | Requirement |
+|---|---|
+| F1 | **Sign-in and roles:** mock Onyen sign-in sends each role to its own home; admin pages and endpoints return 403 to researchers |
+| F2 | **Three equal entry points:** Browse, Search and Ask at equal size and weight on the researcher home |
+| F3 | **Browse by topic and subtopic:** topic → documents → a document page with summary, owning office and Repository link; subtopic tags filter a topic and link related policies |
+| F4 | **Search:** keyword or phrase search over titles, text, topics and subtopics; ranked active documents with citation and link |
+| F5 | **Ask:** a concise answer from the Repository only, with numbered citations linking to the policy and section |
+| F6 | **Referral:** when the sources can't support a confident answer, none is generated; show the responsible office and contact as the next step |
+| F7 | **Answer feedback:** helpful / not helpful on every answer |
+| F8 | **FAQs:** admins write and publish FAQs; researchers browse them on an FAQ page and the matching topic page |
+| F9 | **Saved items:** save a question and answer, or a document, and see them on a Saved page |
+| F10 | **Usage logging:** topic and document views, searches (terms, result count) and questions (outcome, citations) are recorded |
+| F11 | **Admin dashboard:** every measure in [Admin dashboard](#admin-dashboard-must-have) for a date range, aggregates only, with CSV export |
+| F12 | **Content management:** add a Repository document by link as a draft; review and publish; edit topic, subtopics, office and authoritative flag; archive and restore. No in-app text editing: the Repository stays the authoritative text |
 
-**Non-functional**
+**Non-functional (Definite)**
 
-| ID | Requirement | Replaces |
-|---|---|---|
-| MNF1 | **Grounded only:** answers use only active, authoritative Repository documents; off-topic questions are referred | NF5 |
-| MNF2 | **Disclaimer and next step:** every answer shows the client's AI disclaimer, never reads as a determination, and gives a source link or office | NF3 |
-| MNF3 | **Measured quality:** the evaluation on the Link's sample questions finds the right policy in the top 5 for at least 90% of answerable questions and refers at least 90% of out-of-scope ones | new |
-| MNF4 | **Concise and plain:** answers of about 150 words or fewer, never raw policy text | NF2 |
-| MNF5 | **Speed:** a typical answer in under 10 s; browse and search in under 1 s | NF8 |
-| MNF6 | **Privacy:** the dashboard shows aggregates only; questions go only to a UNC-approved AI provider | new |
-| MNF7 | **No silent deletes:** documents are archived; a hard delete needs explicit confirmation | NF6 |
-| MNF8 | **Responsive, accessible, on-brand:** 375–1440 px wide, keyboard-usable, AA contrast, UNC colors | NF1 |
-| MNF9 | **Deployable on CloudApps:** OpenShift-compatible images, settings in env vars, deployment documented | NF10 |
-| MNF10 | **Maintainable and handed off:** CI enforces lint and 100% backend coverage; handoff docs cover architecture, conventions, deployment, maintenance, known limitations and next steps | new |
+| ID | Requirement |
+|---|---|
+| NF1 | **Grounded only:** answers use only active, authoritative Repository documents; off-topic questions are referred |
+| NF2 | **Disclaimer and next step:** every answer shows the Link-approved AI disclaimer, never reads as a determination, and gives a source link or office |
+| NF3 | **Measured quality:** the evaluation on the Link's sample questions finds the right policy in the top 5 for at least 90% of answerable questions and refers at least 90% of out-of-scope ones |
+| NF4 | **Concise and plain:** answers of about 150 words or fewer, never raw policy text |
+| NF5 | **Speed:** a typical answer in under 10 s; browse and search in under 1 s |
+| NF6 | **Privacy:** the dashboard shows aggregates only; questions go only to a UNC-approved AI provider |
+| NF7 | **No silent deletes:** documents are archived; a permanent delete needs explicit confirmation |
+| NF8 | **Responsive, accessible, on-brand:** 375–1440 px wide, keyboard-usable, AA contrast, UNC colors |
+| NF9 | **Deployable on CloudApps:** OpenShift-compatible images, settings in env vars, deployment documented |
+| NF10 | **Maintainable and handed off:** CI enforces lint and 100% backend coverage; handoff docs cover architecture, conventions, deployment, maintenance, known limitations and next steps |
 
-**Perhaps:** plain-language synonyms in search, review-due dates, flagging conflicting or
-outdated content to its owner, dashboard filters by topic, real UNC SSO, related and follow-up
-questions, grouping similar questions, document version history.
+**Perhaps (F13–F21):** plain-language matching in search, review-due dates, flagging
+conflicting or outdated content, dashboard filters by topic, UNC SSO, related questions,
+multi-turn follow-ups, grouping similar questions, document version history.
 
-**Out of scope:** our own MFA, live sync with the Knowledge Base, languages other than English,
-auto-published FAQs, predictive analytics, enterprise system integration, sub-second answers
-under heavy load, a formal WCAG audit, and high-availability failover.
+**Improbable (F22–F27, NF11–NF13):** our own MFA, live sync with the Repository, languages
+other than English, auto-published FAQs, predictive analytics, enterprise system integration,
+sub-second answers under heavy load, a formal WCAG audit, and high-availability failover.
 
-**Interfaces:** the LLM and the embedding model sit behind provider interfaces. Embeddings and
-reranking run locally; no LLM provider is named until UNC approves one. Screens in D1's mockup interfaces that
-aren't in the list above (Announcements, the right rail, System Settings, Integrations) aren't
-being built.
+**Interfaces (I1–I10):** the LLM sits behind a provider interface (I7) and no provider is named
+until UNC approves one; embeddings and reranking run on our own server (I8). UNC SSO (I9) is a
+Perhaps.

@@ -25,8 +25,8 @@ an open question is answered, move it into the log.
 - **Subtopic tags:** the tags for each of the nine topics. Not received yet; needed by about Nov 12
   to appear in the Nov 19 demo. *(Link)*
 - **Test questions:** sample researcher questions and use cases for the evaluation. *(Link)*
-- **MVP requirements sign-off:** does the Link approve the narrowed list (MF1–MF12, MNF1–MNF10)
-  in [product.md](product.md#requirements)? *(Link)*
+- **MVP requirements sign-off:** does the Link approve the revised D1 requirements
+  ([product.md](product.md#requirements))? *(Link)*
 - **Researcher home mockup:** the mockup puts a large inline Ask panel and answer below the three
   Browse/Search/Ask cards, which gives Ask more weight than the "equal prominence" rule allows.
   Is that intended? The mockup also has no disclaimer on its answer; we show one anyway. Its
@@ -36,23 +36,25 @@ an open question is answered, move it into the log.
 ## Log
 
 ### 2026-11-10: MVP requirements narrowed
-The D1 spec (F1–F34, NF1–NF13) overlapped, was hard to test, and was one-third things we won't
-build. It's narrowed to 12 functional (MF1–MF12) and 10 non-functional (MNF1–MNF10) requirements,
-each checkable, based on the Link proposal and Jeanne's emails. The MVP needs every functional
-requirement and at least 8 non-functional ones. Main changes from D1:
+The original D1 spec (F1–F34, NF1–NF13) overlapped, was hard to test, and was one-third things we
+won't build. It's narrowed to 12 functional (F1–F12) and 10 non-functional (NF1–NF10) Definite
+requirements, each checkable, based on the Link proposal and Jeanne's emails. The MVP needs every
+functional requirement and at least 8 non-functional ones. Main changes from D1:
 - **Added:** subtopic tags (Jeanne's 2026-10-29 email), usage logging for browse and search (her
   dashboard asks for Browse, Search and Ask measures), most-cited resources, and a draft → review
   → publish step for content ("add, review, update, and remove" in the proposal).
-- **Promoted to required:** FAQs (named in the proposal's admin list), saved items (Jerry), CSV export (the proposal says "analytics and reporting").
+- **Promoted to required:** FAQs (named in the proposal's admin list), saved items (Jerry), and
+  CSV export (the proposal says "analytics and reporting").
 - **Narrowed:** content management imports documents by Repository link and edits metadata only.
   The Repository stays the authoritative text, so there's no in-app text editor. "Most frequent
   questions" counts exact matches; grouping similar questions stays a "Perhaps".
 - **Dropped:** portable hosting on Vercel/Render (the client hosts on CloudApps), and naming
   specific AI providers in the interfaces.
 
-D1 on the website stays as delivered; the narrowed list is on the website's MVP Scope page and in
-[product.md](product.md#requirements). It's our draft until the Link approves it. *(Jerry, after
-Anton suggested narrowing the list)*
+D1 on the website is revised in place, since it's the requirements document we submit; the old
+F1–F34 list is in the website's git history. A separate MVP page was tried and dropped because it
+only repeated D1. Summary: [product.md](product.md#requirements). It's our draft until the Link
+approves it. *(Jerry, after Anton suggested narrowing the list)*
 
 ### 2026-11-10: MVP workflow owners
 Five workflows remain. Jerry builds Ask (RAG) end to end. The rest are split between two pairs,

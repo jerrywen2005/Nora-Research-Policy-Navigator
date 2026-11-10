@@ -92,7 +92,7 @@ topics; documents in different topics can share a tag, which is how "related pol
 | sort_order | |
 
 **document_tags** *(proposed 2026-11-10)* (document_id, tag_id): a document can have several tags.
-Search also matches tag names (MF4). The tags themselves come from the Link; until they arrive,
+Search also matches tag names (F4). The tags themselves come from the Link; until they arrive,
 the tables stay empty and the tag UI is hidden.
 
 **document_chunks**: the RAG units.

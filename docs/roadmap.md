@@ -90,24 +90,24 @@ Stretch, ask:
 
 ## Phase 2: Nov 10 – Nov 15, MVP workflows
 
-Requirements: MF1–MF12 and MNF1–MNF10 in [product.md](product.md#requirements). MF1 and MF2 are
-done; Phase 1 also built the browse and keyword-search parts of MF3 and MF4.
+Requirements: F1–F12 and NF1–NF10 in [product.md](product.md#requirements). F1 and F2 are
+done; Phase 1 also built the browse and keyword-search parts of F3 and F4.
 
 | | Workflow | Requirements | Backend | Frontend |
 |---|---|---|---|---|
-| A | Ask (RAG) | MF5, MF6 | Jerry | Jerry |
-| B | Feedback and saved items | MF7, MF12 | Andy | Jerry |
-| C | Usage logging and admin dashboard | MF9, MF10 | Andy | Jerry |
-| D | Content management and subtopics | MF3, MF4, MF11 | Adithi | Anton |
-| E | FAQs | MF8 | Anton | Adithi |
+| A | Ask (RAG) | F5, F6 | Jerry | Jerry |
+| B | Feedback and saved items | F7, F9 | Andy | Jerry |
+| C | Usage logging and admin dashboard | F10, F11 | Andy | Jerry |
+| D | Content management and subtopics | F3, F4, F12 | Adithi | Anton |
+| E | FAQs | F8 | Anton | Adithi |
 
 Each pair does its first workflow first (B before C, D before E). Before coding, each pair adds
 its endpoints to [api.md](api.md) and its tables to [database.md](database.md), so backend and
 frontend can work in parallel against the agreed shapes, as in Phase 1. Agree on the
 `POST /api/ask` response first: B and C both need its `question_id`.
 
-The non-functional requirements are shared: whoever builds a screen covers MNF8 (responsive,
-keyboard, contrast) for it, and A covers MNF1–MNF5.
+The non-functional requirements are shared: whoever builds a screen covers NF8 (responsive,
+keyboard, contrast) for it, and A covers NF1–NF5.
 
 **A. Ask (Jerry).** Build plan: [rag.md](rag.md#plan-2026-10-27).
 - [x] Tutorial RAG demo and write-up for the Nov 2 tech talk
