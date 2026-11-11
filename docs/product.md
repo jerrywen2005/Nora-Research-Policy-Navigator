@@ -25,7 +25,7 @@ across many websites and offices, and it's hard to interpret even once you find 
 
 Researchers sign in with their Onyen and then:
 - **browse** the policy topics (9 categories in the Research Policy Repository) and their
-  subtopics (tags the Link defines),
+  subtopics (77 tags the Link defined, shared across topics),
 - **search** policies, guidance and FAQs by keyword, or
 - **ask** a plain-language question and get a short, source-grounded answer with citations, or a
   referral to the right office.
@@ -105,7 +105,7 @@ non-functional ones.
 |---|---|
 | F1 | **Sign-in and roles:** mock Onyen sign-in sends each role to its own home; admin pages and endpoints return 403 to researchers |
 | F2 | **Three equal entry points:** Browse, Search and Ask at equal size and weight on the researcher home |
-| F3 | **Browse by topic and subtopic:** topic → documents → a document page with summary, owning office and Repository link; subtopic tags filter a topic and link related policies |
+| F3 | **Browse by topic and subtopic:** topic → documents → a document page with summary, owning office and Repository link; selecting a subtopic tag lists every policy with it, across topics, and each document links related policies that share a tag |
 | F4 | **Search:** keyword or phrase search over titles, text, topics and subtopics; ranked active documents with citation and link |
 | F5 | **Ask:** a concise answer from the Repository only, with numbered citations linking to the policy and section |
 | F6 | **Referral:** when the sources can't support a confident answer, none is generated; show the responsible office and contact as the next step |

@@ -140,7 +140,8 @@ run query rewriting only when needed (below). Measure latency per stage (`latenc
   referrals).
 
 **Query handling.**
-- Always: expand acronyms and synonyms from a glossary (IRB, COI/FCOI, IACUC, PI, NHSR, …),
+- Always: expand acronyms and synonyms from a glossary (IRB, COI/FCOI, IACUC, PI, NHSR, …;
+  the Link's 77 tag definitions are a ready-made start),
   largely built from the policies' Definitions sections. No LLM call.
 - Experiment, kept only if the evaluation shows a gain: LLM rewriting of short or vague
   questions. The rewrite is used only for retrieval; the answer always responds to the user's
@@ -219,8 +220,9 @@ Consequences for Nora:
   The LLM is still open: for the tutorial, classmates must be able to run it, ideally with no key
   or cost (a local model, or a hosted API with an optional key). For Nora it sits behind
   `LLMProvider`, so we can start with one and switch when UNC decides.
-- **Document scope (decided 2026-10-27).** The tutorial uses the 16 seeded policies. Nora's scope
-  (16 or all 197 Research knowledge base articles; some may link out to PDFs) is still open.
+- **Document scope (decided 2026-10-27; Nora's settled 2026-11-10).** The tutorial uses the 16
+  seeded policies. Nora uses all 197 policies in the Link's inventory (see
+  [decisions.md](decisions.md)); check during ingestion which ones link out to PDFs.
 - **Tutorial format and location.** A notebook or a script, and in this repo (e.g. `tutorial/`)
   or a separate public repo that classmates can clone on its own.
 - **Talk roles** for all four members (see above).
