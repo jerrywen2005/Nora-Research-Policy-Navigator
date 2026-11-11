@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models.feedback import COMMENT_MAX_LENGTH
+from app.schemas.content import DocumentSummary
 
 
 class FeedbackRequest(BaseModel):
@@ -29,3 +31,39 @@ class FeedbackOut(BaseModel):
     comment: str | None
     created_at: datetime
     updated_at: datetime
+
+
+# ---- Saved items ----
+
+
+class SaveRequest(BaseModel):
+    """`POST /api/saved` request in docs/api.md: exactly one of the two ids."""
+
+    document_id: int | None = None
+    question_id: int | None = None
+
+    @model_validator(mode="after")
+    def _exactly_one(self) -> "SaveRequest":
+        if (self.document_id is None) == (self.question_id is None):
+            raise ValueError("Send exactly one of document_id and question_id")
+        return self
+
+
+class SavedQuestion(BaseModel):
+    """`SavedItem.question` in docs/api.md."""
+
+    id: int
+    question_text: str
+    outcome: Literal["answered", "referred", "no_answer"]
+    answer_text: str | None
+    created_at: datetime
+
+
+class SavedItemOut(BaseModel):
+    """`SavedItem` in docs/api.md. Exactly one of `document` and `question` is set."""
+
+    id: int
+    created_at: datetime
+    kind: Literal["document", "question"]
+    document: DocumentSummary | None
+    question: SavedQuestion | None
