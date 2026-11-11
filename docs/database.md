@@ -4,8 +4,8 @@
 `offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13),
 `document_chunks` (migration `2743ef7700b3`, 2026-11-10), `questions` and
 `question_citations` (migration `b3f26accf7c2`, 2026-11-10), `tags` and `document_tags`
-(migration `3405a4fb20ce`, 2026-11-10), and `feedback` and `saved_items` (2026-11-11; contract
-agreed, migration in progress on `feature/feedback-saved`).
+(migration `3405a4fb20ce`, 2026-11-10), and `feedback` (migration `f31dd62e0247`, 2026-11-11).
+`saved_items` has an agreed design and API contract but isn't built yet.
 Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
@@ -156,7 +156,7 @@ re-chunking deletes the chunk; `document_id` is stored alongside so counts survi
 | comment | optional, at most 1000 characters |
 | created_at, updated_at | `updated_at` changes when the rating is replaced |
 
-**saved_items** *(Current)*: documents and questions a user saved (F9).
+**saved_items** *(Proposed; contract agreed 2026-11-11)*: documents and questions a user saved (F9).
 | column | notes |
 |---|---|
 | id, user_id | deleting the user deletes their items |

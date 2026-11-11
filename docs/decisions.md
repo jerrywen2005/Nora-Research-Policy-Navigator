@@ -35,6 +35,14 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-11: only the asker can rate a question (NF6)
+`PUT /api/questions/{id}/feedback` accepts a rating only from the user who asked the question.
+Anyone else, admins included, gets the same `404` as for a question that doesn't exist, so the
+API never reveals that another user's question exists. Feedback is only ever read or changed for
+the signed-in user; admins will see it only as aggregates on the dashboard (workflow C). A blank
+comment is stored as `null`. A question whose user was anonymized (`user_id` null) can no longer
+be rated. (Andy)
+
 ### 2026-11-11: frontend tests with Vitest
 The frontend had no tests; CI only linted and type-checked it. It now uses Vitest and React
 Testing Library (the standard pairing with Vite), and CI runs `npm test`. The first tests cover
