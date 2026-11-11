@@ -242,9 +242,28 @@
   margin: 0 0 1rem;
 }
 
+.answer-card__list {
+  margin: 0 0 1rem;
+  padding-left: 1.4rem;
+}
+
+.answer-card__list li + li {
+  margin-top: 0.35rem;
+}
+
+.answer-card__list sup a,
 .answer-card__text sup a {
   text-decoration: none;
   font-weight: 600;
+}
+
+.answer-card__confidence {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: -0.25rem 0 0.75rem;
+  font-size: 0.85rem;
+  color: var(--rp-muted);
 }
 
 .answer-card__label {

@@ -65,9 +65,11 @@ Browse, Search and Ask cards that link to `/browse`, `/search` and `/ask`, plus 
 panel, the topic grid and a right rail. Search keeps its query in the URL (`/search?q=`).
 
 - **Data:** pages get data only through `researcherApi.ts`, which has one function per endpoint in
-  [api.md](api.md). `getTopics`, `getTopic` and `getDocuments` call the real API. `ask()` still
-  returns `fakeData.ts` until `POST /api/ask` exists; then replace its body with the `apiPost`
-  call in its comment and delete `fakeData.ts`.
+  [api.md](api.md). All of them call the real API, including `ask()` (`POST /api/ask`).
+- **Answers:** `AnswerCard` renders every Ask outcome, the confidence indicator and the
+  disclaimer. The LLM writes a little Markdown (paragraphs, `- ` lists, `**bold**`) and cites as
+  `[1]` or `【1】`; `AnswerText` turns exactly those into React elements, so model output is never
+  inserted as HTML. Answers take several seconds, and the loading text says so.
 - **Ask:** `components/AnswerCard.tsx` renders every `AskResponse` outcome (answer with `[n]`
   citations, sources only, referral) and always shows the disclaimer.
 - **Styles:** `components/components.css` defines `--rp-*` tokens on `.researcher`, mapped onto
