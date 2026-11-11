@@ -266,9 +266,8 @@ doesn't need the network.
 4. **Check:** drop or flag answers that cite nothing, and map the citation numbers back to
    documents.
 5. **Respond:** answer, citations (title, section, URL), confidence, outcome, referral office if
-   any, and the standard disclaimer. The response shape is already agreed in
-   [api.md](api.md#ask-stretch-for-oct-14), and the frontend renders it (`ask()` in
-   `researcherApi.ts` is still fake until this endpoint exists).
+   any, and the standard disclaimer, in the shape in [api.md](api.md#ask). The Ask page renders
+   it (`AnswerCard`).
 6. **Log:** write `questions` and `question_citations`.
 
 ## Interfaces

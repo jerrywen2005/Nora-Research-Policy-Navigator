@@ -79,8 +79,8 @@ Workflow 2, browse topics → search:
   full-text search) and `GET /api/documents/{id}` (Anton)
 - [x] Frontend: researcher home with Browse / Search / Ask given equal weight; topic cards →
   document list; search box; each result shows its citation and source link (Adithi; switched
-  to the real API by Anton). See [frontend.md](frontend.md#researcher-pages). Ask stays on
-  fake data until `POST /api/ask` exists; then delete `fakeData.ts`.
+  to the real API by Anton). See [frontend.md](frontend.md#researcher-pages). Ask moved to
+  the real API on 2026-11-10.
 
 Stretch, ask:
 - [ ] `POST /api/ask` level 2: keyword retrieval, return the top sources, or a referral to the
@@ -131,7 +131,7 @@ the workflows, so each has one owner who makes sure it's met and checked.
 - [x] Referral to the
   topic's office
 - [x] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
-- [ ] Ask page on the real API, with citations, the confidence indicator and the disclaimer;
+- [x] Ask page on the real API, with citations, the confidence indicator and the disclaimer;
   delete `fakeData.ts`
 - [x] Evaluation script over test questions (`python -m app.rag eval`; ours first, the Link's
   when they arrive)
