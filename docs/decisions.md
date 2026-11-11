@@ -20,7 +20,13 @@ an open question is answered, move it into the log.
   *(Link)*
 - **Referrals:** which office handles which topic, and what contact details should be shown?
   *(Link)*
-- **Answer standards:** the exact disclaimer wording and the confidence/referral criteria. *(Link)*
+- **Answer standards:** the exact disclaimer wording, the citation and source-link format, and the
+  confidence/referral criteria. *(Link; asked for in Jeanne's 2026-10-29 email)*
+- **Subtopic tags:** the tags for each of the nine topics. Not received yet; needed by about Nov 12
+  to appear in the Nov 19 demo. *(Link)*
+- **Test questions:** sample researcher questions and use cases for the evaluation. *(Link)*
+- **MVP requirements sign-off:** does the Link approve the revised D1 requirements
+  ([product.md](product.md#requirements))? *(Link)*
 - **Researcher home mockup:** the mockup puts a large inline Ask panel and answer below the three
   Browse/Search/Ask cards, which gives Ask more weight than the "equal prominence" rule allows.
   Is that intended? The mockup also has no disclaimer on its answer; we show one anyway. Its
@@ -28,6 +34,69 @@ an open question is answered, move it into the log.
   names currently come from the mockup. *(Link)*
 
 ## Log
+
+### 2026-11-10: MVP requirements narrowed
+The original D1 spec (F1–F34, NF1–NF13) overlapped, was hard to test, and was one-third things we
+won't build. It's narrowed to 12 functional (F1–F12) and 10 non-functional (NF1–NF10) Definite
+requirements, each checkable, based on the Link proposal and Jeanne's emails. The MVP needs every
+functional requirement and at least 8 non-functional ones. Main changes from D1:
+- **Added:** subtopic tags (Jeanne's 2026-10-29 email), usage logging for browse and search (her
+  dashboard asks for Browse, Search and Ask measures), most-cited resources, and a draft → review
+  → publish step for content ("add, review, update, and remove" in the proposal).
+- **Promoted to required:** FAQs (named in the proposal's admin list), saved items (Jerry), and
+  CSV export (the proposal says "analytics and reporting").
+- **Narrowed:** content management imports documents by Repository link and edits metadata only.
+  The Repository stays the authoritative text, so there's no in-app text editor. "Most frequent
+  questions" counts exact matches; grouping similar questions stays a "Perhaps".
+- **Dropped:** portable hosting on Vercel/Render (the client hosts on CloudApps), and naming
+  specific AI providers in the interfaces.
+
+D1 on the website is revised in place, since it's the requirements document we submit; the old
+F1–F34 list is in the website's git history. A separate MVP page was tried and dropped because it
+only repeated D1. Summary: [product.md](product.md#requirements). It's our draft until the Link
+approves it. *(Jerry, after Anton suggested narrowing the list)*
+
+### 2026-11-10: owners for the non-functional and Perhaps requirements
+Each non-functional requirement has one owner who makes sure it's met (most fall to Jerry through
+Ask), and each Perhaps requirement goes to whoever built the workflow it extends. Improbable items
+have no owners. The admin list (Users & Roles) is now Perhaps F22, and D1's interfaces keep the
+mockup's right rail and the answer's confidence indicator, which the frontend already partly
+builds. Tables in [roadmap.md](roadmap.md#phase-2-nov-10--nov-15-mvp-workflows). *(Jerry)*
+
+### 2026-11-10: MVP workflow owners
+Five workflows remain. Jerry builds Ask (RAG) end to end. The rest are split between two pairs,
+each workflow with one backend and one frontend owner: Andy (backend) and Jerry (frontend) take
+feedback and saved items, then usage logging and the admin dashboard; Adithi and Anton take
+content management with subtopics (Adithi backend, Anton frontend), then FAQs (Anton backend,
+Adithi frontend). Details in [roadmap.md](roadmap.md). *(Jerry)*
+
+### 2026-11-10: subtopics are tags, built before the client's list arrives
+Subtopics are tags that belong to one of the nine topics and can be shared by documents across
+topics (Jeanne: tags "help users find related policies across topics"). So they're a `tags` table
+plus a `document_tags` join, not child rows in `topics`. We build the tables, admin editing and
+filtering now, hide the tag UI while there are no tags, and load the Link's tags when they
+arrive. We don't make up placeholder tags, because the Link defines the taxonomy. See
+[database.md](database.md#content). *(Jerry)*
+
+### 2026-10-29: client follow-up email and course deadlines
+Jeanne's summary of the Oct 27 meeting:
+- The UNC Research Policy Repository is the initial knowledge source.
+- Tags ("subtopics") for each of the nine topics are to be added to the app and to retrieval
+  before the **Nov 19 RCC Steering Group** demo.
+- Nora answers only from approved sources, with citations and links, an AI disclaimer, and a
+  referral when it can't answer confidently.
+- The client expects a working prototype by the **end of the semester in December**, plus handoff
+  documentation (architecture, coding conventions, deployment, maintenance, known limitations,
+  next steps).
+- Jeanne and Amanda Chang owe us: the document inventory with links and tags, sample test
+  questions, referral offices, and the citation and disclaimer preferences.
+
+Her dashboard guidance asks for aggregate patterns (Browse, Search and Ask activity, common
+search terms, searches with no useful result, referrals, helpfulness, trends over time), not
+views of individual researchers.
+
+At the same day's coach meeting (Vinir Rai), the course deadlines were set: **MVP Thu Nov 12**,
+final product **Sun Nov 15**.
 
 ### 2026-10-29: reply received on the SSO request
 A reply to our UNC SSO (auth) request has come back. Its details still need to be added to

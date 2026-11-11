@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** Current as of 2026-10-27. Update the checkboxes and "Now" section as work lands.
+**Status:** Current as of 2026-11-10. Update the checkboxes and "Now" section as work lands.
 
 ## Milestones
 
@@ -8,9 +8,11 @@
 |---|---|
 | Wed Oct 14, 11:59 pm | Demo video: at least 1 core feature and 2 workflows, dummy data |
 | ~~Oct 30~~ | ~~Quarterly client meeting~~ Cancelled (2026-10-27) |
-| Mon Nov 2 | Team tech talk on RAG (20 min); its demo is our RAG pipeline ([rag.md](rag.md#plan-2026-10-27)) |
-| Nov 19, 3–4 pm | Steering group showcase (end-to-end researcher experience) |
-| End of November | Admin portal: content management and analytics |
+| Mon Nov 2 | Team tech talk on RAG (20 min), done; the demo is in a separate tutorial repo |
+| **Thu Nov 12** | **MVP due (course):** every MF requirement and at least 8 MNF ([product.md](product.md#requirements)) |
+| Sun Nov 15 | Final product due (course) |
+| Nov 19, 3–4 pm | RCC Steering Group demo: end-to-end researcher experience, with subtopic tags |
+| End of semester (December) | Working prototype and handoff documentation for the client |
 
 Client check-ins are every other week. Record each meeting in the website timeline/journal, and
 put any decisions in [decisions.md](decisions.md).
@@ -22,6 +24,10 @@ Our only access dependency is UNC SSO (Connect Carolina): requested, and a reply
 request has come in. Until SSO is set up, everything below is built and demoed on the local Docker
 stack, with mock login. See
 [deployment.md](deployment.md) and [auth.md](auth.md).
+
+Building the five MVP workflows in [Phase 2](#phase-2-nov-10--nov-15-mvp-workflows). Waiting on the
+Link for the subtopic tags, disclaimer and citation wording, referral contacts and sample test
+questions ([decisions.md](decisions.md#open-questions)).
 
 ## Phase 1: Oct 14 demo
 
@@ -82,32 +88,101 @@ Stretch, ask:
 - [ ] Level 3, if an API key is available: an LLM writes a cited answer from the retrieved
   snippets. The LLM sits behind an interface and is mocked in tests.
 
-## Phase 2: Oct 15 – Nov 19, real knowledge base and RAG (Anton and Jerry)
+## Phase 2: Nov 10 – Nov 15, MVP workflows
 
-Build plan, stages and split: [rag.md](rag.md#plan-2026-10-27).
+Requirements: F1–F12 and NF1–NF10 in [product.md](product.md#requirements). F1 and F2 are
+done; Phase 1 also built the browse and keyword-search parts of F3 and F4.
 
-- [ ] Tutorial RAG demo and write-up for the Nov 2 tech talk
-- [ ] Ingestion script for Research Policy Repository documents → `documents` + `document_chunks`
-  with embeddings
-- [ ] Hybrid retrieval (pgvector + full-text), confidence check, referral logic
-- [ ] `POST /api/ask` writes `questions` and `question_citations`
-- [ ] Evaluation script over a set of test questions (ours first, the Link's later)
-- [ ] Nov 19: grounded answers on real documents at the steering group showcase
+| | Workflow | Requirements | Backend | Frontend |
+|---|---|---|---|---|
+| A | Ask (RAG) | F5, F6 | Jerry | Jerry |
+| B | Feedback and saved items | F7, F9 | Andy | Jerry |
+| C | Usage logging and admin dashboard | F10, F11 | Andy | Jerry |
+| D | Content management and subtopics | F3, F4, F12 | Adithi | Anton |
+| E | FAQs | F8 | Anton | Adithi |
 
-## Phase 3: Oct 31 – Nov 19, researcher experience
+Each pair does its first workflow first (B before C, D before E). Before coding, each pair adds
+its endpoints to [api.md](api.md) and its tables to [database.md](database.md), so backend and
+frontend can work in parallel against the agreed shapes, as in Phase 1. Agree on the
+`POST /api/ask` response first: B and C both need its `question_id`.
 
-- [ ] Feedback (helpful / not helpful), saved items, FAQ page, right rail, referral panel
-- [ ] UNC branding, responsive layout
-- [ ] Interim hosted URL if OKD isn't ready (public docs and fake users only)
+**Non-functional owners.** The MVP needs at least 8 of the 10. NF9 is done; the rest follow from
+the workflows, so each has one owner who makes sure it's met and checked.
 
-## Phase 4: Nov 20 – end of November, admin portal
+| | Requirement | Owner | How it's met |
+|---|---|---|---|
+| NF1 | Grounded answers only | Jerry | A: the gate and the grounding prompt |
+| NF2 | Disclaimer and next step | Jerry | A: the answer panel and referral panel |
+| NF3 | Measured answer quality | Jerry | A: the evaluation script, on the Link's questions when they arrive |
+| NF4 | Concise, plain language | Jerry | A: the prompt, checked in the evaluation |
+| NF5 | Response time | Jerry (Ask), Adithi (browse and search) | A, and D's search changes |
+| NF6 | Privacy | Andy | C: aggregate-only analytics queries |
+| NF7 | No silent deletes | Adithi | D: archive instead of delete, a confirmed hard delete |
+| NF8 | Responsive, accessible, on-brand | Each screen's frontend owner; Anton checks every page at the end | All workflows |
+| NF9 | Deployable on CloudApps | Andy | Done; keep the images and the deployment doc current |
+| NF10 | Maintainable and handed off | Anton | CI is done; Anton writes the handoff documentation |
 
-- [ ] Users & Roles: admin list editable in the app, plus the `ADMIN_ONYENS` bootstrap
-  ([auth.md](auth.md#admins), [api.md](api.md#admin-managing-admins-proposed-not-built))
+**A. Ask (Jerry).** Build plan: [rag.md](rag.md#plan-2026-10-27).
+- [x] Tutorial RAG demo and write-up for the Nov 2 tech talk
+- [ ] Ingestion: Repository documents → `document_chunks` with embeddings
+- [ ] Hybrid retrieval (pgvector + full-text), reranking, the confidence gate and referral to the
+  topic's office
+- [ ] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
+- [ ] Ask page on the real API, with citations, the confidence indicator and the disclaimer;
+  delete `fakeData.ts`
+- [ ] Evaluation script over test questions (ours first, the Link's when they arrive)
 
-- [ ] Content management: documents, FAQs, topics, offices; authoritative flag, archive and
-  replace, review dates
-- [ ] Analytics: everything on the must-have list in [product.md](product.md#admin-dashboard-must-have), plus CSV export
+**B. Feedback and saved items (Andy backend, Jerry frontend).**
+- [ ] `feedback` and `saved_items` tables and endpoints
+- [ ] Helpful / not-helpful buttons on each answer
+- [ ] Save buttons on answers and documents, a Saved page, and saved items in the right rail
+
+**C. Usage logging and admin dashboard (Andy backend, Jerry frontend).**
+- [ ] `usage_events` for topic views, document views and searches (terms, result count)
+- [ ] Analytics endpoints for every measure in
+  [product.md](product.md#admin-dashboard-must-have), for a date range, aggregates only
+- [ ] CSV export
+- [ ] Admin Overview on the real API; delete `sampleData.ts`
+
+**D. Content management and subtopics (Adithi backend, Anton frontend).**
+- [ ] `tags` and `document_tags` ([database.md](database.md#content)); load the Link's tags when
+  they arrive, and hide the tag UI until then
+- [ ] Admin endpoints: add a document by Repository link (imported as a draft), publish, edit
+  topic, tags, office and authoritative flag, archive and restore; hard delete needs confirmation
+- [ ] Changing a document re-runs ingestion for its chunks (coordinate with A)
+- [ ] Search also matches topic and subtopic names; topic pages filter by subtopic; document
+  pages list related policies
+- [ ] Admin Policy Library and Content Management pages
+
+**E. FAQs (Anton backend, Adithi frontend).**
+- [ ] `faqs` table and endpoints; draft → published
+- [ ] Admin FAQ editor
+- [ ] Researcher FAQ page, and FAQs on their topic's page
+
+## After the MVP
+
+The "Perhaps" requirements (F13–F22), as time allows. Each goes to the people who built the
+workflow it extends, so nobody has to learn a new part of the code:
+
+| | Requirement | Owner | Extends |
+|---|---|---|---|
+| F13 | Plain-language search matching | Jerry (backend), Anton (frontend) | A's retrieval, D's search |
+| F14 | Review dates | Adithi (backend), Anton (frontend) | D |
+| F15 | Conflicting-content flags | Adithi (backend), Anton (frontend) | D; waits on the Link's decision |
+| F16 | Dashboard filters | Andy (backend), Jerry (frontend) | C |
+| F17 | UNC SSO | Jerry | The auth backend; waits on ITS ([auth.md](auth.md)) |
+| F18 | Related questions | Jerry | A |
+| F19 | Multi-turn follow-up | Jerry | A |
+| F20 | Question grouping | Andy (backend), Jerry (frontend) | C, using A's embeddings |
+| F21 | Document version history | Adithi (backend), Anton (frontend) | D |
+| F22 | Admin list management (Users & Roles), plus the `ADMIN_ONYENS` bootstrap ([auth.md](auth.md#admins), [api.md](api.md#admin-managing-admins-proposed-not-built)) | Andy (backend), Adithi (frontend) | The auth backend |
+
+Jerry's list is the longest, so if he's still on A, F18 and F19 wait and F13 goes to Adithi.
+
+Improbable items (F23–F28, NF11–NF13) have no owners: we aren't building them.
+
+- [ ] Handoff documentation for the client (Anton, NF10): architecture, conventions, deployment,
+  maintenance, known limitations, next steps
 
 ## When access arrives
 
