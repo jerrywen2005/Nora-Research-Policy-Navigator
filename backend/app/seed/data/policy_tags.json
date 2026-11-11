@@ -1,0 +1,390 @@
+{
+  "_source": "Nora_Policy_Tag_Inventory_Updated_2026.10.28.xlsx from the Research Policy Navigator Link (Tag Definitions sheet). Regenerate from a newer inventory; don't edit by hand. Each policy's tags are in policy_inventory.json.",
+  "tags": [
+    {
+      "slug": "agreements-subrecipients-consultants",
+      "name": "Agreements, Subrecipients & Consultants",
+      "definition": "Agreements and administrative requirements for subrecipient, consultant, and other sponsored-project relationships."
+    },
+    {
+      "slug": "anesthesia-surgery-pain-management",
+      "name": "Anesthesia, Surgery & Pain Management",
+      "definition": "Anesthesia, surgical procedures, analgesia, pain recognition, and related animal welfare requirements."
+    },
+    {
+      "slug": "animal-laboratory-research-materials",
+      "name": "Animal & Laboratory Research Materials",
+      "definition": "Acquiring and handling materials or pharmaceutical agents used in animal or laboratory research."
+    },
+    {
+      "slug": "animal-health-welfare-humane-endpoints",
+      "name": "Animal Health, Welfare & Humane Endpoints",
+      "definition": "Monitoring animal health and well-being, minimizing distress, and applying humane endpoints or euthanasia standards."
+    },
+    {
+      "slug": "animal-housing-facilities",
+      "name": "Animal Housing & Facilities",
+      "definition": "Animal housing conditions, space allocations, environmental conditions, and specialized research animal facilities."
+    },
+    {
+      "slug": "animal-husbandry-routine-care",
+      "name": "Animal Husbandry & Routine Care",
+      "definition": "Day-to-day animal care, monitoring, identification, transport, enrichment, and routine husbandry practices."
+    },
+    {
+      "slug": "animal-procedures-research-agents",
+      "name": "Animal Procedures & Research Agents",
+      "definition": "Animal research procedures and the preparation or administration of agents used in animal studies."
+    },
+    {
+      "slug": "animal-research-media-imaging",
+      "name": "Animal Research Media & Imaging",
+      "definition": "Creating, using, or handling images, recordings, audio, and video involving research animals."
+    },
+    {
+      "slug": "animal-welfare-reporting-noncompliance",
+      "name": "Animal Welfare Reporting & Noncompliance",
+      "definition": "Reporting, reviewing, and responding to animal welfare concerns, adverse outcomes, or noncompliance."
+    },
+    {
+      "slug": "audit-compliance",
+      "name": "Audit Compliance",
+      "definition": "Audit obligations, responses, documentation, and compliance for sponsored research activities."
+    },
+    {
+      "slug": "award-acceptance-setup",
+      "name": "Award Acceptance & Setup",
+      "definition": "Acceptance, authorization, and initial administrative setup of sponsored awards."
+    },
+    {
+      "slug": "award-management",
+      "name": "Award Management",
+      "definition": "Administrative management of sponsored awards during the award period, including changes and compliance obligations."
+    },
+    {
+      "slug": "award-management-prior-approvals",
+      "name": "Award Management & Prior Approvals",
+      "definition": "Sponsor or institutional approvals required for specified award changes, actions, or expenditures."
+    },
+    {
+      "slug": "budgeting-cost-planning",
+      "name": "Budgeting & Cost Planning",
+      "definition": "Sponsored-project budget development, estimates, cost planning, and budget-related requirements."
+    },
+    {
+      "slug": "cash-advances-payment-cards",
+      "name": "Cash Advances & Payment Cards",
+      "definition": "Requirements for cash advances, payment cards, and authorized payment methods for research activities."
+    },
+    {
+      "slug": "clinical-billing-financial-administration",
+      "name": "Clinical Billing & Financial Administration",
+      "definition": "Clinical research billing, coverage analysis, charges, and related financial administration."
+    },
+    {
+      "slug": "clinical-data-records-systems",
+      "name": "Clinical Data, Records & Systems",
+      "definition": "Systems and procedures for maintaining clinical research administrative data, documents, and electronic records."
+    },
+    {
+      "slug": "clinical-research-electronic-signatures",
+      "name": "Clinical Research Electronic Signatures",
+      "definition": "Requirements for valid electronic signatures on essential clinical research documents."
+    },
+    {
+      "slug": "clinical-study-startup-oversight",
+      "name": "Clinical Study Startup & Oversight",
+      "definition": "Institutional approvals and operational prerequisites for initiating and overseeing clinical research projects."
+    },
+    {
+      "slug": "clinical-task-delegation-qualifications",
+      "name": "Clinical Task Delegation & Qualifications",
+      "definition": "Delegation of clinical research tasks and verification of staff qualifications, licensure, or supervision."
+    },
+    {
+      "slug": "community-engagement-participant-outreach",
+      "name": "Community Engagement & Participant Outreach",
+      "definition": "Community partnerships, engagement, public education, and research-participant outreach distinct from study recruitment."
+    },
+    {
+      "slug": "conflict-of-interest-in-human-research",
+      "name": "Conflict of Interest in Human Research",
+      "definition": "Conflict of interest affecting human subjects research, including IRB member, consultant, or study-related conflicts."
+    },
+    {
+      "slug": "department-of-defense-dod-research-requirements",
+      "name": "Department of Defense (DoD) Research Requirements",
+      "definition": "Human subjects research requirements specific to Department of Defense support or oversight."
+    },
+    {
+      "slug": "department-of-education-ed-research-requirements",
+      "name": "Department of Education (ED) Research Requirements",
+      "definition": "Human subjects research requirements specific to U.S. Department of Education regulations."
+    },
+    {
+      "slug": "department-of-energy-doe-research-requirements",
+      "name": "Department of Energy (DOE) Research Requirements",
+      "definition": "Human subjects research requirements specific to U.S. Department of Energy regulations."
+    },
+    {
+      "slug": "department-of-justice-doj-research-requirements",
+      "name": "Department of Justice (DOJ) Research Requirements",
+      "definition": "Human subjects research requirements specific to Department of Justice support or oversight."
+    },
+    {
+      "slug": "employee-conflict-of-interest",
+      "name": "Employee Conflict of Interest",
+      "definition": "University employee conflicts of interest, disclosures, and management outside or beyond research-specific requirements."
+    },
+    {
+      "slug": "entrepreneurship-university-resources",
+      "name": "Entrepreneurship & University Resources",
+      "definition": "Research-related entrepreneurship, external business activities, and authorized use of University resources."
+    },
+    {
+      "slug": "environmental-protection-agency-epa-research-requirements",
+      "name": "Environmental Protection Agency (EPA) Research Requirements",
+      "definition": "Human subjects research requirements specific to Environmental Protection Agency regulations."
+    },
+    {
+      "slug": "exempt-human-subjects-research-determinations",
+      "name": "Exempt Human Subjects Research Determinations",
+      "definition": "Procedures and criteria for determining whether human subjects research meets an exemption category."
+    },
+    {
+      "slug": "export-controls-sanctions",
+      "name": "Export Controls & Sanctions",
+      "definition": "Restrictions, reviews, and authorizations involving controlled exports, transfers, foreign persons, or economic sanctions."
+    },
+    {
+      "slug": "fda-regulated-research",
+      "name": "FDA-Regulated Research",
+      "definition": "Human subjects research requirements applicable to FDA-regulated drugs, devices, or investigations."
+    },
+    {
+      "slug": "financial-management-reporting",
+      "name": "Financial Management & Reporting",
+      "definition": "Financial accounting, monitoring, reconciliation, and reporting for sponsored projects."
+    },
+    {
+      "slug": "human-embryonic-stem-cell-research",
+      "name": "Human Embryonic Stem Cell Research",
+      "definition": "Requirements governing research involving human embryonic stem cells."
+    },
+    {
+      "slug": "human-research-program-irb-oversight",
+      "name": "Human Research Program & IRB Oversight",
+      "definition": "Governance, authority, structure, and institutional oversight of the human research protection program and IRB."
+    },
+    {
+      "slug": "human-trafficking-prevention-reporting",
+      "name": "Human Trafficking Prevention & Reporting",
+      "definition": "Prohibitions, prevention responsibilities, and reporting requirements related to human trafficking in research activities."
+    },
+    {
+      "slug": "iacuc-oversight-protocols",
+      "name": "IACUC Oversight & Protocols",
+      "definition": "Institutional Animal Care and Use Committee authority, animal-use protocol review, approvals, and changes."
+    },
+    {
+      "slug": "irb-determinations-study-types",
+      "name": "IRB Determinations & Study Types",
+      "definition": "Determining whether activities require IRB consideration and how different research types are classified."
+    },
+    {
+      "slug": "irb-review-approval",
+      "name": "IRB Review & Approval",
+      "definition": "IRB submission review, approval criteria, review pathways, modifications, continuing review, and review actions."
+    },
+    {
+      "slug": "incident-reporting-response",
+      "name": "Incident Reporting & Response",
+      "definition": "Reporting, reviewing, and responding to research incidents, including reportable safety events, data breaches, and other reportable occurrences."
+    },
+    {
+      "slug": "individual-financial-conflict-of-interest-in-research",
+      "name": "Individual Financial Conflict of Interest in Research",
+      "definition": "Financial interest disclosure, review, and management requirements for individuals involved in research."
+    },
+    {
+      "slug": "institutional-conflict-of-interest-in-human-research",
+      "name": "Institutional Conflict of Interest in Human Research",
+      "definition": "University-level or institutional financial conflicts that could affect human subjects research."
+    },
+    {
+      "slug": "international-research",
+      "name": "International Research",
+      "definition": "Requirements substantively involving research abroad, international research activities, or cross-border collaborations."
+    },
+    {
+      "slug": "investigational-drug-management",
+      "name": "Investigational Drug Management",
+      "definition": "Investigator oversight, handling, storage, accountability, administration, or disposition of investigational drugs."
+    },
+    {
+      "slug": "investigator-responsibilities",
+      "name": "Investigator Responsibilities",
+      "definition": "Substantive responsibilities of principal investigators or investigators for conduct, oversight, and compliance."
+    },
+    {
+      "slug": "multisite-research-irb-reliance",
+      "name": "Multisite Research & IRB Reliance",
+      "definition": "Coordination of multisite studies, IRB reliance arrangements, and allocation of review responsibilities among sites."
+    },
+    {
+      "slug": "non-exempt-human-subjects-research-review",
+      "name": "Non-Exempt Human Subjects Research Review",
+      "definition": "Review pathways and requirements for non-exempt human subjects research, including expedited and convened IRB review."
+    },
+    {
+      "slug": "not-human-subjects-research-nhsr-determinations",
+      "name": "Not Human Subjects Research (NHSR) Determinations",
+      "definition": "Assessment and formal determination that an activity does not meet the regulatory definition of human subjects research."
+    },
+    {
+      "slug": "participant-recruitment-consent-protections",
+      "name": "Participant Recruitment, Consent & Protections",
+      "definition": "Recruitment, informed consent, participant rights, and protections in human subjects research."
+    },
+    {
+      "slug": "personnel-costs-effort-reporting",
+      "name": "Personnel Costs & Effort Reporting",
+      "definition": "Allocation, documentation, certification, or reporting of personnel time and costs on sponsored projects."
+    },
+    {
+      "slug": "pharmaceutical-processes",
+      "name": "Pharmaceutical Processes",
+      "definition": "Processes for requesting, handling, or administering pharmaceutical products in research settings."
+    },
+    {
+      "slug": "post-submission-activities",
+      "name": "Post-Submission Activities",
+      "definition": "Administrative processes following proposal submission and before, or alongside, an award decision."
+    },
+    {
+      "slug": "postdoctoral-appointments-scholar-support",
+      "name": "Postdoctoral Appointments & Scholar Support",
+      "definition": "Postdoctoral appointments, status, conditions, and institutional support for postdoctoral scholars."
+    },
+    {
+      "slug": "project-closeout",
+      "name": "Project Closeout",
+      "definition": "Sponsored-project closeout, required final reporting, reconciliation, and end-of-award responsibilities."
+    },
+    {
+      "slug": "proposal-management",
+      "name": "Proposal Management",
+      "definition": "Preparing, reviewing, authorizing, submitting, and managing sponsored-project proposals."
+    },
+    {
+      "slug": "quality-assurance",
+      "name": "Quality Assurance",
+      "definition": "Quality assurance activities, checks, evaluation processes, and follow-up to improve compliance or quality."
+    },
+    {
+      "slug": "research-core-management",
+      "name": "Research Core Management",
+      "definition": "Governance, administration, financial practices, and services of research core facilities or service centers."
+    },
+    {
+      "slug": "research-data-ownership",
+      "name": "Research Data Ownership",
+      "definition": "Rights, ownership, authority, and institutional or investigator interests in research data and related materials."
+    },
+    {
+      "slug": "research-data-stewardship",
+      "name": "Research Data Stewardship",
+      "definition": "Responsible management, accuracy, integrity, maintenance, protection, and use of research data or research-related information."
+    },
+    {
+      "slug": "research-data-privacy-specimens",
+      "name": "Research Data, Privacy & Specimens",
+      "definition": "Privacy, confidentiality, security, and authorized use of human research information or biological specimens."
+    },
+    {
+      "slug": "research-finance",
+      "name": "Research Finance",
+      "definition": "Financial requirements applicable to research, including accounting, payments, and use of research funds."
+    },
+    {
+      "slug": "research-methods-settings",
+      "name": "Research Methods & Settings",
+      "definition": "Requirements associated with particular research methods, study designs, or research environments."
+    },
+    {
+      "slug": "research-misconduct-reporting-investigations",
+      "name": "Research Misconduct Reporting & Investigations",
+      "definition": "Reporting, reviewing, investigating, and responding to allegations of research misconduct."
+    },
+    {
+      "slug": "research-participant-payments-incentives",
+      "name": "Research Participant Payments & Incentives",
+      "definition": "Compensation, reimbursement, incentives, and approved payments provided to research participants."
+    },
+    {
+      "slug": "research-records-management-retention",
+      "name": "Research Records Management & Retention",
+      "definition": "Creation, maintenance, preservation, access, retention, and disposition of required research or research oversight records."
+    },
+    {
+      "slug": "research-security-compliance-oversight",
+      "name": "Research Security & Compliance Oversight",
+      "definition": "Research security program responsibilities, disclosures, risk management, monitoring, and compliance oversight."
+    },
+    {
+      "slug": "research-security-training",
+      "name": "Research Security Training",
+      "definition": "Required research security training, completion timelines, renewal, and related training administration."
+    },
+    {
+      "slug": "research-systems",
+      "name": "Research Systems",
+      "definition": "Designated administrative systems, access, use, and processes supporting sponsored research management."
+    },
+    {
+      "slug": "responsible-conduct-of-research",
+      "name": "Responsible Conduct of Research",
+      "definition": "Ethical and professional standards for responsible conduct, supervision, and integrity in research."
+    },
+    {
+      "slug": "roles-responsibilities",
+      "name": "Roles & Responsibilities",
+      "definition": "Substantive duties, decision-making authority, accountability, delegation, and allocation of responsibilities among research personnel, committees, institutional offices, or other parties."
+    },
+    {
+      "slug": "special-research-populations-participant-groups",
+      "name": "Special Research Populations & Participant Groups",
+      "definition": "Additional protections or requirements for particular groups of research participants."
+    },
+    {
+      "slug": "sponsored-human-research",
+      "name": "Sponsored Human Research",
+      "definition": "Human subjects research subject to sponsor agreements, contracts, or sponsor-specific obligations."
+    },
+    {
+      "slug": "sponsored-programs-administration",
+      "name": "Sponsored Programs Administration",
+      "definition": "Administrative processes, services, and responsibilities for sponsored programs."
+    },
+    {
+      "slug": "sponsored-programs-oversight-and-compliance",
+      "name": "Sponsored Programs Oversight and Compliance",
+      "definition": "Institutional monitoring, accountability, and regulatory or sponsor compliance for sponsored programs."
+    },
+    {
+      "slug": "sponsored-project-costs-purchasing",
+      "name": "Sponsored Project Costs & Purchasing",
+      "definition": "Allowable costs, purchasing, procurement, and expense administration on sponsored projects."
+    },
+    {
+      "slug": "training-education",
+      "name": "Training & Education",
+      "definition": "Requirements for research-related training, education, competency verification, qualifications, completion schedules, or ongoing learning. Apply only when training or competency is substantive."
+    },
+    {
+      "slug": "cgmp-compliance-quality-agreements",
+      "name": "cGMP Compliance & Quality Agreements",
+      "definition": "Current good manufacturing practice quality oversight, quality agreements, and related authorization responsibilities."
+    }
+  ]
+}

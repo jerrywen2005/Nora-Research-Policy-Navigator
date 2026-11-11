@@ -44,6 +44,27 @@ gate would block every workflow right before the MVP. Each workflow tests the sc
 add a threshold once the main screens are covered. See [frontend.md](frontend.md#testing).
 *(Jerry)*
 
+### 2026-11-10: content management backend and subtopic tags (workflow D)
+Built the admin content-management endpoints (F12, NF7) and subtopic tags (F3, F4). Decisions:
+- **Tags** follow the shared-list model in the inventory entry below. The 77 tags and their
+  definitions are seeded from `policy_tags.json` and each policy's tags from
+  `policy_inventory.json`. A document has at most five; a topic's subtopic filter is the set of
+  tags its active documents use. Schema: [database.md](database.md); endpoints:
+  [api.md](api.md#tags).
+- **Admins edit metadata only.** A document's title and text come from the Research Policy
+  Repository, which stays the authoritative copy. Documents are added by importing a Repository
+  link as a draft; `source_url` is stored in the official `/KB/Article/{id}` form, and duplicates
+  are detected by article ID.
+- **Lifecycle:** draft → active → archived. Publishing needs an owning office and at least one
+  topic. Restoring an archived document returns it to draft, not active, so it's reviewed again.
+  Permanent delete only works on archived documents and needs `confirm=true`.
+- **Search** also matches topic and tag names (weight B), combined at query time so renaming a
+  tag needs no reindex.
+- Re-running ingestion for a document's chunks when it's published, archived, restored or edited
+  isn't wired up yet; ingestion (`app/rag/ingest.py`) now exists, so this is next.
+- Not covered yet: editing topics, offices and tags in the app, FAQs, replacing a document with a
+  newer one, and review dates. *(Adithi)*
+
 ### 2026-11-10: the Link's policy and tag inventory
 The Link's `Nora_Policy_Tag_Inventory_Updated_2026.10.28.xlsx` (dated Oct 28; the docs wrongly
 said the tags hadn't arrived) is the inventory Jeanne's Oct 29 email promised. It settles:

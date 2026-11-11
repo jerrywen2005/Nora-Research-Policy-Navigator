@@ -25,8 +25,10 @@ from app.models import (
     DocumentStatus,
     Office,
     Role,
+    Tag,
     Topic,
     User,
+    document_tags,
     document_topics,
 )
 from app.rag import retrieval
@@ -86,13 +88,15 @@ def login(client: TestClient, onyen: str) -> dict:
 
 @pytest.fixture
 def content(db_session: Session):
-    """Factories for offices, topics and documents, starting from empty content tables.
+    """Factories for offices, topics, tags and documents, starting from empty content tables.
 
     Your dev database may already hold seed content; it is deleted inside this test's
     transaction, so results only contain what the test creates.
     """
+    db_session.execute(delete(document_tags))
     db_session.execute(delete(document_topics))
     db_session.execute(delete(Document))
+    db_session.execute(delete(Tag))
     db_session.execute(delete(Topic))
     db_session.execute(delete(Office))
 
@@ -111,6 +115,14 @@ def content(db_session: Session):
             db_session.add(topic)
             db_session.flush()
             return topic
+
+        @staticmethod
+        def tag(name: str, **fields) -> Tag:
+            fields.setdefault("slug", name.lower().replace(" ", "-"))
+            tag = Tag(name=name, **fields)
+            db_session.add(tag)
+            db_session.flush()
+            return tag
 
         @staticmethod
         def document(title: str, topics: list[Topic] = (), **fields) -> Document:

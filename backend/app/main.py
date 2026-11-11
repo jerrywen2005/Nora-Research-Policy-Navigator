@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.api import ask, auth, documents, health, topics
+from app.api import admin_documents, ask, auth, documents, health, taxonomy, topics
 from app.config import Settings, get_settings
 
 API_PREFIX = "/api"
@@ -43,6 +43,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(topics.router, prefix=API_PREFIX)
     app.include_router(documents.router, prefix=API_PREFIX)
     app.include_router(ask.router, prefix=API_PREFIX)
+    app.include_router(taxonomy.router, prefix=API_PREFIX)
+    app.include_router(admin_documents.router, prefix=API_PREFIX)
     return app
 
 
