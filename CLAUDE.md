@@ -79,7 +79,9 @@ activated venv; run backend commands from `backend/`.
 - Chunk and embed documents for Ask: `cd backend && python -m app.rag` (docker compose does this
   too). Only changed documents are re-processed. Tests use a fake embedder, never the real model.
 - Backend lint: `cd backend && ruff check . && ruff format --check .`
-- Frontend: `cd frontend && npm run lint && npm run build` (the build includes the type-check)
+- Frontend: `cd frontend && npm run lint && npm test && npm run build` (the build includes the
+  type-check). Tests are Vitest + React Testing Library, next to the code as `*.test.tsx`; see
+  [docs/frontend.md](docs/frontend.md#testing).
 - New migration: `cd backend && alembic revision --autogenerate -m "..."`, then review the file.
 
 Run the relevant tests and lint before saying a change is done.

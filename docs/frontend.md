@@ -83,6 +83,21 @@ disabled with a "Soon" tag. When you add a page: add its route in `App.tsx`, the
 item a `to`. Set `end: true` only on items that shouldn't stay highlighted on the pages below them
 (Home, Overview).
 
+## Testing
+
+`npm test` runs Vitest with React Testing Library in jsdom (`npm run test:watch` while
+developing, `npm run coverage` for a report). CI runs it on every PR.
+
+- Put a test next to the code it tests: `AnswerCard.tsx` → `AnswerCard.test.tsx`.
+- Test what a researcher sees and does: find elements by role, label or text
+  (`getByRole('button', { name: 'Ask' })`), click and type with `userEvent`, and assert on the
+  result. Avoid class names and component internals.
+- Mock the API functions a component calls (`vi.mock('../pages/researcher/researcherApi')`), or
+  stub `fetch` when testing the API functions themselves.
+- Each workflow adds tests for the screens it builds. There's no coverage threshold yet:
+  existing pages were written without tests, and a 100% gate would block everyone before the
+  MVP. Add one once the main screens are covered.
+
 ## Styling
 
 - Use the variables in `theme.css` (`--color-navy`, `--color-accent`, `--space-4`, ...) rather

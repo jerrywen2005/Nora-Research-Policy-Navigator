@@ -35,6 +35,15 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-11: frontend tests with Vitest
+The frontend had no tests; CI only linted and type-checked it. It now uses Vitest and React
+Testing Library (the standard pairing with Vite), and CI runs `npm test`. The first tests cover
+the Ask components, starting with how LLM answers render (Markdown and citations, and never as
+HTML). No coverage threshold yet, unlike the backend's 100%: existing pages have no tests, and a
+gate would block every workflow right before the MVP. Each workflow tests the screens it builds;
+add a threshold once the main screens are covered. See [frontend.md](frontend.md#testing).
+*(Jerry)*
+
 ### 2026-11-10: the Link's policy and tag inventory
 The Link's `Nora_Policy_Tag_Inventory_Updated_2026.10.28.xlsx` (dated Oct 28; the docs wrongly
 said the tags hadn't arrived) is the inventory Jeanne's Oct 29 email promised. It settles:
