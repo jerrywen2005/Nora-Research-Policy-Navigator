@@ -83,17 +83,18 @@ analytics line up with the content.
 
 **document_topics** (document_id, topic_id): a document can belong to several topics.
 
-**tags** *(proposed 2026-11-10)*: subtopics. The Link defines a set of tags for each of the nine
-topics; documents in different topics can share a tag, which is how "related policies" are found.
+**tags** *(proposed 2026-11-10)*: subtopics, from the Link's tag inventory (77 tags). Tags are
+shared across all nine topics and have equal status: they aren't owned by a topic and aren't
+ranked. Selecting a tag lists every policy with it, from any topic, which is how "related
+policies" are found.
 | column | notes |
 |---|---|
-| id, topic_id | the topic the tag is listed under |
-| slug, name | unique (topic_id, slug) |
-| sort_order | |
+| id, slug (unique), name | e.g. `training-education`, "Training & Education" |
+| definition | the Link's "when to use" text; shown as help text and used as a retrieval glossary |
 
-**document_tags** *(proposed 2026-11-10)* (document_id, tag_id): a document can have several tags.
-Search also matches tag names (F4). The tags themselves come from the Link; until they arrive,
-the tables stay empty and the tag UI is hidden.
+**document_tags** *(proposed 2026-11-10)* (document_id, tag_id): up to five tags per document in
+the inventory; the order of Tag 1–5 means nothing, so it isn't stored. Search also matches tag
+names (F4).
 
 **document_chunks**: the RAG units.
 | column | notes |

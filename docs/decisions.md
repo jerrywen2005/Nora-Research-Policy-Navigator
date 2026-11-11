@@ -16,14 +16,12 @@ an open question is answered, move it into the log.
 - **OKD:** Postgres + pgvector availability, outbound API access, image registry, hostname,
   secrets. *(client's team, who now own hosting)*
 - **Repo:** must the repo move to a UNC GitHub organization? *(coach / ITS)*
-- **Content:** which Research Policy Repository documents are approved to load, and in what format?
-  *(Link)*
-- **Referrals:** which office handles which topic, and what contact details should be shown?
-  *(Link)*
+- **Referrals:** the inventory gives each policy's contact. Is that who Nora should refer to, and
+  who handles questions that match no policy? *(Link)*
 - **Answer standards:** the exact disclaimer wording, the citation and source-link format, and the
   confidence/referral criteria. *(Link; asked for in Jeanne's 2026-10-29 email)*
-- **Subtopic tags:** the tags for each of the nine topics. Not received yet; needed by about Nov 12
-  to appear in the Nov 19 demo. *(Link)*
+- **Untagged policy:** Research Service Centers procedure (article 132340) has no tag yet; the
+  inventory's review notes say a reviewer must confirm one. *(Link)*
 - **Test questions:** sample researcher questions and use cases for the evaluation. *(Link)*
 - **MVP requirements sign-off:** does the Link approve the revised D1 requirements
   ([product.md](product.md#requirements))? *(Link)*
@@ -34,6 +32,23 @@ an open question is answered, move it into the log.
   names currently come from the mockup. *(Link)*
 
 ## Log
+
+### 2026-11-10: the Link's policy and tag inventory
+The Link's `Nora_Policy_Tag_Inventory_Updated_2026.10.28.xlsx` (dated Oct 28; the docs wrongly
+said the tags hadn't arrived) is the inventory Jeanne's Oct 29 email promised. It settles:
+- **Scope:** Nora's initial knowledge source is all **197** Research Policy Repository policies,
+  not the 16 we seeded. Each row has the category, article ID, title, direct link, issuing
+  officer, responsible unit and policy contact (194 with an email).
+- **Tags:** 77 tags, each with a definition, up to five per policy (196 of 197 tagged). Tags are
+  **shared across categories with equal status**: Tag 1–5 is not a ranking or hierarchy, and
+  selecting a tag should find policies in any category. This replaces our earlier "tags belong to
+  one topic" design: `tags` has no `topic_id` ([database.md](database.md#content)), and D1 F3 now
+  says a tag lists every policy with it, across topics.
+- **Topics:** its nine Repository categories match our nine seeded topics one to one.
+
+Plan: Jerry converts the spreadsheet to `backend/app/seed/data/policy_inventory.json` and seeds
+the 197 documents for ingestion; Adithi seeds the tags from the same file. The tag definitions
+also start the retrieval glossary ([rag.md](rag.md)). *(Jerry)*
 
 ### 2026-11-10: MVP requirements narrowed
 The original D1 spec (F1–F34, NF1–NF13) overlapped, was hard to test, and was one-third things we
