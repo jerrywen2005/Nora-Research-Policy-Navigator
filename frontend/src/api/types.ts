@@ -99,18 +99,18 @@ export interface Citation {
   number: number
   document_id: number
   title: string
-  section: string | null
+  section: string // heading path within the document
   source_url: string | null
   snippet: string
 }
 
 export interface AskResponse {
-  question_id: number | null
+  question_id: number
   outcome: AskOutcome
   answer: string | null
   citations: Citation[]
   referral: Office | null
-  confidence: number | null
+  confidence: number // best reranker score, 0 to 1
   disclaimer: string
 }
 
