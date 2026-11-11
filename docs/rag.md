@@ -288,6 +288,27 @@ change to the prompt or retrieval.
 
 Newest first. One entry per decision or finding: what, why, and the evidence.
 
+### 2026-11-10: ingestion built
+`python -m app.rag` chunks every active document's Markdown (structure-aware, about 300 words at
+most, a one-paragraph overlap when a section is split) and embeds each chunk with
+`BAAI/bge-small-en-v1.5` into `document_chunks.embedding`. Decisions:
+- **fastembed instead of sentence-transformers.** It runs the same bge models on ONNX Runtime, so
+  the backend image doesn't pull in PyTorch (gigabytes). The reranker it also supports is
+  `BAAI/bge-reranker-base`, the one the tutorial's eval picked.
+- **No vector index yet.** See [database.md](database.md#content).
+- **Re-run is cheap.** Chunks remember the document's `content_hash`, so only changed documents
+  are re-embedded; docker compose runs ingestion on every start.
+- **Tests never load a model.** `FakeEmbeddingProvider` hashes words into the vector; the real
+  provider is tested against a stub. Set `EMBEDDING_PROVIDER=fake` to run the app without it.
+
+Numbers: 197 policies → 2,465 chunks (114 words on average; the largest is one 353-word paragraph,
+which isn't cut). The first run took 4.6 minutes on a laptop CPU, 1.5 of them downloading the
+model; a re-run with nothing changed takes about a second. Vector search alone already shows why
+hybrid retrieval and reranking are next: "Is ITAR relevant to my lab?" returns animal-care
+standards (the model doesn't know the acronym), and "Can I take my laptop to China for a
+conference?", which the 16-policy tutorial answered, now ranks "Animal Transport" first: with 12×
+more documents there are more near-misses. *(Jerry)*
+
 ### 2026-10-27: Nora reranker candidates
 For Nora's reranker, benchmark `BAAI/bge-reranker-base` (expected pick), `bge-reranker-v2-m3` and
 MiniLM on the evaluation set for accuracy and CPU latency; the tutorial keeps MiniLM. The gate

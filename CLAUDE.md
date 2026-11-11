@@ -76,6 +76,8 @@ activated venv; run backend commands from `backend/`.
   and migrate it themselves. Coverage must stay at **100%**; CI fails otherwise.
 - Seed dummy data: `cd backend && python -m app.seed` (docker compose does this on startup). Sign
   in as `researcher1` or `admin1`.
+- Chunk and embed documents for Ask: `cd backend && python -m app.rag` (docker compose does this
+  too). Only changed documents are re-processed. Tests use a fake embedder, never the real model.
 - Backend lint: `cd backend && ruff check . && ruff format --check .`
 - Frontend: `cd frontend && npm run lint && npm run build` (the build includes the type-check)
 - New migration: `cd backend && alembic revision --autogenerate -m "..."`, then review the file.

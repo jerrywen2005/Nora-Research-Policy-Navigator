@@ -25,6 +25,11 @@ class Settings(BaseSettings):
     session_secret: str = DEV_SESSION_SECRET
     session_max_age_seconds: int = 8 * 60 * 60
 
+    # RAG models; see docs/rag.md. "fake" needs no download and is for tests.
+    embedding_provider: Literal["fastembed", "fake"] = "fastembed"
+    # Where downloaded model files are kept between runs.
+    model_cache_dir: str = ".cache/models"
+
     @property
     def is_production(self) -> bool:
         return self.environment == "production"

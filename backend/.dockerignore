@@ -8,3 +8,4 @@ htmlcov
 *.egg-info
 build
 .env
+.cache

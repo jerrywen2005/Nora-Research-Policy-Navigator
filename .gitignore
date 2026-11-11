@@ -18,3 +18,6 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Downloaded RAG model files (backend/.cache/models)
+.cache/

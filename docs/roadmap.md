@@ -126,7 +126,7 @@ the workflows, so each has one owner who makes sure it's met and checked.
 - [x] Tutorial RAG demo and write-up for the Nov 2 tech talk
 - [x] Convert the Link's inventory spreadsheet to `app/seed/data/policy_inventory.json` and seed
   all 197 documents (title, link, topic, contact); D loads the tags from the same file
-- [ ] Ingestion: fetch each policy's text → `document_chunks` with embeddings
+- [x] Ingestion: each policy's text → `document_chunks` with embeddings (`python -m app.rag`)
 - [ ] Hybrid retrieval (pgvector + full-text), reranking, the confidence gate and referral to the
   topic's office
 - [ ] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
