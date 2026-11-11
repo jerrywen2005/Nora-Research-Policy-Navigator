@@ -73,7 +73,7 @@ Because the browser only talks to one origin, no CORS setup is needed.
 ```sh
 cd backend && pytest                            # 100% coverage required
 cd backend && ruff check . && ruff format --check .
-cd frontend && npm run lint && npm run build
+cd frontend && npm run lint && npm test && npm run build
 ```
 
 CI runs all of these, plus migrations and Docker builds, on every PR.
