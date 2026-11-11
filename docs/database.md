@@ -1,7 +1,8 @@
 # Database
 
 **Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12), and so are
-`offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13).
+`offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13),
+and `document_chunks` (migration `2743ef7700b3`, 2026-11-10).
 Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
@@ -96,16 +97,18 @@ policies" are found.
 the inventory; the order of Tag 1–5 means nothing, so it isn't stored. Search also matches tag
 names (F4).
 
-**document_chunks**: the RAG units.
+**document_chunks**: the RAG units, built by `python -m app.rag` (`app/rag/ingest.py`).
 | column | notes |
 |---|---|
-| id, document_id, chunk_index | unique (document_id, chunk_index) |
-| section_heading | for clearer citations |
-| text, token_count | |
-| embedding | `vector(N)` with an HNSW index. N depends on the embedding model (open question) |
-| search_vector | generated `tsvector` for hybrid retrieval |
+| id, document_id, chunk_index | unique (document_id, chunk_index); deleting a document deletes its chunks |
+| section_heading | heading path, e.g. "2. Procedure > 2.1 Initial Determination"; shown in citations |
+| context | "Document title > section heading", prepended to the text for embedding and search |
+| text, word_count | the section's paragraphs; about 300 words at most |
+| content_hash | the document's `content_hash` when the chunk was made; a mismatch means re-chunk |
+| embedding | `vector(384)` (BAAI/bge-small-en-v1.5). No vector index: an exact scan over a few thousand chunks takes milliseconds, and an HNSW index can return fewer rows than asked for when combined with a `WHERE` filter. Add one only if the corpus grows by orders of magnitude |
+| search_vector | generated `tsvector` with a GIN index: context (A) > text (B) |
 
-When a document is edited, its chunks are regenerated.
+When a document's text changes, ingestion deletes its chunks and makes new ones.
 
 **faqs**: curated by admins, never auto-published.
 | column | notes |
