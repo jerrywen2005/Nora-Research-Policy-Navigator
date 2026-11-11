@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 
 // Dev-only proxy: the browser calls /api/* on the Vite server, which forwards
 // to FastAPI. The frontend and API then share one origin, so no CORS is needed.
@@ -14,6 +14,16 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': { target: apiTarget, changeOrigin: true },
+    },
+  },
+  // `npm test`: Vitest runs *.test.ts(x) files in a simulated browser (jsdom).
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/**/*.test.{ts,tsx}', 'src/test/**', 'src/main.tsx'],
     },
   },
 })
