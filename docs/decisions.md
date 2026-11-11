@@ -29,6 +29,26 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-10: content management backend and subtopic tags (workflow D)
+Built the admin content-management endpoints (F12, NF7) and subtopic tags (F3, F4). Decisions:
+- **Tags are one shared list**, following the Link's tag inventory
+  (`Nora_Policy_Tag_Inventory_Updated_2026.10.28.xlsx`): equally weighted labels that no topic
+  owns, so a document in any topic can carry any tag. A document has at most five (the Link's
+  limit). A topic's subtopic filter is the set of tags its active documents use. Schema:
+  [database.md](database.md); endpoints: [api.md](api.md#tags).
+- **Admins edit metadata only.** A document's title and text come from the Research Policy
+  Repository, which stays the authoritative copy. Documents are added by importing a Repository
+  link as a draft; `source_url` is stored in the official `/KB/Article/{id}` form, and duplicates
+  are detected by article ID.
+- **Lifecycle:** draft → active → archived. Publishing needs an owning office and at least one
+  topic. Restoring an archived document returns it to draft, not active, so it's reviewed again.
+  Permanent delete only works on archived documents and needs `confirm=true`.
+- **Search** also matches topic and tag names (weight B), combined at query time so renaming a
+  tag needs no reindex.
+- Updating RAG chunks on publish/archive/restore waits for workflow A's ingestion.
+- Not covered yet: editing topics, offices and tags in the app, FAQs, replacing a document with a
+  newer one, and review dates.
+
 ### 2026-10-29: reply received on the SSO request
 A reply to our UNC SSO (auth) request has come back. Its details still need to be added to
 [auth.md](auth.md) and the SSO open question above. *(Jerry)*

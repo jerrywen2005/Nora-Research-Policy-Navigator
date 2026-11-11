@@ -105,8 +105,13 @@ Build plan, stages and split: [rag.md](rag.md#plan-2026-10-27).
 - [ ] Users & Roles: admin list editable in the app, plus the `ADMIN_ONYENS` bootstrap
   ([auth.md](auth.md#admins), [api.md](api.md#admin-managing-admins-proposed-not-built))
 
-- [ ] Content management: documents, FAQs, topics, offices; authoritative flag, archive and
-  replace, review dates
+- [x] Content management backend for documents (2026-11-10): import from the Repository as a
+  draft, metadata edits incl. authoritative flag and up to 5 subtopic tags, publish / archive /
+  restore, confirmed permanent delete ([api.md](api.md#admin-content-management))
+- [x] Subtopic tags from the Link's inventory: tag filter, tag-aware search, related documents
+- [ ] Content management frontend (Policy Library page) on the endpoints above
+- [ ] Re-chunk documents on publish / archive / restore once ingestion exists
+- [ ] Content management: FAQs, editing topics, offices and tags; replace, review dates
 - [ ] Analytics: everything on the must-have list in [product.md](product.md#admin-dashboard-must-have), plus CSV export
 
 ## When access arrives
