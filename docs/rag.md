@@ -247,9 +247,10 @@ A script (later, an admin upload) does the following:
 Re-ingesting a changed document replaces its chunks. Only `active` + `is_authoritative` documents
 are retrieved for answers.
 
-The 16 seeded policies have full text in `documents.content_text`
-(`backend/app/seed/data/research_policies.json`), but with headings flattened, so ingestion
-re-extracts them from the knowledge base HTML.
+The seed loads all 197 policies in the Link's inventory with their full text in
+`documents.content_text`, headings kept as Markdown (`backend/app/seed/data/policy_inventory.json`,
+built by `backend/scripts/build_policy_inventory.py`). Chunking reads that text, so ingestion
+doesn't need the network.
 
 ## Answering `POST /api/ask`
 
