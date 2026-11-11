@@ -1,0 +1,156 @@
+[
+  {
+    "question": "Is ITAR relevant to my lab?",
+    "expected_articles": [
+      132084
+    ]
+  },
+  {
+    "question": "Am I allowed to take my laptop to China for a conference?",
+    "expected_articles": [
+      132084
+    ]
+  },
+  {
+    "question": "What happens if someone fabricates data in a study?",
+    "expected_articles": [
+      132346,
+      148336
+    ]
+  },
+  {
+    "question": "Am I required to report a colleague I suspect of plagiarism?",
+    "expected_articles": [
+      132346,
+      148336,
+      132342,
+      132344
+    ]
+  },
+  {
+    "question": "Who can be a PI on a sponsored project?",
+    "expected_articles": [
+      132273,
+      132274
+    ]
+  },
+  {
+    "question": "What does OSP 200.04 say about project closeout?",
+    "expected_articles": [
+      132275
+    ]
+  },
+  {
+    "question": "Do I have to tell anyone if I own stock in a company that funds my study?",
+    "expected_articles": [
+      159289,
+      159915
+    ]
+  },
+  {
+    "question": "How often do investigators need FCOI training?",
+    "expected_articles": [
+      159289,
+      159915
+    ]
+  },
+  {
+    "question": "Can a staff member award a university contract to their spouse's business?",
+    "expected_articles": [
+      159535
+    ]
+  },
+  {
+    "question": "Who owns the data from my research?",
+    "expected_articles": [
+      151461
+    ]
+  },
+  {
+    "question": "Can I take my lab notebooks with me when I move to another university?",
+    "expected_articles": [
+      151461
+    ]
+  },
+  {
+    "question": "How long can someone stay a postdoc at UNC?",
+    "expected_articles": [
+      132268,
+      154301
+    ]
+  },
+  {
+    "question": "Do postdocs get health insurance?",
+    "expected_articles": [
+      132268,
+      154301
+    ]
+  },
+  {
+    "question": "How do I find out whether my project counts as human subjects research?",
+    "expected_articles": [
+      132221
+    ]
+  },
+  {
+    "question": "Can a study involving prisoners be exempt?",
+    "expected_articles": [
+      132222
+    ]
+  },
+  {
+    "question": "Can I get consent orally instead of a signed form?",
+    "expected_articles": [
+      132227
+    ]
+  },
+  {
+    "question": "When can I use participants' Social Security numbers in research?",
+    "expected_articles": [
+      132227
+    ]
+  },
+  {
+    "question": "Who decides whether my animal study protocol is approved?",
+    "expected_articles": [
+      132183,
+      148123
+    ]
+  },
+  {
+    "question": "Who pays for routine care in a clinical trial, the patient or the study?",
+    "expected_articles": [
+      132341
+    ]
+  },
+  {
+    "question": "Do I need to disclose foreign funding sources for research security?",
+    "expected_articles": [
+      158839
+    ]
+  },
+  {
+    "question": "Where is the best pizza in Chapel Hill?",
+    "expected_articles": null
+  },
+  {
+    "question": "How do I get a parking permit?",
+    "expected_articles": null
+  },
+  {
+    "question": "What is the deadline for submitting my thesis to the graduate school?",
+    "expected_articles": null
+  },
+  {
+    "question": "How do I reserve a study room in Davis Library?",
+    "expected_articles": null
+  },
+  {
+    "question": "When is spring break this year?",
+    "expected_articles": null
+  },
+  {
+    "question": "How do I reset my Onyen password?",
+    "expected_articles": null
+  }
+]
