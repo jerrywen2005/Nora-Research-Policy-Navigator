@@ -77,6 +77,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'Human Research & IRB',
     description: 'IRB review, consent, and protections for research participants.',
     document_count: 0,
+    tags: [],
     office: ohre,
   },
   {
@@ -85,6 +86,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'Clinical Research',
     description: 'Clinical trial registration, reporting, and study conduct.',
     document_count: 0,
+    tags: [],
     office: clinical,
   },
   {
@@ -93,6 +95,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'Conflict of Interest',
     description: 'Disclosing outside interests and managing conflicts.',
     document_count: 0,
+    tags: [],
     office: coi,
   },
   {
@@ -101,6 +104,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'Research Integrity',
     description: 'Responsible conduct of research and research misconduct.',
     document_count: 0,
+    tags: [],
     office: integrity,
   },
   {
@@ -109,6 +113,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'Sponsored Programs',
     description: 'Proposals, awards, and managing externally funded projects.',
     document_count: 0,
+    tags: [],
     office: osp,
   },
   {
@@ -117,6 +122,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'Research Operations',
     description: 'Data agreements, research data, and day-to-day research administration.',
     document_count: 0,
+    tags: [],
     office: ovcr,
   },
   {
@@ -125,6 +131,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'Animal Care & Use',
     description: 'IACUC protocols and the humane use of animals in research.',
     document_count: 0,
+    tags: [],
     office: iacuc,
   },
   {
@@ -133,6 +140,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'International Research & Security',
     description: 'Export controls, foreign collaboration, and research security.',
     document_count: 0,
+    tags: [],
     office: security,
   },
   {
@@ -141,6 +149,7 @@ export const fakeTopics: TopicDetail[] = [
     name: 'Postdoctoral Affairs',
     description: 'Appointments, policies, and resources for postdoctoral scholars.',
     document_count: 0,
+    tags: [],
     office: postdoc,
   },
 ]
@@ -163,6 +172,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('human-subjects-research'),
     is_authoritative: true,
     last_reviewed_at: '2026-08-01',
+    tags: [],
+    related_documents: [],
     content_text:
       'Research involving living individuals or identifiable private information typically ' +
       'requires IRB review if it meets the federal definition of human subjects research, ' +
@@ -179,6 +190,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('human-subjects-research', 'research-operations'),
     is_authoritative: true,
     last_reviewed_at: '2026-08-01',
+    tags: [],
+    related_documents: [],
     content_text:
       'If a study uses existing data that are de-identified and the investigator cannot link ' +
       'the data to individuals, IRB review may not be required. Identifiable data generally ' +
@@ -196,6 +209,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('human-subjects-research'),
     is_authoritative: true,
     last_reviewed_at: '2026-06-15',
+    tags: [],
+    related_documents: [],
     content_text:
       'Human subject means a living individual about whom an investigator conducting research ' +
       'obtains information through intervention or interaction, or obtains identifiable ' +
@@ -212,6 +227,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('human-subjects-research', 'clinical-research'),
     is_authoritative: true,
     last_reviewed_at: '2026-07-20',
+    tags: [],
+    related_documents: [],
     content_text:
       'Consent documents must describe the purpose, risks, benefits, and voluntary nature of ' +
       'participation. The IRB may approve a waiver of consent under limited conditions.',
@@ -227,6 +244,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('human-subjects-research'),
     is_authoritative: false,
     last_reviewed_at: '2026-05-02',
+    tags: [],
+    related_documents: [],
     content_text:
       'Some low-risk research, such as anonymous surveys, may qualify as exempt. The IRB, not ' +
       'the investigator, makes the exemption determination.',
@@ -242,6 +261,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('clinical-research'),
     is_authoritative: true,
     last_reviewed_at: '2026-04-11',
+    tags: [],
+    related_documents: [],
     content_text:
       'Applicable clinical trials must be registered before enrolling the first participant ' +
       'and must report results within the required timeframe.',
@@ -257,6 +278,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('conflict-of-interest'),
     is_authoritative: true,
     last_reviewed_at: '2026-03-30',
+    tags: [],
+    related_documents: [],
     content_text:
       'Investigators disclose significant financial interests related to their institutional ' +
       'responsibilities annually and whenever a new interest arises.',
@@ -272,6 +295,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('research-integrity'),
     is_authoritative: true,
     last_reviewed_at: '2026-02-14',
+    tags: [],
+    related_documents: [],
     content_text:
       'Allegations of research misconduct are reviewed through inquiry and investigation ' +
       'phases, with protections for complainants and respondents.',
@@ -287,6 +312,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('sponsored-programs'),
     is_authoritative: true,
     last_reviewed_at: '2026-09-01',
+    tags: [],
+    related_documents: [],
     content_text:
       'Complete proposals should be routed to the sponsored programs office several business ' +
       'days before the sponsor deadline to allow for review.',
@@ -302,6 +329,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('research-operations', 'human-subjects-research'),
     is_authoritative: false,
     last_reviewed_at: '2026-06-03',
+    tags: [],
+    related_documents: [],
     content_text:
       'A data use agreement is typically needed before receiving or sharing data that are not ' +
       'publicly available, including limited data sets.',
@@ -317,6 +346,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('animal-care-and-use'),
     is_authoritative: true,
     last_reviewed_at: '2026-01-20',
+    tags: [],
+    related_documents: [],
     content_text:
       'All research, teaching, or testing involving live vertebrate animals requires an ' +
       'approved IACUC protocol before animals are acquired or used.',
@@ -332,6 +363,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('international-research-and-security'),
     is_authoritative: true,
     last_reviewed_at: '2026-05-18',
+    tags: [],
+    related_documents: [],
     content_text:
       'Shipping items, traveling with equipment, or sharing controlled technical data with ' +
       'foreign persons may require an export control review.',
@@ -347,6 +380,8 @@ export const fakeDocuments: DocumentDetail[] = [
     topics: topicRefs('postdoctoral-affairs'),
     is_authoritative: true,
     last_reviewed_at: '2026-07-07',
+    tags: [],
+    related_documents: [],
     content_text:
       'Postdoctoral appointments are made for a fixed term with an individual mentoring plan ' +
       'reviewed each year.',

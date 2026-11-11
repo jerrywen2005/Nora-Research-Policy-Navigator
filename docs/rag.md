@@ -249,6 +249,12 @@ The 16 seeded policies have full text in `documents.content_text`
 (`backend/app/seed/data/research_policies.json`), but with headings flattened, so ingestion
 re-extracts them from the knowledge base HTML.
 
+For Repository articles, step 2 already exists: `extract_article` in
+`backend/app/policy_repository.py` turns an article page into its title and text with `h2`–`h5`
+headings as Markdown (`## Purpose`), and `RepositoryClient` fetches the page (faked in tests).
+The admin import endpoint uses them (`POST /api/admin/documents`, see [api.md](api.md)). Each
+document's subtopic tags are in `document_tags`, for metadata filters and context headers.
+
 ## Answering `POST /api/ask`
 
 1. **Retrieve:** a hybrid search combining pgvector similarity and Postgres full-text search,

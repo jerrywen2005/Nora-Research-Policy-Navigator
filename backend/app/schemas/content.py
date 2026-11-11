@@ -3,6 +3,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
+DocTypeName = Literal["policy", "sop", "guidance", "faq", "webpage", "job_aid", "other"]
+
 
 class _FromOrm(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -18,6 +20,15 @@ class OfficeOut(_FromOrm):
     url: str | None
 
 
+class TagOut(_FromOrm):
+    """`Tag` in docs/api.md: a subtopic tag from the Link's shared list."""
+
+    id: int
+    slug: str
+    name: str
+    definition: str | None
+
+
 class TopicRef(_FromOrm):
     """`TopicRef` in frontend/src/api/types.ts: the short form listed on a document."""
 
@@ -31,6 +42,7 @@ class TopicOut(TopicRef):
 
     description: str
     document_count: int
+    tags: list[TagOut]
 
 
 class TopicDetail(TopicOut):
@@ -39,17 +51,27 @@ class TopicDetail(TopicOut):
     office: OfficeOut | None
 
 
+class DocumentRef(_FromOrm):
+    """`DocumentRef` in docs/api.md: the short form for links to a document."""
+
+    id: int
+    title: str
+    doc_type: DocTypeName
+    citation: str | None
+
+
 class DocumentSummary(_FromOrm):
     """`DocumentSummary` in docs/api.md."""
 
     id: int
     title: str
-    doc_type: Literal["policy", "sop", "guidance", "faq", "webpage", "job_aid", "other"]
+    doc_type: DocTypeName
     citation: str | None
     source_url: str | None
     summary: str | None
     office: OfficeOut | None
     topics: list[TopicRef]
+    tags: list[TagOut]
     is_authoritative: bool
     last_reviewed_at: date | None
 
@@ -60,9 +82,10 @@ class DocumentSummary(_FromOrm):
 
 
 class DocumentDetail(DocumentSummary):
-    """`DocumentDetail` in docs/api.md."""
+    """`DocumentDetail` in docs/api.md. The endpoint fills in `related_documents`."""
 
     content_text: str
+    related_documents: list[DocumentRef] = []
 
 
 class DocumentPage(BaseModel):

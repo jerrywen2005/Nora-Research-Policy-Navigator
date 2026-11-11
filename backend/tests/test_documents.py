@@ -65,6 +65,7 @@ def test_list_matches_the_api_contract(signed_in: TestClient, content):
                     {"id": topic.id, "slug": "testing", "name": "Testing"},
                     {"id": other.id, "slug": "other", "name": "Other"},
                 ],
+                "tags": [],
                 "is_authoritative": True,
                 "last_reviewed_at": "2026-08-01",
             }
