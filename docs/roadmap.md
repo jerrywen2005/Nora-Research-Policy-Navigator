@@ -140,7 +140,7 @@ the workflows, so each has one owner who makes sure it's met and checked.
 
 **B. Feedback and saved items (Andy backend, Jerry frontend).**
 - [x] `feedback` table and endpoints (`PUT`/`DELETE /api/questions/{id}/feedback`)
-- [ ] `saved_items` table and endpoints
+- [x] `saved_items` table and endpoints (`GET`/`POST /api/saved`, `DELETE /api/saved/{id}`)
 - [ ] Helpful / not-helpful buttons on each answer
 - [ ] Save buttons on answers and documents, a Saved page, and saved items in the right rail
 

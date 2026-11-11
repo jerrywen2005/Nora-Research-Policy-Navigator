@@ -35,6 +35,13 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-11: only active documents can be saved
+`POST /api/saved` returns `404` for a draft document as well as for an unknown or archived one,
+because researchers can't see drafts anywhere else (`GET /api/documents/{id}` is also `404` for
+them). A document that was saved while active stays in the user's Saved list after it is archived,
+as the contract says, so they can still see and remove it. Saving someone else's question is the
+same `404` as a missing one (NF6), like feedback. (Andy)
+
 ### 2026-11-11: only the asker can rate a question (NF6)
 `PUT /api/questions/{id}/feedback` accepts a rating only from the user who asked the question.
 Anyone else, admins included, gets the same `404` as for a question that doesn't exist, so the
