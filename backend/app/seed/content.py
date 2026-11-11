@@ -120,9 +120,47 @@ SEED_TOPICS = [
     },
 ]
 
-# Full text of selected public policies from the knowledge base above, with their topics and
-# office. Regenerate or extend it by hand; each entry is keyed by its source_url.
-DOCUMENTS_FILE = Path(__file__).parent / "data" / "research_policies.json"
+# The Link's policy inventory: every policy Nora uses, with its Repository category, responsible
+# unit, tags and full text (headings kept as Markdown). Built by scripts/build_policy_inventory.py
+# from the Link's spreadsheet; rebuild it rather than editing it by hand.
+DOCUMENTS_FILE = Path(__file__).parent / "data" / "policy_inventory.json"
+
+# Repository category (as the inventory names it) -> topic slug.
+CATEGORY_TOPICS = {
+    "Human Research Ethics and IRB": "human-subjects-research",
+    "Clinical Research": "clinical-research",
+    "Conflict of Interest": "conflict-of-interest",
+    "Research Integrity": "research-integrity",
+    "Sponsored Programs": "sponsored-programs",
+    "Research Operations": "research-operations",
+    "Animal Care and Use and IACUC": "animal-care-and-use",
+    "International Research and Research Security": "international-research-and-security",
+    "Postdoctoral Affairs": "postdoctoral-affairs",
+}
+
+# Responsible unit (as the inventory records it) -> office. A policy with no unit gets its
+# topic's office.
+UNIT_OFFICES = {
+    "Office of Human Research Ethics (OHRE)": "ohre",
+    "Office of Sponsored Programs": "osp",
+    "Office of Sponsored Programs, Cost Analysis and Compliance": "osp",
+    "Office of Animal Care and Use": "oacu",
+    "Conflict of Interest Office, OVCR Research Compliance services": "coi",
+    "UNC Export Compliance Office": "export",
+    "Office of Postdoctoral Affairs": "opa",
+    "Office of the Vice Chancellor for Research": "ovcr",
+    "Office of Vice Chancellor for Research": "ovcr",
+    "Office of the Vice Chancellor for Research (OVCR)": "ovcr",
+    "Office of the Vice Chancellor for Research – Clinical Research Operations": "ovcr",
+    "Science and Security Program, Office of the Vice Chancellor for Research": "ovcr",
+    "OVCR Compliance": "ovcr",
+    "Clinical Research Compliance": "ovcr",
+    "CTQA, Clinical Research Compliance Office": "ovcr",
+}
+
+# Earlier seeds stored this form of the same article URL; matching it too means re-seeding an
+# existing database updates those rows instead of duplicating them.
+LEGACY_URL = "https://policies.unc.edu/TDClient/2833/Portal/KB/ArticleDet?ID={}"
 
 
 def load_seed_documents() -> list[dict]:
@@ -158,21 +196,26 @@ def seed_content(session: Session) -> None:
         topic.is_active = True
         topics[data["slug"]] = topic
 
+    topic_offices = {t["slug"]: t["office"] for t in SEED_TOPICS}
     for data in load_seed_documents():
+        urls = [data["source_url"], LEGACY_URL.format(data["article_id"])]
         document = session.scalars(
-            select(Document).where(Document.source_url == data["source_url"])
+            select(Document).where(Document.source_url.in_(urls))
         ).one_or_none()
         if document is None:
-            document = Document(source_url=data["source_url"])
+            document = Document()
             session.add(document)
+        topic_slug = CATEGORY_TOPICS[data["category"]]
+        office_key = UNIT_OFFICES.get(data["responsible_unit"]) or topic_offices[topic_slug]
+        document.source_url = data["source_url"]
         document.title = data["title"]
         document.doc_type = data["doc_type"]
         document.citation = data["citation"]
         document.summary = data["summary"]
         document.content_text = data["content_text"]
         document.content_hash = hashlib.sha256(data["content_text"].encode()).hexdigest()
-        document.office = offices[data["office"]]
-        document.topics = [topics[slug] for slug in data["topics"]]
+        document.office = offices[office_key]
+        document.topics = [topics[topic_slug]]
         document.status = DocumentStatus.ACTIVE
         document.is_authoritative = True
     session.flush()

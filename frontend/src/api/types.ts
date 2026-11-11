@@ -45,7 +45,16 @@ export interface TopicDetail extends Topic {
 
 // ---- Documents ----
 
-export type DocType = 'policy' | 'sop' | 'guidance' | 'faq' | 'webpage' | 'job_aid' | 'other'
+export type DocType =
+  | 'policy'
+  | 'standard'
+  | 'procedure'
+  | 'sop'
+  | 'guidance'
+  | 'faq'
+  | 'webpage'
+  | 'job_aid'
+  | 'other'
 
 export interface DocumentSummary {
   id: number

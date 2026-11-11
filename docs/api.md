@@ -153,7 +153,7 @@ exists, results link straight to `source_url`.*
   "last_reviewed_at": "2026-08-01"
 }
 ```
-`doc_type` is one of `policy`, `sop`, `guidance`, `faq`, `webpage`, `job_aid`, `other`.
+`doc_type` is one of `policy`, `standard`, `procedure`, `sop`, `guidance`, `faq`, `webpage`, `job_aid`, `other`.
 `citation`, `source_url`, `summary`, `office` and `last_reviewed_at` may be `null`.
 
 #### DocumentDetail

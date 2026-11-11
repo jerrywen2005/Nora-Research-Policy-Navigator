@@ -73,8 +73,8 @@ Workflow 2, browse topics → search:
 - [x] `offices`, `topics`, `documents`, `document_topics` tables + migration (Anton)
 - [x] Seed: the 9 categories and 16 real public policies from the
   [UNC Policies Research knowledge base](https://policies.unc.edu/TDClient/2833/Portal/KB/Category/21680/Research),
-  full text, with source URLs and the responsible offices' public contacts (Anton). The
-  documents are in `backend/app/seed/data/research_policies.json`.
+  full text, with source URLs and the responsible offices' public contacts (Anton). Since
+  replaced by the Link's 197-policy inventory in `backend/app/seed/data/policy_inventory.json`.
 - [x] `GET /api/topics`, `GET /api/topics/{slug}`, `GET /api/documents?topic=&q=` (Postgres
   full-text search) and `GET /api/documents/{id}` (Anton)
 - [x] Frontend: researcher home with Browse / Search / Ask given equal weight; topic cards →
@@ -124,7 +124,7 @@ the workflows, so each has one owner who makes sure it's met and checked.
 
 **A. Ask (Jerry).** Build plan: [rag.md](rag.md#plan-2026-10-27).
 - [x] Tutorial RAG demo and write-up for the Nov 2 tech talk
-- [ ] Convert the Link's inventory spreadsheet to `app/seed/data/policy_inventory.json` and seed
+- [x] Convert the Link's inventory spreadsheet to `app/seed/data/policy_inventory.json` and seed
   all 197 documents (title, link, topic, contact); D loads the tags from the same file
 - [ ] Ingestion: fetch each policy's text → `document_chunks` with embeddings
 - [ ] Hybrid retrieval (pgvector + full-text), reranking, the confidence gate and referral to the
