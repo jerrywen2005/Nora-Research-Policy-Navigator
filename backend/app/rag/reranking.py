@@ -47,15 +47,17 @@ class FastEmbedReranker:
         return [sigmoid(float(logit)) for logit in self.model.rerank(question, texts)]
 
 
+def content_words(text: str) -> set[str]:
+    """Words of four or more letters, so "the" and "is" don't count as overlap."""
+    return set(re.findall(r"[a-z0-9]{4,}", text.lower()))
+
+
 class FakeReranker:
-    """A stand-in for tests: the share of the question's words that appear in the text."""
+    """A stand-in for tests: the share of the question's content words found in the text."""
 
     def score(self, question: str, texts: list[str]) -> list[float]:
-        words = set(re.findall(r"[a-z0-9]+", question.lower()))
-        return [
-            len(words & set(re.findall(r"[a-z0-9]+", text.lower()))) / len(words) if words else 0
-            for text in texts
-        ]
+        words = content_words(question)
+        return [len(words & content_words(text)) / len(words) if words else 0 for text in texts]
 
 
 @lru_cache

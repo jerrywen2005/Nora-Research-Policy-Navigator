@@ -14,6 +14,7 @@ dependencies = [
     "pgvector>=0.5", # the vector column type for SQLAlchemy
     "fastembed>=0.9", # runs the embedding and reranking models on ONNX Runtime, without PyTorch
     "rank-bm25>=0.2", # keyword search (BM25); Postgres has no BM25
+    "openai>=2.0", # client for the answer-writing LLM; any OpenAI-compatible provider works
 ]
 
 [project.optional-dependencies]

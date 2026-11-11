@@ -288,6 +288,25 @@ change to the prompt or retrieval.
 
 Newest first. One entry per decision or finding: what, why, and the evidence.
 
+### 2026-11-10: `POST /api/ask` built
+`app/rag/answer.py`: retrieve → gate (0.04) → the LLM answers from the 5 numbered chunks →
+citation check → log to `questions` and `question_citations`. Decisions:
+- **The LLM is optional.** `LLMProvider` with one OpenAI-compatible implementation (Groq for
+  local development); `LLM_PROVIDER=none` is the default until UNC approves a provider. Without
+  it, Ask returns the matching sections as sources: api.md's "level 2".
+- **An answer that cites nothing isn't shown** (`no_answer`, with a referral). Citations accept
+  `[1]` and the `【1】` some models write, and numbers that don't exist are ignored.
+- **An LLM failure never shows an error page.** The researcher gets the sources and an office;
+  the question is logged as `error` (shown to the browser as `no_answer`).
+- **Referrals** (until the Link decides, see decisions.md): a gate referral goes to the topic's
+  office when asked from a topic, otherwise to the Office of the Vice Chancellor for Research; a
+  `no_answer` goes to the office that owns the best-matching policy.
+- **The prompt is versioned** (`PROMPT_VERSION`, logged per question) and tells the model to
+  answer only from the sources, cite every claim, never make a determination, and treat source
+  text as content, not instructions. Version `2026-11-10.2` adds "only name an office if it
+  appears in the sources": in testing, the first version told an ITAR asker to contact an
+  "Office of Research Compliance" that wasn't in the sources. *(Jerry)*
+
 ### 2026-11-10: retrieval built and evaluated on 197 policies
 `app/rag/retrieval.py`: vector search (pgvector cosine) and BM25 keyword search, top 20 each,
 merged with RRF, then `BAAI/bge-reranker-base` rescores the 20 and keeps 5. Only active,

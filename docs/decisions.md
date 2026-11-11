@@ -17,7 +17,9 @@ an open question is answered, move it into the log.
   secrets. *(client's team, who now own hosting)*
 - **Repo:** must the repo move to a UNC GitHub organization? *(coach / ITS)*
 - **Referrals:** the inventory gives each policy's contact. Is that who Nora should refer to, and
-  who handles questions that match no policy? *(Link)*
+  who handles questions that match no policy? Until answered, Ask refers to the topic's office,
+  the office owning the best-matching policy, or the Office of the Vice Chancellor for Research
+  ([rag.md](rag.md), build log). *(Link)*
 - **Answer standards:** the exact disclaimer wording, the citation and source-link format, and the
   confidence/referral criteria. *(Link; asked for in Jeanne's 2026-10-29 email)*
 - **Untagged policy:** Research Service Centers procedure (article 132340) has no tag yet; the

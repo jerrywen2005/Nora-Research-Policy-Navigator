@@ -10,6 +10,7 @@ from app.models.content import (
     Topic,
     document_topics,
 )
+from app.models.question import Outcome, Question, QuestionCitation
 from app.models.user import Role, User
 
 __all__ = [
@@ -19,6 +20,9 @@ __all__ = [
     "DocumentChunk",
     "DocumentStatus",
     "Office",
+    "Outcome",
+    "Question",
+    "QuestionCitation",
     "Role",
     "Topic",
     "User",
