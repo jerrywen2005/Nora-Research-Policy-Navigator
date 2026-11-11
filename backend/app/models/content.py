@@ -26,6 +26,8 @@ from app.db import Base
 
 class DocType(StrEnum):
     POLICY = "policy"
+    STANDARD = "standard"
+    PROCEDURE = "procedure"
     SOP = "sop"
     GUIDANCE = "guidance"
     FAQ = "faq"

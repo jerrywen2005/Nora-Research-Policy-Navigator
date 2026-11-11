@@ -4,6 +4,8 @@ import { Icon } from './Icon'
 
 const docTypeLabels: Record<DocType, string> = {
   policy: 'Policy',
+  standard: 'Standard',
+  procedure: 'Procedure',
   sop: 'SOP',
   guidance: 'Guidance',
   faq: 'FAQ',

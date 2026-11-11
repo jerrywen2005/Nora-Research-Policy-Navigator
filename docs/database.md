@@ -67,7 +67,7 @@ analytics line up with the content.
 | column | notes |
 |---|---|
 | id, title | |
-| doc_type | `policy`, `sop`, `guidance`, `faq`, `webpage`, `job_aid`, `other` |
+| doc_type | `policy`, `standard`, `procedure`, `sop`, `guidance`, `faq`, `webpage`, `job_aid`, `other` |
 | citation | official policy number or reference, if any |
 | source_url | link shown to users |
 | summary | short description for browse and search results |
