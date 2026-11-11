@@ -5,12 +5,13 @@ import { AnswerCard } from './AnswerCard'
 import { AskPanel } from './AskPanel'
 import './components.css'
 
+// Questions the policies answer well (see `python -m app.rag eval` in the backend).
 const EXAMPLE_QUESTIONS = [
-  'Do I need IRB approval for my study?',
-  'Can I share de-identified data?',
-  'What is considered human subjects research?',
-  'How do I disclose a conflict of interest?',
-  'Where can I find data use agreements?',
+  'How far in advance must a postdoc request an extension of the five-year term?',
+  'Can I get consent orally instead of a signed form?',
+  'Who owns the data from my research?',
+  'How often do investigators need FCOI training?',
+  'Is ITAR relevant to my lab?',
 ]
 
 type AskState =
@@ -41,7 +42,7 @@ export function AskSection({ inputRef }: { inputRef?: Ref<HTMLInputElement> }) {
         onAsk={handleAsk}
       />
       <div aria-live="polite">
-        {state.status === 'loading' && <p className="status">Looking through sources…</p>}
+        {state.status === 'loading' && <p className="status">Reading the research policies… this can take 10 seconds.</p>}
         {state.status === 'error' && (
           <p className="status status--error">Something went wrong. Please try again.</p>
         )}
