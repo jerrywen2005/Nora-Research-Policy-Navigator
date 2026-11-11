@@ -27,6 +27,7 @@ class Settings(BaseSettings):
 
     # RAG models; see docs/rag.md. "fake" needs no download and is for tests.
     embedding_provider: Literal["fastembed", "fake"] = "fastembed"
+    reranker_provider: Literal["fastembed", "fake"] = "fastembed"
     # Where downloaded model files are kept between runs.
     model_cache_dir: str = ".cache/models"
 

@@ -127,12 +127,16 @@ the workflows, so each has one owner who makes sure it's met and checked.
 - [x] Convert the Link's inventory spreadsheet to `app/seed/data/policy_inventory.json` and seed
   all 197 documents (title, link, topic, contact); D loads the tags from the same file
 - [x] Ingestion: each policy's text → `document_chunks` with embeddings (`python -m app.rag`)
-- [ ] Hybrid retrieval (pgvector + full-text), reranking, the confidence gate and referral to the
+- [x] Hybrid retrieval (pgvector + BM25), reranking and the confidence gate threshold
+- [ ] Referral to the
   topic's office
 - [ ] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
 - [ ] Ask page on the real API, with citations, the confidence indicator and the disclaimer;
   delete `fakeData.ts`
-- [ ] Evaluation script over test questions (ours first, the Link's when they arrive)
+- [x] Evaluation script over test questions (`python -m app.rag eval`; ours first, the Link's
+  when they arrive)
+- [ ] Bring a typical answer under 10 s (NF5): rerank fewer candidates or benchmark a smaller
+  reranker; retrieval alone is about 7 s on a laptop CPU
 
 **B. Feedback and saved items (Andy backend, Jerry frontend).**
 - [ ] `feedback` and `saved_items` tables and endpoints
