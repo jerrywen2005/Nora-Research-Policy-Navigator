@@ -178,6 +178,37 @@ export interface AskResponse {
   disclaimer: string
 }
 
+// ---- Feedback and saved items ----
+
+// PUT /api/questions/{question_id}/feedback
+export interface FeedbackRequest {
+  helpful: boolean
+  comment: string | null // at most 1000 characters
+}
+
+export interface Feedback {
+  question_id: number
+  helpful: boolean
+  comment: string | null
+  created_at: string // ISO 8601 timestamp
+  updated_at: string
+}
+
+// POST /api/saved: send exactly one of the two.
+export type SaveRequest = { document_id: number } | { question_id: number }
+
+export interface SavedQuestion {
+  id: number
+  question_text: string
+  outcome: AskOutcome
+  answer_text: string | null
+  created_at: string
+}
+
+export type SavedItem =
+  | { id: number; created_at: string; kind: 'document'; document: DocumentSummary; question: null }
+  | { id: number; created_at: string; kind: 'question'; document: null; question: SavedQuestion }
+
 // ---- Health ----
 
 export interface HealthResponse {
