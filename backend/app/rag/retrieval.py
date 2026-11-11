@@ -24,9 +24,10 @@ CANDIDATES = 20  # from each search, and how many the reranker reads
 TOP_K = 5  # chunks shown to the LLM
 RRF_K = 60  # the standard constant in 1 / (k + rank)
 # The confidence gate: if the best reranker score is below this, the sources don't cover the
-# question, so Nora refers instead of answering. Set from the evaluation; re-tune it whenever the
-# reranker, the chunking or the document set changes (docs/rag.md, build log).
-GATE_THRESHOLD = 0.03
+# question, so Nora refers instead of answering. Set from the evaluation (2026-11-10, 197
+# policies): off-topic questions scored at most 0.030, the lowest correctly retrieved real one
+# 0.051. Re-tune it whenever the reranker, the chunking or the document set changes.
+GATE_THRESHOLD = 0.04
 
 MODES = ("dense", "keyword", "hybrid", "rerank")
 
