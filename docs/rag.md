@@ -288,6 +288,55 @@ change to the prompt or retrieval.
 
 Newest first. One entry per decision or finding: what, why, and the evidence.
 
+### 2026-11-10: retrieval built and evaluated on 197 policies
+`app/rag/retrieval.py`: vector search (pgvector cosine) and BM25 keyword search, top 20 each,
+merged with RRF, then `BAAI/bge-reranker-base` rescores the 20 and keeps 5. Only active,
+authoritative documents (and the chosen topic, if any) are searched.
+
+**BM25 instead of Postgres `ts_rank`.** The plan was to start with `ts_rank` and switch only if
+the evaluation showed a gain. It did, by a lot. Keyword search alone, on the 20 answerable
+questions (expected policy ranked first / in the top 5):
+
+| method | top-1 | top-5 |
+|---|---|---|
+| `ts_rank` (OR of the question's words) | 6/20 | 7/20 |
+| `ts_rank_cd` | 1/20 | 8/20 |
+| BM25 (`rank_bm25`, in memory) | 8/20 | 12/20 |
+
+`ts_rank` counts how often a word appears, so "lab" repeated in animal-care chunks beats the one
+chunk that mentions ITAR; BM25 weights rare words. The index lives in memory (about 2,500 chunks,
+built in about a second) and rebuilds when ingestion changes the chunks.
+
+**Full evaluation** (`python -m app.rag eval`, real models):
+
+| method | top-1 | top-5 |
+|---|---|---|
+| vector | 13/20 | 17/20 |
+| keyword (BM25) | 8/20 | 12/20 |
+| hybrid (RRF) | 10/20 | 18/20 |
+| hybrid + reranker | 14/20 | **20/20** |
+
+Every question has an expected policy among the 5 chunks the LLM sees. Top-1 is lower than the
+16-policy tutorial's 20/20: with 12× more documents, a related policy sometimes ranks first
+(animal protocols → the animal imaging standard; foreign funding → research security training;
+reporting plagiarism → OHRE SOP 1401).
+
+**Gate threshold 0.04** (was 0.03 in the tutorial). Off-topic questions' best scores were at most
+0.030 ("thesis deadline" matched OSP 300.03's proposal deadlines); the lowest correctly retrieved
+real question was 0.051 (ITAR). At 0.04: 6/6 off-topic referred, 17/20 real ones answered. The
+3 referred real questions (laptop to China, owning stock, lab notebooks) all had the wrong
+policy ranked first, so referring them avoids answers grounded in the wrong policy. Re-tune
+when the reranker, chunking or documents change, and when the Link's questions arrive.
+
+**Open: speed.** Retrieval takes a median 7.3 s (max 14 s) on a laptop CPU, almost all of it the
+reranker reading 20 chunks; with the LLM, a typical answer is near NF5's 10 s. Next: rerank 10–15
+candidates, or compare smaller rerankers (fastembed has MiniLM-L-12 at 0.12 GB and Jina turbo at
+0.15 GB, against bge-reranker-base's 1.04 GB) on both accuracy and latency.
+
+**Models as downloaded:** fastembed's `BAAI/bge-small-en-v1.5` is a quantized ONNX build
+(`Qdrant/bge-small-en-v1.5-onnx-Q`, 67 MB); bge-reranker-base is full precision (1.04 GB),
+which also matters for the image size on CloudApps. *(Jerry)*
+
 ### 2026-11-10: ingestion built
 `python -m app.rag` chunks every active document's Markdown (structure-aware, about 300 words at
 most, a one-paragraph overlap when a section is split) and embeds each chunk with
