@@ -252,6 +252,12 @@ The seed loads all 197 policies in the Link's inventory with their full text in
 built by `backend/scripts/build_policy_inventory.py`). Chunking reads that text, so ingestion
 doesn't need the network.
 
+Documents added after the seed come from the admin import (`POST /api/admin/documents`, see
+[api.md](api.md)): `extract_article` in `backend/app/policy_repository.py` turns a live article
+page into its title and text with `h2`–`h5` headings as Markdown (`## Purpose`), the same form as
+the seed, and `RepositoryClient` fetches the page (faked in tests). Each document's subtopic tags
+are in `document_tags`, for metadata filters and context headers.
+
 ## Answering `POST /api/ask`
 
 1. **Retrieve:** a hybrid search combining pgvector similarity and Postgres full-text search,

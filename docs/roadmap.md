@@ -151,13 +151,17 @@ the workflows, so each has one owner who makes sure it's met and checked.
 - [ ] Admin Overview on the real API; delete `sampleData.ts`
 
 **D. Content management and subtopics (Adithi backend, Anton frontend).**
-- [ ] `tags` and `document_tags` ([database.md](database.md#content)); seed the 77 tags, their
+- [x] `tags` and `document_tags` ([database.md](database.md#content)); seed the 77 tags, their
   definitions and the document assignments from `policy_inventory.json`
-- [ ] Admin endpoints: add a document by Repository link (imported as a draft), publish, edit
+- [x] Admin endpoints: add a document by Repository link (imported as a draft), publish, edit
   topic, tags, office and authoritative flag, archive and restore; hard delete needs confirmation
+  ([api.md](api.md#admin-content-management))
 - [ ] Changing a document re-runs ingestion for its chunks (coordinate with A)
-- [ ] Search also matches topic and tag names; a tag page lists every policy with that tag
-  across topics; document pages show their tags and related policies
+- [x] Backend: search also matches topic and tag names; `GET /api/documents?tag=` lists every
+  policy with a tag across topics; topics list their tags; documents return their tags and
+  related policies
+- [ ] Researcher pages for the above: tag page, tag filter on topic pages, tags and related
+  policies on document pages
 - [ ] Admin Policy Library and Content Management pages
 
 **E. FAQs (Anton backend, Adithi frontend).**

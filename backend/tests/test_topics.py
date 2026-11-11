@@ -31,6 +31,7 @@ def test_list_topics_in_display_order_with_active_document_counts(client: TestCl
         "name": "Z Topic",
         "description": "Shown first.",
         "document_count": 2,
+        "tags": [],
     }
     assert [t["document_count"] for t in body] == [2, 0, 1]
 
@@ -50,6 +51,7 @@ def test_get_topic_includes_referral_office(client: TestClient, content):
         "name": "Testing",
         "description": "",
         "document_count": 1,
+        "tags": [],
         "office": {
             "id": office.id,
             "name": "Office of Testing",

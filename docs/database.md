@@ -2,8 +2,9 @@
 
 **Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12), and so are
 `offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13),
-`document_chunks` (migration `2743ef7700b3`, 2026-11-10), and `questions` and
-`question_citations` (migration `b3f26accf7c2`, 2026-11-10).
+`document_chunks` (migration `2743ef7700b3`, 2026-11-10), `questions` and
+`question_citations` (migration `b3f26accf7c2`, 2026-11-10), and `tags` and `document_tags`
+(migration `3405a4fb20ce`, 2026-11-10).
 Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
@@ -81,22 +82,24 @@ analytics line up with the content.
 | replaced_by_id | nullable self-reference when a newer document supersedes this one |
 | effective_date, last_reviewed_at, review_due_at | for review cycles and "stale content" alerts |
 | created_by, updated_by, created_at, updated_at | admin audit |
-| search_vector | generated `tsvector` with a GIN index, for keyword search. Weighted: title (A) > summary (B) > content_text (C) |
+| search_vector | generated `tsvector` with a GIN index, for keyword search. Weighted: title (A) > summary (B) > content_text (C). Search adds topic and tag names at weight B (see document_tags) |
 
 **document_topics** (document_id, topic_id): a document can belong to several topics.
 
-**tags** *(proposed 2026-11-10)*: subtopics, from the Link's tag inventory (77 tags). Tags are
+**tags**: subtopics, from the Link's tag inventory (77 tags, with definitions in
+`backend/app/seed/data/policy_tags.json`; each policy's tags are in `policy_inventory.json`). Tags are
 shared across all nine topics and have equal status: they aren't owned by a topic and aren't
 ranked. Selecting a tag lists every policy with it, from any topic, which is how "related
-policies" are found.
+policies" are found. A topic's subtopic filter is the set of tags its active documents use.
 | column | notes |
 |---|---|
-| id, slug (unique), name | e.g. `training-education`, "Training & Education" |
+| id, slug (unique), name (unique) | e.g. `training-education`, "Training & Education" |
 | definition | the Link's "when to use" text; shown as help text and used as a retrieval glossary |
 
-**document_tags** *(proposed 2026-11-10)* (document_id, tag_id): up to five tags per document in
-the inventory; the order of Tag 1–5 means nothing, so it isn't stored. Search also matches tag
-names (F4).
+**document_tags** (document_id, tag_id): up to five tags per document (the Link's limit, enforced
+by the admin API); the order of Tag 1–5 means nothing, so it isn't stored. Keyword search also
+matches topic and tag names (F4); they're joined in at query time instead of being stored in
+`documents.search_vector`, so renaming a tag needs no reindex.
 
 **document_chunks**: the RAG units, built by `python -m app.rag` (`app/rag/ingest.py`).
 | column | notes |

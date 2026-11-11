@@ -11,6 +11,7 @@ from app.models.content import (
     document_topics,
 )
 from app.models.question import Outcome, Question, QuestionCitation
+from app.models.tags import Tag, document_tags
 from app.models.user import Role, User
 
 __all__ = [
@@ -24,7 +25,9 @@ __all__ = [
     "Question",
     "QuestionCitation",
     "Role",
+    "Tag",
     "Topic",
     "User",
+    "document_tags",
     "document_topics",
 ]

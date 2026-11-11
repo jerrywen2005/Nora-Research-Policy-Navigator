@@ -34,9 +34,18 @@ export interface TopicRef {
   name: string
 }
 
+// Subtopic tag (workflow D): one shared list from the Link, not owned by a topic.
+export interface Tag {
+  id: number
+  slug: string
+  name: string
+  definition: string | null
+}
+
 export interface Topic extends TopicRef {
   description: string
   document_count: number
+  tags: Tag[] // workflow D; tags on this topic's active documents
 }
 
 export interface TopicDetail extends Topic {
@@ -65,12 +74,22 @@ export interface DocumentSummary {
   summary: string | null
   office: Office | null
   topics: TopicRef[]
+  tags: Tag[] // workflow D
   is_authoritative: boolean
   last_reviewed_at: string | null // "YYYY-MM-DD"
 }
 
+// Short form for links to a document (workflow D)
+export interface DocumentRef {
+  id: number
+  title: string
+  doc_type: DocType
+  citation: string | null
+}
+
 export interface DocumentDetail extends DocumentSummary {
   content_text: string
+  related_documents: DocumentRef[] // workflow D; documents sharing a tag
 }
 
 export interface Page<T> {
@@ -81,9 +100,54 @@ export interface Page<T> {
 // Query parameters for GET /api/documents
 export interface DocumentQuery {
   topic?: string
+  tag?: string // workflow D; a tag slug, across all topics unless topic is also set
   q?: string
   limit?: number
   offset?: number
+}
+
+// ---- Admin: content management (workflow D) ----
+
+export type DocumentStatus = 'draft' | 'active' | 'archived'
+
+export interface UserRef {
+  id: number
+  onyen: string
+  display_name: string | null
+}
+
+export interface AdminDocument extends DocumentSummary {
+  status: DocumentStatus
+  created_at: string // ISO 8601 timestamp
+  updated_at: string // ISO 8601 timestamp
+  updated_by: UserRef | null
+}
+
+export interface AdminDocumentDetail extends AdminDocument {
+  content_text: string
+}
+
+// Query parameters for GET /api/admin/documents
+export interface AdminDocumentQuery {
+  status?: DocumentStatus
+  topic?: string
+  q?: string
+  limit?: number
+  offset?: number
+}
+
+// POST /api/admin/documents
+export interface ImportDocumentRequest {
+  source_url: string
+}
+
+// PATCH /api/admin/documents/{id}; omitted fields are unchanged, lists replace the whole list
+export interface UpdateDocumentRequest {
+  doc_type?: DocType
+  office_id?: number | null
+  topic_ids?: number[]
+  tag_ids?: number[] // at most 5
+  is_authoritative?: boolean
 }
 
 // ---- Ask ----

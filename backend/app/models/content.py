@@ -155,6 +155,9 @@ class Document(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+    # Tag and document_tags live in app/models/tags.py.
+    tags: Mapped[list["Tag"]] = relationship(secondary="document_tags", order_by="Tag.name")  # noqa: F821
+    updated_by_user: Mapped["User | None"] = relationship(foreign_keys=[updated_by])  # noqa: F821
 
 
 # The size of BAAI/bge-small-en-v1.5's vectors (app/rag/embeddings.py). A different embedding
