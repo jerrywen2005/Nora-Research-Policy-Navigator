@@ -20,8 +20,9 @@ services:
 
   backend:
     build: ./backend
-    # Migrate, load the dummy seed data (idempotent), then serve with hot reload.
-    command: sh -c "alembic upgrade head && python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    # Migrate, load the seed data, chunk and embed changed documents (all three idempotent; the
+    # first run downloads the embedding model into backend/.cache), then serve with hot reload.
+    command: sh -c "alembic upgrade head && python -m app.seed && python -m app.rag && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-policy_navigator}
       AUTH_PROVIDER: mock # sign in as any Onyen; see docs/auth.md

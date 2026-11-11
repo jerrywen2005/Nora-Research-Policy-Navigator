@@ -24,7 +24,12 @@ that data may be stored.
   volumes.
 - Frontend production image: nginx-unprivileged on port 8080. It serves the static build and
   proxies `/api` to the backend.
-- Backend: uvicorn. Run `alembic upgrade head` as a startup step or a one-off job before rollout.
+- Backend: uvicorn. Run `alembic upgrade head` as a startup step or a one-off job before rollout,
+  then `python -m app.rag` to chunk and embed any changed documents.
+- RAG models (about 130 MB for embeddings, more for the reranker) download on first use into
+  `MODEL_CACHE_DIR` (default `.cache/models`, relative to `/app`, which isn't writable on
+  OpenShift). Point it at a writable volume, or download the models into the image at build time
+  so pods don't depend on outbound access to Hugging Face.
 
 ## Who handles what (decided 2026-10-27)
 

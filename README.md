@@ -47,6 +47,7 @@ pip install -e "./backend[dev]"
 cd backend
 alembic upgrade head
 python -m app.seed                  # dummy users and data
+python -m app.rag                   # chunk and embed documents for Ask (first run downloads a model)
 uvicorn app.main:app --reload       # http://localhost:8000
 
 # Frontend (separate terminal)
