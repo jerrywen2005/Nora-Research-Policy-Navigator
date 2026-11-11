@@ -128,9 +128,9 @@ the workflows, so each has one owner who makes sure it's met and checked.
   all 197 documents (title, link, topic, contact); D loads the tags from the same file
 - [x] Ingestion: each policy's text → `document_chunks` with embeddings (`python -m app.rag`)
 - [x] Hybrid retrieval (pgvector + BM25), reranking and the confidence gate threshold
-- [ ] Referral to the
+- [x] Referral to the
   topic's office
-- [ ] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
+- [x] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
 - [ ] Ask page on the real API, with citations, the confidence indicator and the disclaimer;
   delete `fakeData.ts`
 - [x] Evaluation script over test questions (`python -m app.rag eval`; ours first, the Link's

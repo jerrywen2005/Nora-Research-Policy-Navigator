@@ -26,6 +26,11 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-policy_navigator}
       AUTH_PROVIDER: mock # sign in as any Onyen; see docs/auth.md
+      # Ask's answer-writing LLM, off unless .env sets it (see .env.example and docs/rag.md).
+      LLM_PROVIDER: ${LLM_PROVIDER:-none}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.groq.com/openai/v1}
+      LLM_MODEL: ${LLM_MODEL:-openai/gpt-oss-20b}
     ports:
       - "8000:8000" # API docs at http://localhost:8000/api/docs
     volumes:

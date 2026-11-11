@@ -2,7 +2,8 @@
 
 **Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12), and so are
 `offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13),
-and `document_chunks` (migration `2743ef7700b3`, 2026-11-10).
+`document_chunks` (migration `2743ef7700b3`, 2026-11-10), and `questions` and
+`question_citations` (migration `b3f26accf7c2`, 2026-11-10).
 Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
@@ -124,23 +125,24 @@ Admins review them and write the FAQ.
 
 ### Usage and analytics
 
-**questions**: one row per Ask.
+**questions**: one row per Ask, written by `POST /api/ask` (`app/rag/answer.py`).
 | column | notes |
 |---|---|
 | id, user_id | user_id is nullable so it can be anonymized (see the open privacy question) |
 | question_text | |
-| topic_id | classified topic, nullable |
-| outcome | `answered`, `referred`, `no_answer`, `error` |
-| confidence | score from the pipeline |
+| topic_id | the topic the user asked from, nullable |
+| outcome | `answered`, `referred`, `no_answer`, `error` (the LLM failed; the user saw sources and an office) |
+| confidence | the best reranker score, 0 to 1 |
 | answer_text | stored. It's small, and admins need it to review weak answers |
 | referred_office_id | nullable |
 | model, prompt_version, latency_ms | for comparing pipeline versions |
 | parent_question_id | nullable; for multi-turn follow-ups later |
 | created_at | |
 
-**question_citations** (question_id, chunk_id, document_id, rank, score, was_cited): what was
-retrieved and what the answer actually cited. This drives the "most cited resources" analytics.
-`document_id` is stored alongside the chunk so counts survive re-chunking.
+**question_citations** (question_id, rank, chunk_id, document_id, score, was_cited): the chunks
+retrieved for a question, best first (primary key: question_id + rank), and whether the answer
+cited each. This drives the "most cited resources" analytics. `chunk_id` becomes null when
+re-chunking deletes the chunk; `document_id` is stored alongside so counts survive.
 
 **feedback**
 | column | notes |
