@@ -5,29 +5,14 @@ from fastapi.testclient import TestClient
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
-from app.models import Feedback, Outcome, Question, User
+from app.models import Feedback, Question, User
 from tests.conftest import login
+from tests.questions import add_question
 
 
 @pytest.fixture
 def make_question(db_session: Session):
-    """Factory for logged questions, as POST /api/ask would write them."""
-
-    def make(user_id: int | None, text: str = "Do I need IRB approval?") -> Question:
-        question = Question(
-            user_id=user_id,
-            question_text=text,
-            outcome=Outcome.ANSWERED,
-            confidence=0.8,
-            answer_text="Usually yes. [1]",
-            prompt_version="test",
-            latency_ms=10,
-        )
-        db_session.add(question)
-        db_session.flush()
-        return question
-
-    return make
+    return lambda user_id: add_question(db_session, user_id)
 
 
 @pytest.fixture
