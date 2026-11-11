@@ -164,3 +164,13 @@ def test_get_missing_or_inactive_document_is_404(signed_in: TestClient, content)
         response = signed_in.get(f"/api/documents/{document_id}")
         assert response.status_code == 404
         assert response.json() == {"detail": "Document not found"}
+
+
+def test_every_document_type_is_served(signed_in: TestClient, content):
+    for doc_type in DocType:
+        content.document(f"A {doc_type} document", doc_type=doc_type)
+
+    response = signed_in.get("/api/documents", params={"limit": 100})
+
+    assert response.status_code == 200, response.text
+    assert {item["doc_type"] for item in response.json()["items"]} == set(DocType)
