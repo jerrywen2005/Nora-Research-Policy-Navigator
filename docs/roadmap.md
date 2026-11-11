@@ -25,9 +25,9 @@ request has come in. Until SSO is set up, everything below is built and demoed o
 stack, with mock login. See
 [deployment.md](deployment.md) and [auth.md](auth.md).
 
-Building the five MVP workflows in [Phase 2](#phase-2-nov-10--nov-15-mvp-workflows). Waiting on the
-Link for the subtopic tags, disclaimer and citation wording, referral contacts and sample test
-questions ([decisions.md](decisions.md#open-questions)).
+Building the five MVP workflows in [Phase 2](#phase-2-nov-10--nov-15-mvp-workflows). The Link's
+policy and tag inventory (197 policies, 77 tags) is in; we're still waiting on the disclaimer and
+citation wording and sample test questions ([decisions.md](decisions.md#open-questions)).
 
 ## Phase 1: Oct 14 demo
 
@@ -124,7 +124,9 @@ the workflows, so each has one owner who makes sure it's met and checked.
 
 **A. Ask (Jerry).** Build plan: [rag.md](rag.md#plan-2026-10-27).
 - [x] Tutorial RAG demo and write-up for the Nov 2 tech talk
-- [ ] Ingestion: Repository documents → `document_chunks` with embeddings
+- [ ] Convert the Link's inventory spreadsheet to `app/seed/data/policy_inventory.json` and seed
+  all 197 documents (title, link, topic, contact); D loads the tags from the same file
+- [ ] Ingestion: fetch each policy's text → `document_chunks` with embeddings
 - [ ] Hybrid retrieval (pgvector + full-text), reranking, the confidence gate and referral to the
   topic's office
 - [ ] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
@@ -145,13 +147,13 @@ the workflows, so each has one owner who makes sure it's met and checked.
 - [ ] Admin Overview on the real API; delete `sampleData.ts`
 
 **D. Content management and subtopics (Adithi backend, Anton frontend).**
-- [ ] `tags` and `document_tags` ([database.md](database.md#content)); load the Link's tags when
-  they arrive, and hide the tag UI until then
+- [ ] `tags` and `document_tags` ([database.md](database.md#content)); seed the 77 tags, their
+  definitions and the document assignments from `policy_inventory.json`
 - [ ] Admin endpoints: add a document by Repository link (imported as a draft), publish, edit
   topic, tags, office and authoritative flag, archive and restore; hard delete needs confirmation
 - [ ] Changing a document re-runs ingestion for its chunks (coordinate with A)
-- [ ] Search also matches topic and subtopic names; topic pages filter by subtopic; document
-  pages list related policies
+- [ ] Search also matches topic and tag names; a tag page lists every policy with that tag
+  across topics; document pages show their tags and related policies
 - [ ] Admin Policy Library and Content Management pages
 
 **E. FAQs (Anton backend, Adithi frontend).**
