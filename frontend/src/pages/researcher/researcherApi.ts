@@ -1,19 +1,14 @@
-// Data access for the researcher pages, one function per endpoint in docs/api.md. Topics and
-// documents call the real API. ask() still returns fake data until POST /api/ask exists; then
-// replace its body with the apiPost call in its comment and delete fakeData.ts.
-import { apiGet } from '../../api/client'
+// Data access for the researcher pages, one function per endpoint in docs/api.md.
+import { apiGet, apiPost } from '../../api/client'
 import type {
   AskRequest,
   AskResponse,
-  Citation,
-  DocumentDetail,
   DocumentQuery,
   DocumentSummary,
   Page,
   Topic,
   TopicDetail,
 } from '../../api/types'
-import { fakeDisclaimer, fakeDocuments, fakeTopics, fallbackOffice } from './fakeData'
 
 export function getTopics(): Promise<Topic[]> {
   return apiGet<Topic[]>('/topics')
@@ -35,94 +30,8 @@ export function getDocuments(query: DocumentQuery): Promise<Page<DocumentSummary
   return apiGet<Page<DocumentSummary>>(`/documents?${params}`)
 }
 
-// ---- Fake ask() and its helpers, until POST /api/ask exists ----
-
-// A short delay so loading states show up in the demo, as they would with a real request.
-function fakeLatency(ms = 250) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-const STOP_WORDS = new Set([
-  'about', 'does', 'from', 'have', 'need', 'should', 'that', 'there', 'this', 'what', 'when',
-  'where', 'which', 'with', 'would', 'your',
-])
-
-function keywords(text: string): string[] {
-  return text
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter((word) => word.length > 2 && !STOP_WORDS.has(word))
-}
-
-// Number of query keywords that appear in the document. A rough stand-in for full-text search.
-function score(doc: DocumentDetail, terms: string[]): number {
-  const haystack = `${doc.title} ${doc.summary ?? ''} ${doc.content_text}`.toLowerCase()
-  return terms.filter((term) => haystack.includes(term)).length
-}
-
-function toCitation(doc: DocumentDetail, number: number): Citation {
-  return {
-    number,
-    document_id: doc.id,
-    title: doc.title,
-    section: null,
-    source_url: doc.source_url,
-    snippet: doc.content_text,
-  }
-}
-
-// apiPost<AskResponse>('/ask', request)
-// Mimics stretch level 2 (top sources, no generated answer), plus one canned level 3 answer for
-// the IRB example question so the demo can show an answer with citations.
-export async function ask(request: AskRequest): Promise<AskResponse> {
-  await fakeLatency(600)
-  const terms = keywords(request.question)
-  const matches = fakeDocuments
-    .filter((doc) => !request.topic || doc.topics.some((t) => t.slug === request.topic))
-    .map((doc) => ({ doc, score: score(doc, terms) }))
-    .filter((match) => match.score >= 2)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
-    .map((match) => match.doc)
-
-  if (matches.length === 0) {
-    const topic = fakeTopics.find((t) => t.slug === request.topic)
-    return {
-      question_id: null,
-      outcome: 'referred',
-      answer: "Nora couldn't find sources that answer this question confidently.",
-      citations: [],
-      referral: topic?.office ?? fallbackOffice,
-      confidence: null,
-      disclaimer: fakeDisclaimer,
-    }
-  }
-
-  if (terms.includes('irb')) {
-    const sources = [1, 2, 3].map((id) => fakeDocuments.find((doc) => doc.id === id)!)
-    return {
-      question_id: null,
-      outcome: 'answered',
-      answer:
-        'You may need IRB approval for your study. Research involving living individuals or ' +
-        'identifiable private information typically requires IRB review if it meets the ' +
-        'federal definition of human subjects research [1][3]. If your study uses existing ' +
-        'data that are de-identified and you cannot link the data to individuals, IRB review ' +
-        'may not be required [2].',
-      citations: sources.map((doc, index) => toCitation(doc, index + 1)),
-      referral: null,
-      confidence: 0.82,
-      disclaimer: fakeDisclaimer,
-    }
-  }
-
-  return {
-    question_id: null,
-    outcome: 'answered',
-    answer: null,
-    citations: matches.map((doc, index) => toCitation(doc, index + 1)),
-    referral: null,
-    confidence: null,
-    disclaimer: fakeDisclaimer,
-  }
+// Answers from the policies with citations, or refers to an office (docs/api.md). Takes several
+// seconds: retrieval and reranking run on the server's CPU, then the LLM writes the answer.
+export function ask(request: AskRequest): Promise<AskResponse> {
+  return apiPost<AskResponse>('/ask', request)
 }

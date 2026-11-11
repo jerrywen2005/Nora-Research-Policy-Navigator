@@ -1,7 +1,7 @@
 """create tags tables
 
 Revision ID: 3405a4fb20ce
-Revises: 6de3ee5b4d8c
+Revises: b3f26accf7c2
 Create Date: 2026-11-10 20:48:10.388400
 
 """
@@ -13,7 +13,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "3405a4fb20ce"
-down_revision: str | Sequence[str] | None = "6de3ee5b4d8c"
+down_revision: str | Sequence[str] | None = "b3f26accf7c2"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

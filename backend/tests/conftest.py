@@ -5,6 +5,7 @@ The schema is migrated once per run, and each test runs inside a transaction tha
 so tests never see each other's rows and never leave data in your dev database.
 """
 
+import hashlib
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -30,6 +31,9 @@ from app.models import (
     document_tags,
     document_topics,
 )
+from app.rag import retrieval
+from app.rag.embeddings import FakeEmbeddingProvider
+from app.rag.ingest import ingest_all
 
 ALEMBIC_INI = Path(__file__).resolve().parent.parent / "alembic.ini"
 
@@ -132,3 +136,49 @@ def content(db_session: Session):
             return document
 
     return Factory
+
+
+# ---- RAG: a small corpus for retrieval tests, ingested with the fake embedder ----
+
+EXPORT = (
+    "## 1. Scope\nITAR and EAR export controls apply to controlled equipment and data.\n"
+    "## 2. Travel\nTaking a laptop abroad can require an export license."
+)
+ANIMALS = (
+    "## 1. Housing\nMouse cage density limits for the animal facility and the lab.\n"
+    "## 2. Lab procedures\nLab staff record each animal procedure in the lab log."
+)
+
+
+def article_url(article: int) -> str:
+    return f"https://policies.unc.edu/TDClient/2833/Portal/KB/Article/{article}"
+
+
+@pytest.fixture
+def corpus(db_session, content):
+    """Two searchable policies, plus a draft and a non-authoritative one that must never match."""
+    retrieval._index = None  # each test builds its own keyword index
+    security = content.topic("international-research-and-security")
+    animals = content.topic("animal-care-and-use")
+
+    def policy(title, text, topic, article, **fields):
+        fields.setdefault("status", DocumentStatus.ACTIVE)
+        fields.setdefault("is_authoritative", True)
+        return content.document(
+            title,
+            topics=[topic],
+            content_text=text,
+            content_hash=hashlib.sha256(text.encode()).hexdigest(),
+            source_url=article_url(article),
+            **fields,
+        )
+
+    documents = {
+        "export": policy("Export Controls Policy", EXPORT, security, 132084),
+        "animals": policy("Mouse Cage Density Standard", ANIMALS, animals, 132193),
+        "draft": policy("Draft Export Notes", EXPORT, security, 1, status=DocumentStatus.DRAFT),
+        "unofficial": policy("Export Blog Post", EXPORT, security, 2, is_authoritative=False),
+    }
+    ingest_all(db_session, FakeEmbeddingProvider())
+    yield documents
+    retrieval._index = None

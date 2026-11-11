@@ -5,13 +5,10 @@ import pytest
 
 from app import policy_repository
 from app.policy_repository import (
-    CATEGORY_TOPICS,
     HttpRepositoryClient,
     RepositoryError,
     extract_article,
     get_repository_client,
-    inventory_policy,
-    load_inventory,
     official_url,
     parse_article_id,
 )
@@ -125,23 +122,3 @@ def test_http_client_wraps_network_errors(monkeypatch):
 
 def test_get_repository_client_is_the_http_client():
     assert isinstance(get_repository_client(), HttpRepositoryClient)
-
-
-def test_inventory_is_consistent():
-    inventory = load_inventory()
-    tag_names = {tag["name"] for tag in inventory["tags"]}
-
-    assert len({tag["slug"] for tag in inventory["tags"]}) == len(inventory["tags"])
-    assert len(inventory["policies"]) == len({p["article_id"] for p in inventory["policies"]})
-    for policy in inventory["policies"]:
-        assert policy["category"] in CATEGORY_TOPICS
-        assert len(policy["tags"]) <= 5
-        assert set(policy["tags"]) <= tag_names
-
-
-def test_inventory_policy():
-    policy = inventory_policy(132183)
-
-    assert policy.topic_slug == "animal-care-and-use"
-    assert policy.tag_names == ["IACUC Oversight & Protocols"]
-    assert inventory_policy(1) is None

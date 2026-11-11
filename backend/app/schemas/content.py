@@ -1,9 +1,8 @@
 from datetime import date
-from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
-DocTypeName = Literal["policy", "sop", "guidance", "faq", "webpage", "job_aid", "other"]
+from app.models import DocType
 
 
 class _FromOrm(BaseModel):
@@ -56,7 +55,7 @@ class DocumentRef(_FromOrm):
 
     id: int
     title: str
-    doc_type: DocTypeName
+    doc_type: DocType
     citation: str | None
 
 
@@ -65,7 +64,8 @@ class DocumentSummary(_FromOrm):
 
     id: int
     title: str
-    doc_type: DocTypeName
+    # The model's enum, so a new document type can't be stored but fail to serialize.
+    doc_type: DocType
     citation: str | None
     source_url: str | None
     summary: str | None

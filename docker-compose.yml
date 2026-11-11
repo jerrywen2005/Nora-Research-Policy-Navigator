@@ -20,11 +20,17 @@ services:
 
   backend:
     build: ./backend
-    # Migrate, load the dummy seed data (idempotent), then serve with hot reload.
-    command: sh -c "alembic upgrade head && python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    # Migrate, load the seed data, chunk and embed changed documents (all three idempotent; the
+    # first run downloads the embedding model into backend/.cache), then serve with hot reload.
+    command: sh -c "alembic upgrade head && python -m app.seed && python -m app.rag && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-policy_navigator}
       AUTH_PROVIDER: mock # sign in as any Onyen; see docs/auth.md
+      # Ask's answer-writing LLM, off unless .env sets it (see .env.example and docs/rag.md).
+      LLM_PROVIDER: ${LLM_PROVIDER:-none}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.groq.com/openai/v1}
+      LLM_MODEL: ${LLM_MODEL:-openai/gpt-oss-20b}
     ports:
       - "8000:8000" # API docs at http://localhost:8000/api/docs
     volumes:

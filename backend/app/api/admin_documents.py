@@ -20,7 +20,6 @@ from app.policy_repository import (
     RepositoryError,
     extract_article,
     get_repository_client,
-    inventory_policy,
     official_url,
     parse_article_id,
 )
@@ -30,6 +29,7 @@ from app.schemas.admin_documents import (
     ImportDocumentRequest,
     UpdateDocumentRequest,
 )
+from app.seed.tags import inventory_policy
 
 router = APIRouter(
     prefix="/admin/documents",

@@ -5,7 +5,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from app.schemas.content import DocTypeName, DocumentSummary, _FromOrm
+from app.models import DocType
+from app.schemas.content import DocumentSummary, _FromOrm
 
 MAX_TAGS_PER_DOCUMENT = 5  # the Link's tag inventory allows up to five tags per policy
 
@@ -44,7 +45,7 @@ class ImportDocumentRequest(BaseModel):
 class UpdateDocumentRequest(BaseModel):
     """Every field is optional: omitted fields stay as they are, and lists replace the list."""
 
-    doc_type: DocTypeName | None = None
+    doc_type: DocType | None = None
     office_id: int | None = None
     topic_ids: list[int] | None = None
     tag_ids: list[int] | None = Field(default=None, max_length=MAX_TAGS_PER_DOCUMENT)

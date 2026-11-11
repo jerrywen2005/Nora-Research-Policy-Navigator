@@ -5,16 +5,12 @@
   the network; `HttpRepositoryClient` is the real one.
 - `extract_article`: title and text from an article page, keeping headings as Markdown so RAG
   ingestion can split on sections (docs/rag.md).
-- The Link's tag inventory (`seed/data/policy_tags.json`): each policy's category and tags.
 """
 
-import json
 import re
 import urllib.request
 from dataclasses import dataclass
-from functools import cache
 from html.parser import HTMLParser
-from pathlib import Path
 from typing import Protocol
 from urllib.parse import urlsplit
 
@@ -145,44 +141,3 @@ def extract_article(html: str) -> Article:
     if not title or not content_text:
         raise RepositoryError("The page has no article title or text")
     return Article(title=title, content_text=content_text)
-
-
-INVENTORY_FILE = Path(__file__).parent / "seed" / "data" / "policy_tags.json"
-
-# The Repository's official category names (as in the inventory) → our topic slugs.
-CATEGORY_TOPICS = {
-    "Animal Care and Use and IACUC": "animal-care-and-use",
-    "Clinical Research": "clinical-research",
-    "Conflict of Interest": "conflict-of-interest",
-    "Human Research Ethics and IRB": "human-subjects-research",
-    "International Research and Research Security": "international-research-and-security",
-    "Postdoctoral Affairs": "postdoctoral-affairs",
-    "Research Integrity": "research-integrity",
-    "Research Operations": "research-operations",
-    "Sponsored Programs": "sponsored-programs",
-}
-
-
-@dataclass
-class InventoryPolicy:
-    article_id: int
-    topic_slug: str
-    tag_names: list[str]
-
-
-@cache
-def load_inventory() -> dict:
-    """The Link's tag inventory: {"tags": [...], "policies": [...]}."""
-    return json.loads(INVENTORY_FILE.read_text(encoding="utf-8"))
-
-
-def inventory_policy(article_id: int) -> InventoryPolicy | None:
-    """The inventory's category and tags for one article, or None if it isn't listed."""
-    for policy in load_inventory()["policies"]:
-        if policy["article_id"] == article_id:
-            return InventoryPolicy(
-                article_id=article_id,
-                topic_slug=CATEGORY_TOPICS[policy["category"]],
-                tag_names=policy["tags"],
-            )
-    return None

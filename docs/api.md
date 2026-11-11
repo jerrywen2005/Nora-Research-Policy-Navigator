@@ -183,7 +183,7 @@ exists, results link straight to `source_url`.*
   "last_reviewed_at": "2026-08-01"
 }
 ```
-`doc_type` is one of `policy`, `sop`, `guidance`, `faq`, `webpage`, `job_aid`, `other`.
+`doc_type` is one of `policy`, `standard`, `procedure`, `sop`, `guidance`, `faq`, `webpage`, `job_aid`, `other`.
 `citation`, `source_url`, `summary`, `office` and `last_reviewed_at` may be `null`.
 `tags` is a list of [Tag](#tag), ordered by name, possibly empty.
 
@@ -205,19 +205,21 @@ document has no tags.
 `{ "id", "title", "doc_type", "citation" }`: the short form for links to a
 document. `citation` may be `null`.
 
-## Ask (stretch for Oct 14)
+## Ask
 
 ### `POST /api/ask`
 Request:
 ```json
 { "question": "Do I need IRB approval to use an existing dataset?", "topic": null }
 ```
-`topic` is an optional topic slug that narrows retrieval.
+`question` is 1–1000 characters and not blank (422 otherwise). `topic` is an optional topic slug
+that narrows retrieval to that topic's documents; an unknown or inactive slug is 404. Requires
+sign-in (401). Pipeline: [rag.md](rag.md#answering-post-apiask).
 
 Response `200`:
 ```json
 {
-  "question_id": null,
+  "question_id": 41,
   "outcome": "answered",
   "answer": "Usually yes, unless the data are publicly available or fully de-identified. [1]",
   "citations": [
@@ -235,13 +237,21 @@ Response `200`:
   "disclaimer": "Nora provides general information, not an official determination. Contact the responsible office for a formal review."
 }
 ```
-- `outcome` is `"answered"`, `"referred"` or `"no_answer"`.
-- When `outcome` is not `"answered"`, `answer` may be `null` or a short explanation, and
-  `referral` is the [Office](#office) to contact.
-- `answer` refers to citations as `[1]`, `[2]`, matching `number`.
-- Without an LLM (stretch level 2), `answer` is `null`, and `citations` holds the top matching
-  documents as "relevant sources".
-- `question_id` is `null` until questions are logged to the database. Feedback will use it later.
+- `outcome`:
+  - `"answered"`: `answer` cites `citations` as `[1]`, `[2]`, matching `number`. Only cited
+    sources are listed.
+  - `"referred"`: nothing in the policies matched (the confidence gate). `answer` is a short
+    explanation, `citations` is empty, and `referral` is the [Office](#office) to contact: the
+    topic's office when asked from a topic, otherwise the Office of the Vice Chancellor for
+    Research.
+  - `"no_answer"`: sources matched but the answer didn't cite them, or the LLM failed. `answer`
+    is a short explanation, `referral` is the office that owns the best-matching policy, and
+    after an LLM failure `citations` lists the matching sources.
+- `confidence` is the best reranker score, 0 to 1. Below 0.04 the question is referred.
+- With no LLM configured (`LLM_PROVIDER=none`, the default until UNC approves a provider),
+  `outcome` is `"answered"`, `answer` is `null`, and `citations` lists the top matching sections
+  as "relevant sources".
+- `question_id` identifies the logged question; feedback will refer to it.
 - The UI always shows `disclaimer`.
 
 ## Health
@@ -275,8 +285,8 @@ POST (import) → draft ──publish──→ active
 - A transition that isn't in the diagram (for example publishing an archived document) returns
   `409` with a `detail` that says why.
 - Publishing, archiving and restoring, and edits to an active document's topics, tags or
-  `is_authoritative`, will update its RAG chunks in the same request once workflow A's ingestion
-  exists. *Not built yet.*
+  `is_authoritative`, will update its RAG chunks (`app/rag/ingest.py`) in the same request.
+  *Not wired up yet.*
 
 ### `GET /api/admin/documents`
 Lists documents of any status for the Policy Library page. Query parameters, all optional:

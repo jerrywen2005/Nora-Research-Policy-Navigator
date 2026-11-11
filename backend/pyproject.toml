@@ -11,6 +11,10 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "alembic>=1.13",
     "itsdangerous>=2.2", # signs the session cookie (Starlette SessionMiddleware)
+    "pgvector>=0.5", # the vector column type for SQLAlchemy
+    "fastembed>=0.9", # runs the embedding and reranking models on ONNX Runtime, without PyTorch
+    "rank-bm25>=0.2", # keyword search (BM25); Postgres has no BM25
+    "openai>=2.0", # client for the answer-writing LLM; any OpenAI-compatible provider works
 ]
 
 [project.optional-dependencies]
@@ -19,6 +23,10 @@ dev = [
     "pytest-cov>=5.0",
     "httpx>=0.27",
     "ruff>=0.6",
+]
+# Only for scripts/build_policy_inventory.py, which rebuilds the seed data by hand.
+data = [
+    "beautifulsoup4>=4.12",
 ]
 
 [build-system]
@@ -30,14 +38,15 @@ include = ["app*"]
 
 [tool.setuptools.package-data]
 "app.seed" = ["data/*.json"]
+"app.rag" = ["data/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--cov=app --cov-report=term-missing"
 
 [tool.coverage.run]
-# Thin command-line entry point; the seed logic it calls is tested.
-omit = ["app/seed/__main__.py"]
+# Thin command-line entry points; the logic they call is tested.
+omit = ["app/seed/__main__.py", "app/rag/__main__.py"]
 
 [tool.coverage.report]
 fail_under = 100

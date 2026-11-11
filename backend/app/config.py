@@ -25,6 +25,19 @@ class Settings(BaseSettings):
     session_secret: str = DEV_SESSION_SECRET
     session_max_age_seconds: int = 8 * 60 * 60
 
+    # RAG models; see docs/rag.md. "fake" needs no download and is for tests.
+    embedding_provider: Literal["fastembed", "fake"] = "fastembed"
+    reranker_provider: Literal["fastembed", "fake"] = "fastembed"
+    # Where downloaded model files are kept between runs.
+    model_cache_dir: str = ".cache/models"
+    # The LLM that writes answers. Off until configured: UNC hasn't approved a provider, and
+    # without one Ask still shows the matching sources. Any OpenAI-compatible API works; for
+    # local development, Groq's free tier: LLM_PROVIDER=openai and LLM_API_KEY=<a Groq key>.
+    llm_provider: Literal["none", "openai", "fake"] = "none"
+    llm_base_url: str = "https://api.groq.com/openai/v1"
+    llm_api_key: str = ""
+    llm_model: str = "openai/gpt-oss-20b"
+
     @property
     def is_production(self) -> bool:
         return self.environment == "production"

@@ -16,11 +16,17 @@ an open question is answered, move it into the log.
 - **OKD:** Postgres + pgvector availability, outbound API access, image registry, hostname,
   secrets. *(client's team, who now own hosting)*
 - **Repo:** must the repo move to a UNC GitHub organization? *(coach / ITS)*
-- **Content:** which Research Policy Repository documents are approved to load, and in what format?
-  *(Link)*
-- **Referrals:** which office handles which topic, and what contact details should be shown?
-  *(Link)*
-- **Answer standards:** the exact disclaimer wording and the confidence/referral criteria. *(Link)*
+- **Referrals:** the inventory gives each policy's contact. Is that who Nora should refer to, and
+  who handles questions that match no policy? Until answered, Ask refers to the topic's office,
+  the office owning the best-matching policy, or the Office of the Vice Chancellor for Research
+  ([rag.md](rag.md), build log). *(Link)*
+- **Answer standards:** the exact disclaimer wording, the citation and source-link format, and the
+  confidence/referral criteria. *(Link; asked for in Jeanne's 2026-10-29 email)*
+- **Untagged policy:** Research Service Centers procedure (article 132340) has no tag yet; the
+  inventory's review notes say a reviewer must confirm one. *(Link)*
+- **Test questions:** sample researcher questions and use cases for the evaluation. *(Link)*
+- **MVP requirements sign-off:** does the Link approve the revised D1 requirements
+  ([product.md](product.md#requirements))? *(Link)*
 - **Researcher home mockup:** the mockup puts a large inline Ask panel and answer below the three
   Browse/Search/Ask cards, which gives Ask more weight than the "equal prominence" rule allows.
   Is that intended? The mockup also has no disclaimer on its answer; we show one anyway. Its
@@ -31,11 +37,11 @@ an open question is answered, move it into the log.
 
 ### 2026-11-10: content management backend and subtopic tags (workflow D)
 Built the admin content-management endpoints (F12, NF7) and subtopic tags (F3, F4). Decisions:
-- **Tags are one shared list**, following the Link's tag inventory
-  (`Nora_Policy_Tag_Inventory_Updated_2026.10.28.xlsx`): equally weighted labels that no topic
-  owns, so a document in any topic can carry any tag. A document has at most five (the Link's
-  limit). A topic's subtopic filter is the set of tags its active documents use. Schema:
-  [database.md](database.md); endpoints: [api.md](api.md#tags).
+- **Tags** follow the shared-list model in the inventory entry below. The 77 tags and their
+  definitions are seeded from `policy_tags.json` and each policy's tags from
+  `policy_inventory.json`. A document has at most five; a topic's subtopic filter is the set of
+  tags its active documents use. Schema: [database.md](database.md); endpoints:
+  [api.md](api.md#tags).
 - **Admins edit metadata only.** A document's title and text come from the Research Policy
   Repository, which stays the authoritative copy. Documents are added by importing a Repository
   link as a draft; `source_url` is stored in the official `/KB/Article/{id}` form, and duplicates
@@ -45,9 +51,90 @@ Built the admin content-management endpoints (F12, NF7) and subtopic tags (F3, F
   Permanent delete only works on archived documents and needs `confirm=true`.
 - **Search** also matches topic and tag names (weight B), combined at query time so renaming a
   tag needs no reindex.
-- Updating RAG chunks on publish/archive/restore waits for workflow A's ingestion.
+- Re-running ingestion for a document's chunks when it's published, archived, restored or edited
+  isn't wired up yet; ingestion (`app/rag/ingest.py`) now exists, so this is next.
 - Not covered yet: editing topics, offices and tags in the app, FAQs, replacing a document with a
-  newer one, and review dates.
+  newer one, and review dates. *(Adithi)*
+
+### 2026-11-10: the Link's policy and tag inventory
+The Link's `Nora_Policy_Tag_Inventory_Updated_2026.10.28.xlsx` (dated Oct 28; the docs wrongly
+said the tags hadn't arrived) is the inventory Jeanne's Oct 29 email promised. It settles:
+- **Scope:** Nora's initial knowledge source is all **197** Research Policy Repository policies,
+  not the 16 we seeded. Each row has the category, article ID, title, direct link, issuing
+  officer, responsible unit and policy contact (194 with an email).
+- **Tags:** 77 tags, each with a definition, up to five per policy (196 of 197 tagged). Tags are
+  **shared across categories with equal status**: Tag 1–5 is not a ranking or hierarchy, and
+  selecting a tag should find policies in any category. This replaces our earlier "tags belong to
+  one topic" design: `tags` has no `topic_id` ([database.md](database.md#content)), and D1 F3 now
+  says a tag lists every policy with it, across topics.
+- **Topics:** its nine Repository categories match our nine seeded topics one to one.
+
+Plan: Jerry converts the spreadsheet to `backend/app/seed/data/policy_inventory.json` and seeds
+the 197 documents for ingestion; Adithi seeds the tags from the same file. The tag definitions
+also start the retrieval glossary ([rag.md](rag.md)). *(Jerry)*
+
+### 2026-11-10: MVP requirements narrowed
+The original D1 spec (F1–F34, NF1–NF13) overlapped, was hard to test, and was one-third things we
+won't build. It's narrowed to 12 functional (F1–F12) and 10 non-functional (NF1–NF10) Definite
+requirements, each checkable, based on the Link proposal and Jeanne's emails. The MVP needs every
+functional requirement and at least 8 non-functional ones. Main changes from D1:
+- **Added:** subtopic tags (Jeanne's 2026-10-29 email), usage logging for browse and search (her
+  dashboard asks for Browse, Search and Ask measures), most-cited resources, and a draft → review
+  → publish step for content ("add, review, update, and remove" in the proposal).
+- **Promoted to required:** FAQs (named in the proposal's admin list), saved items (Jerry), and
+  CSV export (the proposal says "analytics and reporting").
+- **Narrowed:** content management imports documents by Repository link and edits metadata only.
+  The Repository stays the authoritative text, so there's no in-app text editor. "Most frequent
+  questions" counts exact matches; grouping similar questions stays a "Perhaps".
+- **Dropped:** portable hosting on Vercel/Render (the client hosts on CloudApps), and naming
+  specific AI providers in the interfaces.
+
+D1 on the website is revised in place, since it's the requirements document we submit; the old
+F1–F34 list is in the website's git history. A separate MVP page was tried and dropped because it
+only repeated D1. Summary: [product.md](product.md#requirements). It's our draft until the Link
+approves it. *(Jerry, after Anton suggested narrowing the list)*
+
+### 2026-11-10: owners for the non-functional and Perhaps requirements
+Each non-functional requirement has one owner who makes sure it's met (most fall to Jerry through
+Ask), and each Perhaps requirement goes to whoever built the workflow it extends. Improbable items
+have no owners. The admin list (Users & Roles) is now Perhaps F22, and D1's interfaces keep the
+mockup's right rail and the answer's confidence indicator, which the frontend already partly
+builds. Tables in [roadmap.md](roadmap.md#phase-2-nov-10--nov-15-mvp-workflows). *(Jerry)*
+
+### 2026-11-10: MVP workflow owners
+Five workflows remain. Jerry builds Ask (RAG) end to end. The rest are split between two pairs,
+each workflow with one backend and one frontend owner: Andy (backend) and Jerry (frontend) take
+feedback and saved items, then usage logging and the admin dashboard; Adithi and Anton take
+content management with subtopics (Adithi backend, Anton frontend), then FAQs (Anton backend,
+Adithi frontend). Details in [roadmap.md](roadmap.md). *(Jerry)*
+
+### 2026-11-10: subtopics are tags, built before the client's list arrives
+Subtopics are tags that belong to one of the nine topics and can be shared by documents across
+topics (Jeanne: tags "help users find related policies across topics"). So they're a `tags` table
+plus a `document_tags` join, not child rows in `topics`. We build the tables, admin editing and
+filtering now, hide the tag UI while there are no tags, and load the Link's tags when they
+arrive. We don't make up placeholder tags, because the Link defines the taxonomy. See
+[database.md](database.md#content). *(Jerry)*
+
+### 2026-10-29: client follow-up email and course deadlines
+Jeanne's summary of the Oct 27 meeting:
+- The UNC Research Policy Repository is the initial knowledge source.
+- Tags ("subtopics") for each of the nine topics are to be added to the app and to retrieval
+  before the **Nov 19 RCC Steering Group** demo.
+- Nora answers only from approved sources, with citations and links, an AI disclaimer, and a
+  referral when it can't answer confidently.
+- The client expects a working prototype by the **end of the semester in December**, plus handoff
+  documentation (architecture, coding conventions, deployment, maintenance, known limitations,
+  next steps).
+- Jeanne and Amanda Chang owe us: the document inventory with links and tags, sample test
+  questions, referral offices, and the citation and disclaimer preferences.
+
+Her dashboard guidance asks for aggregate patterns (Browse, Search and Ask activity, common
+search terms, searches with no useful result, referrals, helpfulness, trends over time), not
+views of individual researchers.
+
+At the same day's coach meeting (Vinir Rai), the course deadlines were set: **MVP Thu Nov 12**,
+final product **Sun Nov 15**.
 
 ### 2026-10-29: reply received on the SSO request
 A reply to our UNC SSO (auth) request has come back. Its details still need to be added to

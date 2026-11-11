@@ -2,7 +2,10 @@
 
 **Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12), and so are
 `offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13),
-and `tags` and `document_tags` (migration `3405a4fb20ce`, 2026-11-10). Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
+`document_chunks` (migration `2743ef7700b3`, 2026-11-10), `questions` and
+`question_citations` (migration `b3f26accf7c2`, 2026-11-10), and `tags` and `document_tags`
+(migration `3405a4fb20ce`, 2026-11-10).
+Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
 ## Where the database lives
@@ -59,7 +62,7 @@ analytics line up with the content.
 | column | notes |
 |---|---|
 | id, slug (unique), name, description | |
-| parent_id | nullable self-reference, for optional subtopics |
+| parent_id | nullable self-reference. Not used for subtopics, which are `tags` (below) |
 | default_office_id | the office to refer to for this topic |
 | sort_order, is_active | |
 
@@ -67,7 +70,7 @@ analytics line up with the content.
 | column | notes |
 |---|---|
 | id, title | |
-| doc_type | `policy`, `sop`, `guidance`, `faq`, `webpage`, `job_aid`, `other` |
+| doc_type | `policy`, `standard`, `procedure`, `sop`, `guidance`, `faq`, `webpage`, `job_aid`, `other` |
 | citation | official policy number or reference, if any |
 | source_url | link shown to users |
 | summary | short description for browse and search results |
@@ -83,30 +86,33 @@ analytics line up with the content.
 
 **document_topics** (document_id, topic_id): a document can belong to several topics.
 
-**tags**: subtopic tags from the Link's tag inventory (`backend/app/seed/data/policy_tags.json`,
-generated from their spreadsheet). The Link's model is one shared list of equally weighted
-labels, so a tag has no topic: documents in any topic can carry it, and a topic's subtopic filter
-is the set of tags its active documents use.
+**tags**: subtopics, from the Link's tag inventory (77 tags, with definitions in
+`backend/app/seed/data/policy_tags.json`; each policy's tags are in `policy_inventory.json`). Tags are
+shared across all nine topics and have equal status: they aren't owned by a topic and aren't
+ranked. Selecting a tag lists every policy with it, from any topic, which is how "related
+policies" are found. A topic's subtopic filter is the set of tags its active documents use.
 | column | notes |
 |---|---|
-| id | |
-| slug, name | both unique |
-| definition | the Link's "when to use" text; describes a discovery label, not a policy requirement |
+| id, slug (unique), name (unique) | e.g. `training-education`, "Training & Education" |
+| definition | the Link's "when to use" text; shown as help text and used as a retrieval glossary |
 
 **document_tags** (document_id, tag_id): up to five tags per document (the Link's limit, enforced
-by the admin API). Keyword search also matches topic and tag names; they're joined in at query
-time instead of being stored in `documents.search_vector`, so renaming a tag needs no reindex.
+by the admin API); the order of Tag 1–5 means nothing, so it isn't stored. Keyword search also
+matches topic and tag names (F4); they're joined in at query time instead of being stored in
+`documents.search_vector`, so renaming a tag needs no reindex.
 
-**document_chunks**: the RAG units.
+**document_chunks**: the RAG units, built by `python -m app.rag` (`app/rag/ingest.py`).
 | column | notes |
 |---|---|
-| id, document_id, chunk_index | unique (document_id, chunk_index) |
-| section_heading | for clearer citations |
-| text, token_count | |
-| embedding | `vector(N)` with an HNSW index. N depends on the embedding model (open question) |
-| search_vector | generated `tsvector` for hybrid retrieval |
+| id, document_id, chunk_index | unique (document_id, chunk_index); deleting a document deletes its chunks |
+| section_heading | heading path, e.g. "2. Procedure > 2.1 Initial Determination"; shown in citations |
+| context | "Document title > section heading", prepended to the text for embedding and search |
+| text, word_count | the section's paragraphs; about 300 words at most |
+| content_hash | the document's `content_hash` when the chunk was made; a mismatch means re-chunk |
+| embedding | `vector(384)` (BAAI/bge-small-en-v1.5). No vector index: an exact scan over a few thousand chunks takes milliseconds, and an HNSW index can return fewer rows than asked for when combined with a `WHERE` filter. Add one only if the corpus grows by orders of magnitude |
+| search_vector | generated `tsvector` with a GIN index: context (A) > text (B) |
 
-When a document is edited, its chunks are regenerated.
+When a document's text changes, ingestion deletes its chunks and makes new ones.
 
 **faqs**: curated by admins, never auto-published.
 | column | notes |
@@ -122,23 +128,24 @@ Admins review them and write the FAQ.
 
 ### Usage and analytics
 
-**questions**: one row per Ask.
+**questions**: one row per Ask, written by `POST /api/ask` (`app/rag/answer.py`).
 | column | notes |
 |---|---|
 | id, user_id | user_id is nullable so it can be anonymized (see the open privacy question) |
 | question_text | |
-| topic_id | classified topic, nullable |
-| outcome | `answered`, `referred`, `no_answer`, `error` |
-| confidence | score from the pipeline |
+| topic_id | the topic the user asked from, nullable |
+| outcome | `answered`, `referred`, `no_answer`, `error` (the LLM failed; the user saw sources and an office) |
+| confidence | the best reranker score, 0 to 1 |
 | answer_text | stored. It's small, and admins need it to review weak answers |
 | referred_office_id | nullable |
 | model, prompt_version, latency_ms | for comparing pipeline versions |
 | parent_question_id | nullable; for multi-turn follow-ups later |
 | created_at | |
 
-**question_citations** (question_id, chunk_id, document_id, rank, score, was_cited): what was
-retrieved and what the answer actually cited. This drives the "most cited resources" analytics.
-`document_id` is stored alongside the chunk so counts survive re-chunking.
+**question_citations** (question_id, rank, chunk_id, document_id, score, was_cited): the chunks
+retrieved for a question, best first (primary key: question_id + rank), and whether the answer
+cited each. This drives the "most cited resources" analytics. `chunk_id` becomes null when
+re-chunking deletes the chunk; `document_id` is stored alongside so counts survive.
 
 **feedback**
 | column | notes |

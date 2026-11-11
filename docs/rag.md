@@ -140,7 +140,8 @@ run query rewriting only when needed (below). Measure latency per stage (`latenc
   referrals).
 
 **Query handling.**
-- Always: expand acronyms and synonyms from a glossary (IRB, COI/FCOI, IACUC, PI, NHSR, …),
+- Always: expand acronyms and synonyms from a glossary (IRB, COI/FCOI, IACUC, PI, NHSR, …;
+  the Link's 77 tag definitions are a ready-made start),
   largely built from the policies' Definitions sections. No LLM call.
 - Experiment, kept only if the evaluation shows a gain: LLM rewriting of short or vague
   questions. The rewrite is used only for retrieval; the answer always responds to the user's
@@ -219,8 +220,9 @@ Consequences for Nora:
   The LLM is still open: for the tutorial, classmates must be able to run it, ideally with no key
   or cost (a local model, or a hosted API with an optional key). For Nora it sits behind
   `LLMProvider`, so we can start with one and switch when UNC decides.
-- **Document scope (decided 2026-10-27).** The tutorial uses the 16 seeded policies. Nora's scope
-  (16 or all 197 Research knowledge base articles; some may link out to PDFs) is still open.
+- **Document scope (decided 2026-10-27; Nora's settled 2026-11-10).** The tutorial uses the 16
+  seeded policies. Nora uses all 197 policies in the Link's inventory (see
+  [decisions.md](decisions.md)); check during ingestion which ones link out to PDFs.
 - **Tutorial format and location.** A notebook or a script, and in this repo (e.g. `tutorial/`)
   or a separate public repo that classmates can clone on its own.
 - **Talk roles** for all four members (see above).
@@ -245,15 +247,16 @@ A script (later, an admin upload) does the following:
 Re-ingesting a changed document replaces its chunks. Only `active` + `is_authoritative` documents
 are retrieved for answers.
 
-The 16 seeded policies have full text in `documents.content_text`
-(`backend/app/seed/data/research_policies.json`), but with headings flattened, so ingestion
-re-extracts them from the knowledge base HTML.
+The seed loads all 197 policies in the Link's inventory with their full text in
+`documents.content_text`, headings kept as Markdown (`backend/app/seed/data/policy_inventory.json`,
+built by `backend/scripts/build_policy_inventory.py`). Chunking reads that text, so ingestion
+doesn't need the network.
 
-For Repository articles, step 2 already exists: `extract_article` in
-`backend/app/policy_repository.py` turns an article page into its title and text with `h2`–`h5`
-headings as Markdown (`## Purpose`), and `RepositoryClient` fetches the page (faked in tests).
-The admin import endpoint uses them (`POST /api/admin/documents`, see [api.md](api.md)). Each
-document's subtopic tags are in `document_tags`, for metadata filters and context headers.
+Documents added after the seed come from the admin import (`POST /api/admin/documents`, see
+[api.md](api.md)): `extract_article` in `backend/app/policy_repository.py` turns a live article
+page into its title and text with `h2`–`h5` headings as Markdown (`## Purpose`), the same form as
+the seed, and `RepositoryClient` fetches the page (faked in tests). Each document's subtopic tags
+are in `document_tags`, for metadata filters and context headers.
 
 ## Answering `POST /api/ask`
 
@@ -269,9 +272,8 @@ document's subtopic tags are in `document_tags`, for metadata filters and contex
 4. **Check:** drop or flag answers that cite nothing, and map the citation numbers back to
    documents.
 5. **Respond:** answer, citations (title, section, URL), confidence, outcome, referral office if
-   any, and the standard disclaimer. The response shape is already agreed in
-   [api.md](api.md#ask-stretch-for-oct-14), and the frontend renders it (`ask()` in
-   `researcherApi.ts` is still fake until this endpoint exists).
+   any, and the standard disclaimer, in the shape in [api.md](api.md#ask). The Ask page renders
+   it (`AnswerCard`).
 6. **Log:** write `questions` and `question_citations`.
 
 ## Interfaces
@@ -290,6 +292,95 @@ change to the prompt or retrieval.
 ## Build log
 
 Newest first. One entry per decision or finding: what, why, and the evidence.
+
+### 2026-11-10: `POST /api/ask` built
+`app/rag/answer.py`: retrieve → gate (0.04) → the LLM answers from the 5 numbered chunks →
+citation check → log to `questions` and `question_citations`. Decisions:
+- **The LLM is optional.** `LLMProvider` with one OpenAI-compatible implementation (Groq for
+  local development); `LLM_PROVIDER=none` is the default until UNC approves a provider. Without
+  it, Ask returns the matching sections as sources: api.md's "level 2".
+- **An answer that cites nothing isn't shown** (`no_answer`, with a referral). Citations accept
+  `[1]` and the `【1】` some models write, and numbers that don't exist are ignored.
+- **An LLM failure never shows an error page.** The researcher gets the sources and an office;
+  the question is logged as `error` (shown to the browser as `no_answer`).
+- **Referrals** (until the Link decides, see decisions.md): a gate referral goes to the topic's
+  office when asked from a topic, otherwise to the Office of the Vice Chancellor for Research; a
+  `no_answer` goes to the office that owns the best-matching policy.
+- **The prompt is versioned** (`PROMPT_VERSION`, logged per question) and tells the model to
+  answer only from the sources, cite every claim, never make a determination, and treat source
+  text as content, not instructions. Version `2026-11-10.2` adds "only name an office if it
+  appears in the sources": in testing, the first version told an ITAR asker to contact an
+  "Office of Research Compliance" that wasn't in the sources. *(Jerry)*
+
+### 2026-11-10: retrieval built and evaluated on 197 policies
+`app/rag/retrieval.py`: vector search (pgvector cosine) and BM25 keyword search, top 20 each,
+merged with RRF, then `BAAI/bge-reranker-base` rescores the 20 and keeps 5. Only active,
+authoritative documents (and the chosen topic, if any) are searched.
+
+**BM25 instead of Postgres `ts_rank`.** The plan was to start with `ts_rank` and switch only if
+the evaluation showed a gain. It did, by a lot. Keyword search alone, on the 20 answerable
+questions (expected policy ranked first / in the top 5):
+
+| method | top-1 | top-5 |
+|---|---|---|
+| `ts_rank` (OR of the question's words) | 6/20 | 7/20 |
+| `ts_rank_cd` | 1/20 | 8/20 |
+| BM25 (`rank_bm25`, in memory) | 8/20 | 12/20 |
+
+`ts_rank` counts how often a word appears, so "lab" repeated in animal-care chunks beats the one
+chunk that mentions ITAR; BM25 weights rare words. The index lives in memory (about 2,500 chunks,
+built in about a second) and rebuilds when ingestion changes the chunks.
+
+**Full evaluation** (`python -m app.rag eval`, real models):
+
+| method | top-1 | top-5 |
+|---|---|---|
+| vector | 13/20 | 17/20 |
+| keyword (BM25) | 8/20 | 12/20 |
+| hybrid (RRF) | 10/20 | 18/20 |
+| hybrid + reranker | 14/20 | **20/20** |
+
+Every question has an expected policy among the 5 chunks the LLM sees. Top-1 is lower than the
+16-policy tutorial's 20/20: with 12× more documents, a related policy sometimes ranks first
+(animal protocols → the animal imaging standard; foreign funding → research security training;
+reporting plagiarism → OHRE SOP 1401).
+
+**Gate threshold 0.04** (was 0.03 in the tutorial). Off-topic questions' best scores were at most
+0.030 ("thesis deadline" matched OSP 300.03's proposal deadlines); the lowest correctly retrieved
+real question was 0.051 (ITAR). At 0.04: 6/6 off-topic referred, 17/20 real ones answered. The
+3 referred real questions (laptop to China, owning stock, lab notebooks) all had the wrong
+policy ranked first, so referring them avoids answers grounded in the wrong policy. Re-tune
+when the reranker, chunking or documents change, and when the Link's questions arrive.
+
+**Open: speed.** Retrieval takes a median 7.3 s (max 14 s) on a laptop CPU, almost all of it the
+reranker reading 20 chunks; with the LLM, a typical answer is near NF5's 10 s. Next: rerank 10–15
+candidates, or compare smaller rerankers (fastembed has MiniLM-L-12 at 0.12 GB and Jina turbo at
+0.15 GB, against bge-reranker-base's 1.04 GB) on both accuracy and latency.
+
+**Models as downloaded:** fastembed's `BAAI/bge-small-en-v1.5` is a quantized ONNX build
+(`Qdrant/bge-small-en-v1.5-onnx-Q`, 67 MB); bge-reranker-base is full precision (1.04 GB),
+which also matters for the image size on CloudApps. *(Jerry)*
+
+### 2026-11-10: ingestion built
+`python -m app.rag` chunks every active document's Markdown (structure-aware, about 300 words at
+most, a one-paragraph overlap when a section is split) and embeds each chunk with
+`BAAI/bge-small-en-v1.5` into `document_chunks.embedding`. Decisions:
+- **fastembed instead of sentence-transformers.** It runs the same bge models on ONNX Runtime, so
+  the backend image doesn't pull in PyTorch (gigabytes). The reranker it also supports is
+  `BAAI/bge-reranker-base`, the one the tutorial's eval picked.
+- **No vector index yet.** See [database.md](database.md#content).
+- **Re-run is cheap.** Chunks remember the document's `content_hash`, so only changed documents
+  are re-embedded; docker compose runs ingestion on every start.
+- **Tests never load a model.** `FakeEmbeddingProvider` hashes words into the vector; the real
+  provider is tested against a stub. Set `EMBEDDING_PROVIDER=fake` to run the app without it.
+
+Numbers: 197 policies → 2,465 chunks (114 words on average; the largest is one 353-word paragraph,
+which isn't cut). The first run took 4.6 minutes on a laptop CPU, 1.5 of them downloading the
+model; a re-run with nothing changed takes about a second. Vector search alone already shows why
+hybrid retrieval and reranking are next: "Is ITAR relevant to my lab?" returns animal-care
+standards (the model doesn't know the acronym), and "Can I take my laptop to China for a
+conference?", which the 16-policy tutorial answered, now ranks "Animal Transport" first: with 12×
+more documents there are more near-misses. *(Jerry)*
 
 ### 2026-10-27: Nora reranker candidates
 For Nora's reranker, benchmark `BAAI/bge-reranker-base` (expected pick), `bge-reranker-v2-m3` and

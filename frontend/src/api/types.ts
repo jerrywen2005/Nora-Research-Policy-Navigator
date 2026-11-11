@@ -54,7 +54,16 @@ export interface TopicDetail extends Topic {
 
 // ---- Documents ----
 
-export type DocType = 'policy' | 'sop' | 'guidance' | 'faq' | 'webpage' | 'job_aid' | 'other'
+export type DocType =
+  | 'policy'
+  | 'standard'
+  | 'procedure'
+  | 'sop'
+  | 'guidance'
+  | 'faq'
+  | 'webpage'
+  | 'job_aid'
+  | 'other'
 
 export interface DocumentSummary {
   id: number
@@ -154,18 +163,18 @@ export interface Citation {
   number: number
   document_id: number
   title: string
-  section: string | null
+  section: string // heading path within the document
   source_url: string | null
   snippet: string
 }
 
 export interface AskResponse {
-  question_id: number | null
+  question_id: number
   outcome: AskOutcome
   answer: string | null
   citations: Citation[]
   referral: Office | null
-  confidence: number | null
+  confidence: number // best reranker score, 0 to 1
   disclaimer: string
 }
 

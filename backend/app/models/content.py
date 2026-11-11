@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from enum import StrEnum
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     BigInteger,
     CheckConstraint,
@@ -14,6 +15,7 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    UniqueConstraint,
     false,
     func,
     true,
@@ -26,6 +28,8 @@ from app.db import Base
 
 class DocType(StrEnum):
     POLICY = "policy"
+    STANDARD = "standard"
+    PROCEDURE = "procedure"
     SOP = "sop"
     GUIDANCE = "guidance"
     FAQ = "faq"
@@ -145,6 +149,53 @@ class Document(Base):
     topics: Mapped[list[Topic]] = relationship(
         secondary=document_topics, order_by=lambda: (Topic.sort_order, Topic.name)
     )
+    chunks: Mapped[list["DocumentChunk"]] = relationship(
+        back_populates="document",
+        order_by="DocumentChunk.chunk_index",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
     # Tag and document_tags live in app/models/tags.py.
     tags: Mapped[list["Tag"]] = relationship(secondary="document_tags", order_by="Tag.name")  # noqa: F821
     updated_by_user: Mapped["User | None"] = relationship(foreign_keys=[updated_by])  # noqa: F821
+
+
+# The size of BAAI/bge-small-en-v1.5's vectors (app/rag/embeddings.py). A different embedding
+# model means a migration and re-embedding every chunk.
+EMBEDDING_DIMENSIONS = 384
+
+
+class DocumentChunk(Base):
+    """A section-sized piece of a document: the unit RAG retrieves and cites. Built by app/rag."""
+
+    __tablename__ = "document_chunks"
+    __table_args__ = (
+        UniqueConstraint("document_id", "chunk_index"),
+        Index("ix_document_chunks_search_vector", "search_vector", postgresql_using="gin"),
+    )
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(always=True), primary_key=True)
+    # The unique (document_id, chunk_index) index also serves lookups by document.
+    document_id: Mapped[int] = mapped_column(ForeignKey("documents.id", ondelete="CASCADE"))
+    chunk_index: Mapped[int]
+    # Heading path within the document, e.g. "2. Procedure > 2.1 Initial Determination".
+    section_heading: Mapped[str] = mapped_column(Text)
+    # "Document title > section heading": prepended to the text for embedding and search.
+    context: Mapped[str] = mapped_column(Text)
+    text: Mapped[str] = mapped_column(Text)
+    word_count: Mapped[int]
+    # The document's content_hash when this chunk was made; a different hash means re-chunk.
+    content_hash: Mapped[str] = mapped_column(String(64))
+    embedding: Mapped[list[float]] = mapped_column(Vector(EMBEDDING_DIMENSIONS), deferred=True)
+    # Keyword search. Words in the title and headings rank above words in the body.
+    search_vector: Mapped[str] = mapped_column(
+        TSVECTOR,
+        Computed(
+            "setweight(to_tsvector('english', coalesce(context, '')), 'A') || "
+            "setweight(to_tsvector('english', coalesce(text, '')), 'B')",
+            persisted=True,
+        ),
+        deferred=True,
+    )
+
+    document: Mapped[Document] = relationship(back_populates="chunks")

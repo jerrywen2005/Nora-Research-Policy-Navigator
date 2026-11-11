@@ -4,9 +4,8 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import Document, DocumentStatus, Tag
-from app.policy_repository import load_inventory
-from app.seed.content import seed_content
-from app.seed.tags import seed_tags
+from app.seed.content import load_seed_documents, seed_content
+from app.seed.tags import inventory_policy, load_tag_definitions, seed_tags
 from tests.conftest import login
 
 
@@ -32,16 +31,33 @@ def test_seed_tags_loads_the_inventory_and_tags_seeded_documents(db_session: Ses
     seed_tags(db_session)
     seed_tags(db_session)  # idempotent
 
-    inventory = load_inventory()
-    assert db_session.scalar(select(func.count()).select_from(Tag)) == len(inventory["tags"])
-    # 132183 is seeded with an ArticleDet link; the inventory gives it one tag.
+    assert db_session.scalar(select(func.count()).select_from(Tag)) == len(load_tag_definitions())
+    # The inventory gives 132183 one tag.
     animal = db_session.scalars(
         select(Document).where(Document.source_url.contains("132183"))
     ).one()
     assert [tag.name for tag in animal.tags] == ["IACUC Oversight & Protocols"]
     tagged = db_session.scalars(select(Document).where(Document.tags.any())).all()
-    assert len(tagged) == 16
+    assert len(tagged) == len([d for d in load_seed_documents() if d["tags"]])
     assert unlisted.tags == [] and no_link.tags == []
+
+
+def test_inventory_is_consistent():
+    tags = load_tag_definitions()
+    tag_names = {tag["name"] for tag in tags}
+
+    assert len({tag["slug"] for tag in tags}) == len(tags)
+    for policy in load_seed_documents():
+        assert len(policy["tags"]) <= 5
+        assert set(policy["tags"]) <= tag_names
+
+
+def test_inventory_policy():
+    policy = inventory_policy(132183)
+
+    assert policy.topic_slug == "animal-care-and-use"
+    assert policy.tag_names == ["IACUC Oversight & Protocols"]
+    assert inventory_policy(1) is None
 
 
 # ---- GET /api/tags and /api/offices ----
