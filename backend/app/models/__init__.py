@@ -12,6 +12,7 @@ from app.models.content import (
 )
 from app.models.feedback import Feedback
 from app.models.question import Outcome, Question, QuestionCitation
+from app.models.saved_item import SavedItem
 from app.models.tags import Tag, document_tags
 from app.models.user import Role, User
 
@@ -27,6 +28,7 @@ __all__ = [
     "Question",
     "QuestionCitation",
     "Role",
+    "SavedItem",
     "Tag",
     "Topic",
     "User",
