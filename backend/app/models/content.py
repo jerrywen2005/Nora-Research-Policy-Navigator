@@ -145,3 +145,6 @@ class Document(Base):
     topics: Mapped[list[Topic]] = relationship(
         secondary=document_topics, order_by=lambda: (Topic.sort_order, Topic.name)
     )
+    # Tag and document_tags live in app/models/tags.py.
+    tags: Mapped[list["Tag"]] = relationship(secondary="document_tags", order_by="Tag.name")  # noqa: F821
+    updated_by_user: Mapped["User | None"] = relationship(foreign_keys=[updated_by])  # noqa: F821

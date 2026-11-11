@@ -1,8 +1,8 @@
 # Database
 
 **Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12), and so are
-`offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13).
-Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
+`offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13),
+and `tags` and `document_tags` (migration `3405a4fb20ce`, 2026-11-10). Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
 ## Where the database lives
@@ -79,9 +79,23 @@ analytics line up with the content.
 | replaced_by_id | nullable self-reference when a newer document supersedes this one |
 | effective_date, last_reviewed_at, review_due_at | for review cycles and "stale content" alerts |
 | created_by, updated_by, created_at, updated_at | admin audit |
-| search_vector | generated `tsvector` with a GIN index, for keyword search. Weighted: title (A) > summary (B) > content_text (C) |
+| search_vector | generated `tsvector` with a GIN index, for keyword search. Weighted: title (A) > summary (B) > content_text (C). Search adds topic and tag names at weight B (see document_tags) |
 
 **document_topics** (document_id, topic_id): a document can belong to several topics.
+
+**tags**: subtopic tags from the Link's tag inventory (`backend/app/seed/data/policy_tags.json`,
+generated from their spreadsheet). The Link's model is one shared list of equally weighted
+labels, so a tag has no topic: documents in any topic can carry it, and a topic's subtopic filter
+is the set of tags its active documents use.
+| column | notes |
+|---|---|
+| id | |
+| slug, name | both unique |
+| definition | the Link's "when to use" text; describes a discovery label, not a policy requirement |
+
+**document_tags** (document_id, tag_id): up to five tags per document (the Link's limit, enforced
+by the admin API). Keyword search also matches topic and tag names; they're joined in at query
+time instead of being stored in `documents.search_vector`, so renaming a tag needs no reindex.
 
 **document_chunks**: the RAG units.
 | column | notes |
