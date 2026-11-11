@@ -11,6 +11,8 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "alembic>=1.13",
     "itsdangerous>=2.2", # signs the session cookie (Starlette SessionMiddleware)
+    "pgvector>=0.5", # the vector column type for SQLAlchemy
+    "fastembed>=0.9", # runs the embedding and reranking models on ONNX Runtime, without PyTorch
 ]
 
 [project.optional-dependencies]
@@ -40,8 +42,8 @@ testpaths = ["tests"]
 addopts = "--cov=app --cov-report=term-missing"
 
 [tool.coverage.run]
-# Thin command-line entry point; the seed logic it calls is tested.
-omit = ["app/seed/__main__.py"]
+# Thin command-line entry points; the logic they call is tested.
+omit = ["app/seed/__main__.py", "app/rag/__main__.py"]
 
 [tool.coverage.report]
 fail_under = 100
