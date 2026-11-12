@@ -8,6 +8,7 @@ from app.api import (
     ask,
     auth,
     documents,
+    faqs,
     feedback,
     health,
     saved,
@@ -59,6 +60,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(feedback.router, prefix=API_PREFIX)
     app.include_router(saved.router, prefix=API_PREFIX)
     app.include_router(analytics.router, prefix=API_PREFIX)
+    app.include_router(faqs.router, prefix=API_PREFIX)
+    app.include_router(faqs.admin_router, prefix=API_PREFIX)
     return app
 
 
