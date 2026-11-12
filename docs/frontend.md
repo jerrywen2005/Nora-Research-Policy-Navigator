@@ -103,9 +103,10 @@ panel, the topic grid and a right rail. Search keeps its query in the URL (`/sea
   neutral card with the University Policy Office and a link to every UNC policy).
 - **Feedback (F7):** `AnswerFeedback` puts Helpful / Not helpful under every fresh answer
   (`PUT /api/questions/{id}/feedback`). Clicking the selected button again removes the rating
-  (`DELETE`). Not helpful opens an optional comment box. The API has no way to read a rating
-  back, so the buttons start unselected each time an answer is shown, and saved answers don't
-  show them.
+  (`DELETE`). Not helpful opens an optional comment box. Saved answers show the buttons too, starting
+  from the user's rating (`question.feedback`). Each change is passed to `useSaved().setRating`,
+  because the saved list is loaded once per session: rating an answer on the Ask page or the
+  Saved page keeps the Saved page current.
 - **Saved items (F9):** `SavedProvider` (`src/saved/`) loads `GET /api/saved` once and shares it
   through `useSaved()`, so every `SaveButton` and the Saved page agree without refetching.
   `SaveButton` is a toggle (`aria-pressed`) on each answer and on every `DocumentResultCard`; on

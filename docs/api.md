@@ -356,6 +356,7 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
     ],
     "disclaimer": "Nora provides general information, not an official determination. For a formal review, contact one of the offices below.",
     "links": [],
+    "feedback": { "question_id": 41, "helpful": true, "comment": null, "created_at": "2026-11-11T15:02:00Z", "updated_at": "2026-11-11T15:02:00Z" },
     "created_at": "2026-11-11T15:01:12Z"
   }
 }
@@ -376,6 +377,10 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
     response, which lists them in the order the answer first mentions them. Empty for a referral.
   - If the policy has been re-processed since, its old sections are gone: the citation keeps its
     `number`, `document_id`, `title` and `source_url`, and `section` and `snippet` are `""`.
+- `question.feedback` is the user's own [Feedback](#feedback) on that answer, or `null` if they
+  haven't rated it, so the Saved page can show the buttons as they left them. There is no
+  separate GET for a rating: a fresh Ask answer is never rated yet, and the Saved page is the
+  only place an answer is shown again.
 - A saved document that is later archived stays in the list, so the user can still see it and
   remove it.
 
