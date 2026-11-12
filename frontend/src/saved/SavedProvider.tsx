@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Outlet } from 'react-router'
-import type { SavedItem, SaveRequest } from '../api/types'
+import type { Feedback, SavedItem, SaveRequest } from '../api/types'
 import { getSaved, saveItem, unsaveItem } from '../pages/researcher/researcherApi'
 import { matches, SavedContext, type SavedState } from './SavedContext'
 
@@ -42,9 +42,19 @@ export default function SavedProvider({ children }: { children?: ReactNode }) {
     setItems((current) => current.filter((c) => c.id !== itemId))
   }, [])
 
+  const setRating = useCallback((questionId: number, feedback: Feedback | null) => {
+    setItems((current) =>
+      current.map((item) =>
+        item.kind === 'question' && item.question.id === questionId
+          ? { ...item, question: { ...item.question, feedback } }
+          : item,
+      ),
+    )
+  }, [])
+
   const value = useMemo(
-    () => ({ items, status, find, save, remove }),
-    [items, status, find, save, remove],
+    () => ({ items, status, find, save, remove, setRating }),
+    [items, status, find, save, remove, setRating],
   )
 
   return <SavedContext.Provider value={value}>{children ?? <Outlet />}</SavedContext.Provider>

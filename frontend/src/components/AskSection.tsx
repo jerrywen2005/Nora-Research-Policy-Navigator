@@ -5,6 +5,7 @@ import { AnswerCard } from './AnswerCard'
 import { AnswerFeedback } from './AnswerFeedback'
 import { AskPanel } from './AskPanel'
 import { SaveButton } from './SaveButton'
+import { useSaved } from '../saved/SavedContext'
 import './components.css'
 
 // Questions the policies answer well (see `python -m app.rag eval` in the backend).
@@ -25,6 +26,7 @@ type AskState =
 // The ask panel plus the answer to the last question. Used on the home page and the Ask page.
 export function AskSection({ inputRef }: { inputRef?: Ref<HTMLInputElement> }) {
   const [state, setState] = useState<AskState>({ status: 'idle' })
+  const saved = useSaved()
 
   async function handleAsk(question: string) {
     setState({ status: 'loading' })
@@ -55,7 +57,11 @@ export function AskSection({ inputRef }: { inputRef?: Ref<HTMLInputElement> }) {
             response={state.response}
             actions={
               <>
-                <AnswerFeedback questionId={state.response.question_id} />
+                <AnswerFeedback
+                  questionId={state.response.question_id}
+                  // If this answer is saved, the Saved page shows the new rating too.
+                  onChange={(feedback) => saved.setRating(state.response.question_id, feedback)}
+                />
                 <SaveButton target={{ question_id: state.response.question_id }} name="this answer" />
               </>
             }

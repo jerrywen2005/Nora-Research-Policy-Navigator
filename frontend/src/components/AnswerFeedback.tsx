@@ -1,18 +1,27 @@
 import { useId, useState, type FormEvent } from 'react'
+import type { Feedback } from '../api/types'
 import { clearRating, rateAnswer } from '../pages/researcher/researcherApi'
 import './components.css'
 import { Icon } from './Icon'
 
 const MAX_COMMENT = 1000
 
+interface AnswerFeedbackProps {
+  questionId: number
+  // The user's existing rating (a saved answer), so the buttons start where they left them.
+  initial?: Feedback | null
+  // Called after each successful change, with the new rating or null once removed.
+  onChange?: (feedback: Feedback | null) => void
+}
+
 // Helpful / not helpful on an answer (F7). Clicking the selected button again removes the
 // rating. "Not helpful" offers an optional comment, which is what the admin dashboard needs to
 // see why answers miss.
-export function AnswerFeedback({ questionId }: { questionId: number }) {
-  const [helpful, setHelpful] = useState<boolean | null>(null)
+export function AnswerFeedback({ questionId, initial = null, onChange }: AnswerFeedbackProps) {
+  const [helpful, setHelpful] = useState<boolean | null>(initial?.helpful ?? null)
   const [commenting, setCommenting] = useState(false)
   const [comment, setComment] = useState('')
-  const [commentSent, setCommentSent] = useState(false)
+  const [commentSent, setCommentSent] = useState(Boolean(initial?.comment))
   const [pending, setPending] = useState(false)
   const [failed, setFailed] = useState(false)
   const commentId = useId()
@@ -35,11 +44,13 @@ export function AnswerFeedback({ questionId }: { questionId: number }) {
         await clearRating(questionId)
         setHelpful(null)
         setCommenting(false)
+        onChange?.(null)
       } else {
-        await rateAnswer(questionId, { helpful: value, comment: null })
+        const feedback = await rateAnswer(questionId, { helpful: value, comment: null })
         setHelpful(value)
         setCommenting(!value)
         setComment('')
+        onChange?.(feedback)
       }
       setCommentSent(false)
     })
@@ -47,9 +58,13 @@ export function AnswerFeedback({ questionId }: { questionId: number }) {
   const sendComment = (event: FormEvent) => {
     event.preventDefault()
     return attempt(async () => {
-      await rateAnswer(questionId, { helpful: false, comment: comment.trim() || null })
+      const feedback = await rateAnswer(questionId, {
+        helpful: false,
+        comment: comment.trim() || null,
+      })
       setCommenting(false)
       setCommentSent(true)
+      onChange?.(feedback)
     })
   }
 

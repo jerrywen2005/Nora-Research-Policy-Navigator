@@ -1,13 +1,20 @@
 import { render, screen, within } from '@testing-library/react'
+import { useState } from 'react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import SavedProvider from '../../saved/SavedProvider'
 import { savedDocumentItem, savedQuestion, savedQuestionItem } from '../../test/fixtures'
-import { getSaved, saveItem, unsaveItem } from './researcherApi'
+import { getSaved, rateAnswer, saveItem, unsaveItem } from './researcherApi'
 import SavedPage from './SavedPage'
 
-vi.mock('./researcherApi', () => ({ getSaved: vi.fn(), saveItem: vi.fn(), unsaveItem: vi.fn() }))
+vi.mock('./researcherApi', () => ({
+  getSaved: vi.fn(),
+  saveItem: vi.fn(),
+  unsaveItem: vi.fn(),
+  rateAnswer: vi.fn(),
+  clearRating: vi.fn(),
+}))
 const getSavedMock = vi.mocked(getSaved)
 const unsaveMock = vi.mocked(unsaveItem)
 
@@ -90,5 +97,51 @@ describe('SavedPage', () => {
     renderPage()
 
     expect(await screen.findByText(/couldn't be loaded/i)).toBeInTheDocument()
+  })
+
+  it('shows the rating the user gave a saved answer', async () => {
+    const feedback = { question_id: 41, helpful: true, comment: null, created_at: '', updated_at: '' }
+    getSavedMock.mockResolvedValue([savedQuestionItem(8, savedQuestion({ feedback }))])
+    renderPage()
+
+    expect(await screen.findByRole('button', { name: 'Helpful' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'Not helpful' })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('keeps a new rating when the user leaves the page and comes back', async () => {
+    getSavedMock.mockResolvedValue([savedQuestionItem(8)])
+    vi.mocked(rateAnswer).mockResolvedValue({
+      question_id: 41,
+      helpful: true,
+      comment: null,
+      created_at: '',
+      updated_at: '',
+    })
+    // The saved list is loaded once per session, so the page must update it, not just itself.
+    function LeaveAndReturn() {
+      const [shown, setShown] = useState(true)
+      return (
+        <>
+          <button type="button" onClick={() => setShown(!shown)}>
+            Toggle page
+          </button>
+          {shown && <SavedPage />}
+        </>
+      )
+    }
+    render(
+      <MemoryRouter>
+        <SavedProvider>
+          <LeaveAndReturn />
+        </SavedProvider>
+      </MemoryRouter>,
+    )
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Helpful' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Toggle page' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Toggle page' }))
+
+    expect(screen.getByRole('button', { name: 'Helpful' })).toHaveAttribute('aria-pressed', 'true')
+    expect(getSavedMock).toHaveBeenCalledTimes(1)
   })
 })

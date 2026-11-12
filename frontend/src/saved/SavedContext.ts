@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { SavedItem, SaveRequest } from '../api/types'
+import type { Feedback, SavedItem, SaveRequest } from '../api/types'
 
 export interface SavedState {
   // The user's saved items, newest first. Empty until the first GET /api/saved finishes.
@@ -10,6 +10,8 @@ export interface SavedState {
   // Both throw ApiError on failure and leave `items` unchanged.
   save(target: SaveRequest): Promise<void>
   remove(itemId: number): Promise<void>
+  // Keeps a saved answer's rating current after the user rates it anywhere (it isn't refetched).
+  setRating(questionId: number, feedback: Feedback | null): void
 }
 
 export const SavedContext = createContext<SavedState | null>(null)

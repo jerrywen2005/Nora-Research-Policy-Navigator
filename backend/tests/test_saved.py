@@ -10,6 +10,7 @@ from app.models import (
     Document,
     DocumentChunk,
     DocumentStatus,
+    Feedback,
     Outcome,
     Question,
     QuestionCitation,
@@ -97,6 +98,7 @@ def test_save_a_question(client: TestClient, me, db_session):
         "contacts",
         "disclaimer",
         "links",
+        "feedback",
         "created_at",
     }
     assert body["question"]["id"] == question.id
@@ -316,12 +318,48 @@ def test_citation_whose_chunk_was_rechunked_keeps_title_and_link(
     ]
 
 
+def test_saved_answer_includes_the_users_rating(client: TestClient, me, db_session):
+    question = add_question(db_session, me.id, answer_text="Yes.")
+    db_session.flush()
+    assert (
+        client.post("/api/saved", json={"question_id": question.id}).json()["question"]["feedback"]
+        is None
+    )
+
+    client.put(
+        f"/api/questions/{question.id}/feedback", json={"helpful": False, "comment": "Too vague"}
+    )
+
+    [item] = client.get("/api/saved").json()
+    feedback = item["question"]["feedback"]
+    assert (feedback["question_id"], feedback["helpful"], feedback["comment"]) == (
+        question.id,
+        False,
+        "Too vague",
+    )
+    assert set(feedback) == {"question_id", "helpful", "comment", "created_at", "updated_at"}
+
+
+def test_saved_answer_never_shows_another_users_rating(
+    client: TestClient, me, make_user, db_session
+):
+    # The API never lets anyone else rate your question, but the response mustn't rely on that.
+    question = add_question(db_session, me.id, answer_text="Yes.")
+    db_session.add(Feedback(question_id=question.id, user_id=make_user("other1").id, helpful=True))
+    db_session.flush()
+
+    saved = client.post("/api/saved", json={"question_id": question.id}).json()["question"]
+
+    assert saved["feedback"] is None
+
+
 def test_list_query_count_doesnt_grow_with_items(client: TestClient, me, policy, db_session):
     chunk = add_chunk(db_session, policy, 0, "1. Scope", "Applies to research.")
 
     def save_question() -> None:
         question = add_question(db_session, me.id, answer_text="Yes [1].")
         retrieved(question, (chunk, True))
+        db_session.add(Feedback(question_id=question.id, user_id=me.id, helpful=True))
         db_session.add(SavedItem(user_id=me.id, question_id=question.id))
         db_session.flush()
 

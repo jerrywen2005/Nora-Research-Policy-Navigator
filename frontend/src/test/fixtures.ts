@@ -37,6 +37,7 @@ export function savedQuestion(overrides: Partial<SavedQuestion> = {}): SavedQues
     contacts: [],
     disclaimer: 'General information, not an official determination.',
     links: [],
+    feedback: null,
     created_at: '2026-11-11T15:01:12Z',
     ...overrides,
   }
