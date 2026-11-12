@@ -5,6 +5,8 @@ import type {
   AdminDocument,
   AdminDocumentDetail,
   AdminDocumentQuery,
+  Analytics,
+  AnalyticsQuery,
   Office,
   Page,
   Tag,
@@ -59,4 +61,25 @@ export function getTopics(): Promise<Topic[]> {
 
 export function getTags(): Promise<Tag[]> {
   return apiGet<Tag[]>('/tags')
+}
+
+// ---- Analytics (F11): docs/api.md, "Admin analytics" ----
+
+function analyticsParams(query: AnalyticsQuery): string {
+  const params = new URLSearchParams()
+  if (query.from) params.set('from', query.from)
+  if (query.to) params.set('to', query.to)
+  return params.toString()
+}
+
+// Every dashboard measure for a date range (both ends inclusive; the API defaults to the last 30
+// days). Rejects with 422 for a range that's backwards or longer than 366 days.
+export function getAnalytics(query: AnalyticsQuery): Promise<Analytics> {
+  return apiGet<Analytics>(`/admin/analytics?${analyticsParams(query)}`)
+}
+
+// The same numbers as a CSV file. A plain link: the browser sends the session cookie and saves
+// the file under the name the server gives it.
+export function analyticsExportUrl(query: AnalyticsQuery): string {
+  return `/api/admin/analytics/export.csv?${analyticsParams(query)}`
 }

@@ -60,9 +60,18 @@ Every route except `/signin` sits under `RequireAuth`, and `/admin` also under
 
 ## Admin Overview
 
-`src/pages/admin/AdminOverview.tsx` is a mockup. All of its numbers are in `sampleData.ts`, and the
-page shows a "Sample data" badge. The charts in `src/pages/admin/charts/` are plain SVG/CSS (no
-chart library). Their series colors are `--chart-series-1`/`-2` in `charts.css`; they passed a
+`src/pages/admin/AdminOverview.tsx` is the admin dashboard (F11), on
+`GET /api/admin/analytics` ([api.md](api.md#admin-analytics)). It shows every measure in
+[product.md](product.md#admin-dashboard-must-have): tiles for users, interactions, unanswered
+questions and the helpful share; daily activity (one measure at a time, so there's one axis);
+questions by topic, with first- and second-half counts in its table to show which topics are
+growing; outcomes, referrals by office and ratings; and the most viewed, cited, searched,
+zero-result and asked lists. The range is in the URL (`/admin?from=&to=`); without one the
+API's default, the last 30 days, is shown. "Download CSV" links `export.csv` for the same range.
+Date helpers are in `dateRange.ts`. Free-text lists say when they're empty because of the
+2-person threshold (NF6). The charts in `src/pages/admin/charts/` are plain SVG/CSS (no
+chart library). Tests get a fixed-width `ResizeObserver` from `src/test/setup.ts`, since jsdom
+has none. Their series colors are `--chart-series-1`/`-2` in `charts.css`; they passed a
 color-blind and contrast check, which Carolina Blue on its own doesn't.
 
 ## Admin content pages
