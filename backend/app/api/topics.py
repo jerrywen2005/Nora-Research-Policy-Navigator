@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
-from app.auth import get_current_user
+from app.analytics.logging import EventType, log_event
+from app.auth import CurrentUser, get_current_user
 from app.db import get_session
 from app.models import Document, DocumentStatus, Tag, Topic, document_tags, document_topics
 from app.schemas.content import OfficeOut, TagOut, TopicDetail, TopicOut
@@ -72,7 +73,7 @@ def list_topics(session: SessionDep) -> list[TopicOut]:
 
 
 @router.get("/topics/{slug}", response_model=TopicDetail)
-def get_topic(slug: str, session: SessionDep) -> TopicDetail:
+def get_topic(slug: str, user: CurrentUser, session: SessionDep) -> TopicDetail:
     row = session.execute(
         select(Topic, _document_count)
         .options(joinedload(Topic.default_office))
@@ -83,4 +84,5 @@ def get_topic(slug: str, session: SessionDep) -> TopicDetail:
     topic, count = row
     tags = _topic_tags(session, [topic.id])[topic.id]
     office = OfficeOut.model_validate(topic.default_office) if topic.default_office else None
+    log_event(session, user, EventType.TOPIC_VIEW, topic_id=topic.id)
     return TopicDetail(**_topic_out(topic, count, tags).model_dump(), office=office)
