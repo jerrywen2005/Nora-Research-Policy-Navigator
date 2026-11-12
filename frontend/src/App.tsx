@@ -5,6 +5,9 @@ import AppLayout from './layout/AppLayout'
 import NotFound from './layout/NotFound'
 import { adminNav, researcherNav } from './layout/navItems'
 import AdminOverview from './pages/admin/AdminOverview'
+import ContentManagementPage from './pages/admin/ContentManagementPage'
+import DocumentEditorPage from './pages/admin/DocumentEditorPage'
+import PolicyLibraryPage from './pages/admin/PolicyLibraryPage'
 import AskPage from './pages/researcher/AskPage'
 import BrowsePage from './pages/researcher/BrowsePage'
 import DocumentPage from './pages/researcher/DocumentPage'
@@ -44,6 +47,9 @@ export default function App() {
         <Route path="admin" element={<RequireRole role="admin" />}>
           <Route element={<AppLayout navLabel="Admin" nav={adminNav} />}>
             <Route index element={<AdminOverview />} />
+            <Route path="library" element={<PolicyLibraryPage />} />
+            <Route path="content" element={<ContentManagementPage />} />
+            <Route path="documents/:id" element={<DocumentEditorPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Route>

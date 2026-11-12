@@ -20,9 +20,9 @@ export const researcherNav: NavItem[] = [
 
 export const adminNav: NavItem[] = [
   { label: 'Overview', to: '/admin', end: true },
-  { label: 'Policy Library' },
+  { label: 'Policy Library', to: '/admin/library' },
   { label: 'Topics' },
-  { label: 'Content Management' },
+  { label: 'Content Management', to: '/admin/content' },
   { label: 'Users & Roles' },
   { label: 'Analytics & Reports' },
 ]

@@ -163,7 +163,8 @@ the workflows, so each has one owner who makes sure it's met and checked.
   related policies
 - [x] Researcher pages for the above: tag page, tag filter on topic pages, tags and related
   policies on document pages (Anton; [frontend.md](frontend.md#researcher-pages))
-- [ ] Admin Policy Library and Content Management pages
+- [x] Admin Policy Library and Content Management pages, and a document editor (Anton;
+  [frontend.md](frontend.md#admin-content-pages))
 
 **E. FAQs (Anton backend, Adithi frontend).**
 - [x] `faqs` and `faq_documents` tables and endpoints; draft → published → archived, like
