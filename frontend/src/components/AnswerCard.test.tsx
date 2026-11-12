@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { AskResponse, Citation } from '../api/types'
 import { AnswerCard } from './AnswerCard'
+import { DISCLAIMER as SAVED_DISCLAIMER, savedAnswer } from './answerContent'
 
 const DISCLAIMER = 'Nora provides general information, not an official determination.'
 
@@ -35,8 +36,12 @@ describe('AnswerCard', () => {
 
     expect(screen.getByRole('heading', { name: /answer based on unc research/i })).toBeInTheDocument()
     expect(screen.getByText(/ninety days before the term ends/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '[1]' })).toHaveAttribute('href', '#citation-1')
     const source = screen.getByRole('link', { name: /postdoctoral scholar policy/i })
+    // The [1] marker jumps to source 1 in the list.
+    expect(screen.getByRole('link', { name: '[1]' })).toHaveAttribute(
+      'href',
+      `#${source.closest('li')?.id}`,
+    )
     expect(source).toHaveAttribute('href', 'https://policies.unc.edu/Article/1')
     expect(source).toHaveAttribute('target', '_blank')
     expect(screen.getByText(DISCLAIMER)).toBeInTheDocument()
@@ -139,5 +144,43 @@ describe('AnswerCard', () => {
     expect(screen.getByText('Export Controls Policy')).toBeInTheDocument()
     expect(screen.getByText('Snippet 1')).toBeInTheDocument()
     expect(screen.getByText('Export Compliance Office')).toBeInTheDocument()
+  })
+
+  it('gives each card its own citation anchors, so several can share a page', () => {
+    render(
+      <>
+        <AnswerCard response={response()} />
+        <AnswerCard response={response()} />
+      </>,
+    )
+
+    const [first, second] = screen.getAllByRole('link', { name: '[1]' })
+    expect(first.getAttribute('href')).not.toEqual(second.getAttribute('href'))
+    for (const marker of [first, second]) {
+      expect(document.querySelector(marker.getAttribute('href') ?? '')).not.toBeNull()
+    }
+  })
+
+  it('shows a saved answer with its sources and the disclaimer, without a confidence label', () => {
+    render(
+      <AnswerCard
+        response={savedAnswer({
+          id: 41,
+          question_text: 'How long can I be a postdoc?',
+          outcome: 'answered',
+          answer_text: 'Five years [1].',
+          citations: [{ ...citation(1, 'Postdoctoral Scholar Policy'), section: '', snippet: '' }],
+          referral: null,
+          created_at: '2026-11-11T15:01:12Z',
+        })}
+        actions={<button type="button">Saved</button>}
+      />,
+    )
+
+    expect(screen.getByText(/five years/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /postdoctoral scholar policy/i })).toBeInTheDocument()
+    expect(screen.queryByText(/match with the policies/i)).not.toBeInTheDocument()
+    expect(screen.getByText(SAVED_DISCLAIMER)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Saved' })).toBeInTheDocument()
   })
 })

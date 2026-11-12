@@ -1,11 +1,15 @@
 // Data access for the researcher pages, one function per endpoint in docs/api.md.
-import { apiGet, apiPost } from '../../api/client'
+import { apiDelete, apiGet, apiPost, apiPut } from '../../api/client'
 import type {
   AskRequest,
   AskResponse,
   DocumentQuery,
   DocumentSummary,
+  Feedback,
+  FeedbackRequest,
   Page,
+  SavedItem,
+  SaveRequest,
   Topic,
   TopicDetail,
 } from '../../api/types'
@@ -34,4 +38,30 @@ export function getDocuments(query: DocumentQuery): Promise<Page<DocumentSummary
 // seconds: retrieval and reranking run on the server's CPU, then the LLM writes the answer.
 export function ask(request: AskRequest): Promise<AskResponse> {
   return apiPost<AskResponse>('/ask', request)
+}
+
+// ---- Feedback (F7) and saved items (F9) ----
+
+// Rates one of the user's own answers. Rating again replaces the earlier rating.
+export function rateAnswer(questionId: number, request: FeedbackRequest): Promise<Feedback> {
+  return apiPut<Feedback>(`/questions/${questionId}/feedback`, request)
+}
+
+// Removes the user's rating (undo).
+export function clearRating(questionId: number): Promise<void> {
+  return apiDelete(`/questions/${questionId}/feedback`)
+}
+
+// The user's saved documents and answers, newest first.
+export function getSaved(): Promise<SavedItem[]> {
+  return apiGet<SavedItem[]>('/saved')
+}
+
+// Saving something already saved returns the existing item, so a double click is harmless.
+export function saveItem(request: SaveRequest): Promise<SavedItem> {
+  return apiPost<SavedItem>('/saved', request)
+}
+
+export function unsaveItem(itemId: number): Promise<void> {
+  return apiDelete(`/saved/${itemId}`)
 }

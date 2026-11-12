@@ -2,7 +2,9 @@ import { useState, type Ref } from 'react'
 import type { AskResponse } from '../api/types'
 import { ask } from '../pages/researcher/researcherApi'
 import { AnswerCard } from './AnswerCard'
+import { AnswerFeedback } from './AnswerFeedback'
 import { AskPanel } from './AskPanel'
+import { SaveButton } from './SaveButton'
 import './components.css'
 
 // Questions the policies answer well (see `python -m app.rag eval` in the backend).
@@ -46,7 +48,19 @@ export function AskSection({ inputRef }: { inputRef?: Ref<HTMLInputElement> }) {
         {state.status === 'error' && (
           <p className="status status--error">Something went wrong. Please try again.</p>
         )}
-        {state.status === 'done' && <AnswerCard response={state.response} />}
+        {state.status === 'done' && (
+          <AnswerCard
+            // A new question gets fresh feedback buttons.
+            key={state.response.question_id}
+            response={state.response}
+            actions={
+              <>
+                <AnswerFeedback questionId={state.response.question_id} />
+                <SaveButton target={{ question_id: state.response.question_id }} name="this answer" />
+              </>
+            }
+          />
+        )}
       </div>
     </>
   )
