@@ -1,5 +1,5 @@
 // Sample API objects for tests, matching docs/api.md.
-import type { DocumentSummary, SavedItem, SavedQuestion } from '../api/types'
+import type { AdminFaq, DocumentSummary, Faq, SavedItem, SavedQuestion } from '../api/types'
 
 export function documentSummary(overrides: Partial<DocumentSummary> = {}): DocumentSummary {
   return {
@@ -49,4 +49,27 @@ export function savedDocumentItem(id = 7, document = documentSummary()): SavedIt
 
 export function savedQuestionItem(id = 8, question = savedQuestion()): SavedItem {
   return { id, created_at: '2026-11-11T15:12:00Z', kind: 'question', document: null, question }
+}
+
+export function faq(overrides: Partial<Faq> = {}): Faq {
+  return {
+    id: 3,
+    question: 'Do I need IRB approval to use existing de-identified data?',
+    answer: 'Usually not, if you **can’t** link the data back to individuals.',
+    topic: { id: 1, slug: 'human-subjects-research', name: 'Human Research & IRB' },
+    sources: [{ id: 12, title: 'Use of Existing Data', doc_type: 'guidance', citation: 'OHRE SOP 1301' }],
+    updated_at: '2026-11-12T18:30:00Z',
+    ...overrides,
+  }
+}
+
+export function adminFaq(overrides: Partial<AdminFaq> = {}): AdminFaq {
+  return {
+    ...faq(),
+    status: 'draft',
+    sort_order: 0,
+    created_at: '2026-11-12T18:00:00Z',
+    updated_by: { id: 2, onyen: 'admin1', display_name: 'Test Admin' },
+    ...overrides,
+  }
 }

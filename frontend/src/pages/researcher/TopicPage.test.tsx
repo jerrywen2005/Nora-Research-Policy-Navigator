@@ -5,12 +5,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../../api/client'
 import type { TopicDetail } from '../../api/types'
 import SavedProvider from '../../saved/SavedProvider'
-import { documentSummary } from '../../test/fixtures'
-import { getDocuments, getSaved, getTopic } from './researcherApi'
+import { documentSummary, faq } from '../../test/fixtures'
+import { getDocuments, getFaqs, getSaved, getTopic } from './researcherApi'
 import TopicPage from './TopicPage'
 
 vi.mock('./researcherApi', () => ({
   getDocuments: vi.fn(),
+  getFaqs: vi.fn(),
   getTopic: vi.fn(),
   getSaved: vi.fn(),
   saveItem: vi.fn(),
@@ -18,6 +19,7 @@ vi.mock('./researcherApi', () => ({
 }))
 const getDocumentsMock = vi.mocked(getDocuments)
 const getTopicMock = vi.mocked(getTopic)
+const getFaqsMock = vi.mocked(getFaqs)
 
 const topic: TopicDetail = {
   id: 1,
@@ -62,6 +64,7 @@ describe('TopicPage', () => {
           },
     )
     vi.mocked(getSaved).mockReset().mockResolvedValue([])
+    getFaqsMock.mockReset().mockResolvedValue([])
   })
 
   it('lists every document in the topic, with its office', async () => {
@@ -130,5 +133,35 @@ describe('TopicPage', () => {
     getTopicMock.mockRejectedValue(new Error('network'))
     renderPage('/browse/other')
     expect(await screen.findByText("This topic couldn't be loaded.")).toBeInTheDocument()
+  })
+
+  it("shows the topic's first three FAQs and links to the rest", async () => {
+    getFaqsMock.mockResolvedValue([1, 2, 3, 4].map((id) => faq({ id, question: `Question ${id}?` })))
+    renderPage()
+
+    const section = await screen.findByRole('region', { name: 'Frequently asked questions' })
+    expect(getFaqsMock).toHaveBeenCalledWith({ topic: 'sponsored-programs' })
+    expect(within(section).getByText('Question 3?')).toBeInTheDocument()
+    expect(within(section).queryByText('Question 4?')).not.toBeInTheDocument()
+    expect(within(section).getByRole('link', { name: 'See all 4 FAQs for this topic' })).toHaveAttribute(
+      'href',
+      '/faqs?topic=sponsored-programs',
+    )
+  })
+
+  it('shows a single FAQ without a link to more', async () => {
+    getFaqsMock.mockResolvedValue([faq()])
+    renderPage()
+
+    expect(await screen.findByText(faq().question)).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /See all/ })).not.toBeInTheDocument()
+  })
+
+  it('leaves out the FAQ section when the FAQs fail to load', async () => {
+    getFaqsMock.mockRejectedValue(new Error('network'))
+    renderPage()
+
+    expect(await screen.findByText('2 documents')).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Frequently asked questions' })).not.toBeInTheDocument()
   })
 })

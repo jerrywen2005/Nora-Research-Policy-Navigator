@@ -6,6 +6,8 @@ import type {
   DocumentDetail,
   DocumentQuery,
   DocumentSummary,
+  Faq,
+  FaqQuery,
   Feedback,
   FeedbackRequest,
   Page,
@@ -44,6 +46,14 @@ export function getDocument(id: string): Promise<DocumentDetail> {
 // Every subtopic tag, ordered by name.
 export function getTags(): Promise<Tag[]> {
   return apiGet<Tag[]>('/tags')
+}
+
+// Published FAQs, ordered by sort_order, then question; with `topic`, only that topic's. An
+// unknown topic slug gives an empty list.
+export function getFaqs(query: FaqQuery = {}): Promise<Faq[]> {
+  const params = new URLSearchParams()
+  if (query.topic) params.set('topic', query.topic)
+  return apiGet<Faq[]>(`/faqs?${params}`)
 }
 
 // Answers from the policies with citations, or refers to an office (docs/api.md). Takes several

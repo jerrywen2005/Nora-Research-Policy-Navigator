@@ -1,27 +1,37 @@
-// Data access for the admin content pages, one function per endpoint in docs/api.md
-// ("Admin: content management", plus the offices, topics and tags the editor picks from).
+// Data access for the admin pages, one function per endpoint in docs/api.md ("Admin: content
+// management", "Admin: FAQs", "Admin analytics", plus the offices, topics and tags the editors
+// pick from).
 import { apiDelete, apiGet, apiPatch, apiPost } from '../../api/client'
 import type {
   AdminDocument,
   AdminDocumentDetail,
   AdminDocumentQuery,
+  AdminFaq,
+  AdminFaqQuery,
   Analytics,
   AnalyticsQuery,
+  CreateFaqRequest,
   Office,
   Page,
   Tag,
   Topic,
   UpdateDocumentRequest,
+  UpdateFaqRequest,
 } from '../../api/types'
 
-export function listAdminDocuments(query: AdminDocumentQuery): Promise<Page<AdminDocument>> {
+// Query parameters without the empty ones.
+function queryString(query: object): string {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) {
     if (value !== undefined && value !== '') {
       params.set(key, String(value))
     }
   }
-  return apiGet<Page<AdminDocument>>(`/admin/documents?${params}`)
+  return params.toString()
+}
+
+export function listAdminDocuments(query: AdminDocumentQuery): Promise<Page<AdminDocument>> {
+  return apiGet<Page<AdminDocument>>(`/admin/documents?${queryString(query)}`)
 }
 
 // Rejects with an ApiError (status 404) for an unknown document.
@@ -61,6 +71,37 @@ export function getTopics(): Promise<Topic[]> {
 
 export function getTags(): Promise<Tag[]> {
   return apiGet<Tag[]>('/tags')
+}
+
+// ---- FAQs (F8): docs/api.md, "Admin: FAQs" ----
+
+// FAQs of any status, ordered by sort_order, then question. Not paged: there are few.
+export function listAdminFaqs(query: AdminFaqQuery = {}): Promise<AdminFaq[]> {
+  return apiGet<AdminFaq[]>(`/admin/faqs?${queryString(query)}`)
+}
+
+// Rejects with an ApiError (status 404) for an unknown FAQ.
+export function getAdminFaq(id: string): Promise<AdminFaq> {
+  return apiGet<AdminFaq>(`/admin/faqs/${encodeURIComponent(id)}`)
+}
+
+// Creates a draft. Rejects with 422 for a blank field or an unknown id.
+export function createFaq(request: CreateFaqRequest): Promise<AdminFaq> {
+  return apiPost<AdminFaq>('/admin/faqs', request)
+}
+
+export function updateFaq(id: number, request: UpdateFaqRequest): Promise<AdminFaq> {
+  return apiPatch<AdminFaq>(`/admin/faqs/${id}`, request)
+}
+
+// Moves an FAQ through draft → published → archived. Rejects with 409 when the move isn't allowed.
+export function changeFaqStatus(id: number, action: LifecycleAction): Promise<AdminFaq> {
+  return apiPost<AdminFaq>(`/admin/faqs/${id}/${action}`)
+}
+
+// Permanent (NF7): only for archived FAQs, and only after the admin confirms.
+export function deleteFaq(id: number): Promise<void> {
+  return apiDelete(`/admin/faqs/${id}?confirm=true`)
 }
 
 // ---- Analytics (F11): docs/api.md, "Admin analytics" ----

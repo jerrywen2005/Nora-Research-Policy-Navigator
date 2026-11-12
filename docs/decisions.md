@@ -40,6 +40,17 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-12: FAQ frontend (workflow E)
+- **One Markdown renderer.** FAQ answers render with `MarkdownText`, the same component as Ask
+  answers, as [api.md](api.md#faq) asks, so admin-written text is never inserted as HTML.
+- **FAQs get their own admin sidebar item** (`/admin/faqs`) instead of a section in Content
+  Management: they have their own list and lifecycle, and aren't imported from the Repository.
+- **The FAQ page loads every published FAQ once** and filters by topic in the browser, since
+  there are few. Topic pages show the first three and link to `/faqs?topic=`.
+- **No disclaimer box on FAQs.** The page intro says they're general guidance and the linked
+  policies are the official text. If the Link wants the Ask disclaimer wording on FAQs too, it's
+  a one-line change. *(Adithi)*
+
 ### 2026-11-12: saved answers carry the user's rating
 The API had no way to read a rating back, so saved answers had no feedback buttons. Instead of a
 separate GET, each saved question now includes the user's own `feedback` (or `null`): the Saved

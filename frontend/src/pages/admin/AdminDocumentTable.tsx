@@ -1,12 +1,15 @@
 import { Link } from 'react-router'
-import type { AdminDocument, DocumentStatus } from '../../api/types'
+import type { AdminDocument, DocumentStatus, FaqStatus } from '../../api/types'
 import '../../components/components.css' // .visually-hidden
 import { docTypeLabels } from '../../components/docType'
 import './admin.css'
-import { formatDate, statusLabels } from './adminFormat'
+import { faqStatusLabels, formatDate, statusLabels } from './adminFormat'
 
-export function StatusBadge({ status }: { status: DocumentStatus }) {
-  return <span className={`badge status-badge status-badge--${status}`}>{statusLabels[status]}</span>
+// A document's or an FAQ's status. A published FAQ looks like a published (`active`) document.
+export function StatusBadge({ status }: { status: DocumentStatus | FaqStatus }) {
+  const label = status === 'published' ? faqStatusLabels.published : statusLabels[status]
+  const tone = status === 'published' ? 'active' : status
+  return <span className={`badge status-badge status-badge--${tone}`}>{label}</span>
 }
 
 // Documents of any status, each linking to its editor. Used by the Policy Library and the

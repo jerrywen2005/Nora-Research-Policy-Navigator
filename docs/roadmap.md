@@ -169,8 +169,10 @@ the workflows, so each has one owner who makes sure it's met and checked.
 **E. FAQs (Anton backend, Adithi frontend).**
 - [x] `faqs` and `faq_documents` tables and endpoints; draft → published → archived, like
   documents ([api.md](api.md#faqs), [api.md](api.md#admin-faqs))
-- [ ] Admin FAQ editor
-- [ ] Researcher FAQ page, and FAQs on their topic's page
+- [x] Admin FAQ editor: list with status and topic filters, editor with answer preview and
+  source-policy search, publish / archive / restore and confirmed delete
+  ([frontend.md](frontend.md#admin-faq-pages))
+- [x] Researcher FAQ page, and FAQs on their topic's page
 
 ## After the MVP
 

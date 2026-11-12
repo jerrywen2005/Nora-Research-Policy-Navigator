@@ -7,10 +7,13 @@ import { adminNav, researcherNav } from './layout/navItems'
 import AdminOverview from './pages/admin/AdminOverview'
 import ContentManagementPage from './pages/admin/ContentManagementPage'
 import DocumentEditorPage from './pages/admin/DocumentEditorPage'
+import FaqEditorPage from './pages/admin/FaqEditorPage'
+import FaqListPage from './pages/admin/FaqListPage'
 import PolicyLibraryPage from './pages/admin/PolicyLibraryPage'
 import AskPage from './pages/researcher/AskPage'
 import BrowsePage from './pages/researcher/BrowsePage'
 import DocumentPage from './pages/researcher/DocumentPage'
+import FaqPage from './pages/researcher/FaqPage'
 import HomePage from './pages/researcher/HomePage'
 import SavedPage from './pages/researcher/SavedPage'
 import SearchPage from './pages/researcher/SearchPage'
@@ -39,6 +42,7 @@ export default function App() {
             <Route path="search" element={<SearchPage />} />
             <Route path="ask" element={<AskPage />} />
             <Route path="saved" element={<SavedPage />} />
+            <Route path="faqs" element={<FaqPage />} />
             <Route path="documents/:id" element={<DocumentPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
@@ -50,6 +54,8 @@ export default function App() {
             <Route path="library" element={<PolicyLibraryPage />} />
             <Route path="content" element={<ContentManagementPage />} />
             <Route path="documents/:id" element={<DocumentEditorPage />} />
+            <Route path="faqs" element={<FaqListPage />} />
+            <Route path="faqs/:id" element={<FaqEditorPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Route>
