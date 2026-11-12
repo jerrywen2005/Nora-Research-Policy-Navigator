@@ -234,27 +234,39 @@ Response `200`:
       "snippet": "Research using identifiable private information requires..."
     }
   ],
-  "referral": null,
+  "contacts": [
+    { "id": 2, "name": "Office of Human Research Ethics", "email": "irb_questions@unc.edu", "phone": "919-966-3113", "url": "https://research.unc.edu/human-research-ethics/" },
+    { "id": 9, "name": "Research Compliance Services", "email": "rcs@unc.edu", "phone": null, "url": null }
+  ],
   "confidence": 0.82,
-  "disclaimer": "Nora provides general information, not an official determination. Contact the responsible office for a formal review."
+  "disclaimer": "Nora provides general information, not an official determination. For a formal review, contact one of the offices below.",
+  "links": []
 }
 ```
-- `outcome`:
+- `outcome` (who to contact is the Link's rule, 2026-11-12):
   - `"answered"`: `answer` cites `citations` as `[1]`, `[2]`, matching `number`. Only cited
-    sources are listed.
-  - `"referred"`: nothing in the policies matched (the confidence gate). `answer` is a short
-    explanation, `citations` is empty, and `referral` is the [Office](#office) to contact: the
-    topic's office when asked from a topic, otherwise the Office of the Vice Chancellor for
-    Research.
+    sources are listed. `contacts` is the offices that own the cited policies, then Research
+    Compliance Services (RCS).
+  - `"referred"`: the question is about research, but nothing in the policies matched (the
+    confidence gate). `answer` is a short explanation, `citations` is empty, and `contacts` is
+    RCS.
+  - `"out_of_scope"`: below the gate and not about research. `answer` is a short explanation,
+    `contacts` is the University Policy Office, and `links` points to every UNC policy.
   - `"no_answer"`: sources matched but the answer didn't cite them, or the LLM failed. `answer`
-    is a short explanation, `referral` is the office that owns the best-matching policy, and
-    after an LLM failure `citations` lists the matching sources.
+    is a short explanation and `contacts` is RCS; after an LLM failure `citations` lists the
+    matching sources and `contacts` is their offices, then RCS.
+- Below the gate, the LLM decides between `referred` and `out_of_scope`. Without an LLM, only a
+  question far from every policy is `out_of_scope` ([rag.md](rag.md), build log).
+- `contacts` is a list of [Office](#office), most specific first; it is never empty once the
+  two referral offices are seeded. `links` is a list of `{ "title", "url" }`, usually empty.
+- `disclaimer` comes with policy content (`answered`, and `no_answer` with sources) and is
+  `null` on a referral, which has no content to qualify. Show it whenever it's set; the backend
+  (`app/rag/answer.py`) is the only copy of the wording.
 - `confidence` is the best reranker score, 0 to 1. Below 0.04 the question is referred.
 - With no LLM configured (`LLM_PROVIDER=none`, the default until UNC approves a provider),
   `outcome` is `"answered"`, `answer` is `null`, and `citations` lists the top matching sections
   as "relevant sources".
 - `question_id` identifies the logged question; feedback will refer to it.
-- The UI always shows `disclaimer`.
 
 ## Feedback and saved items
 
@@ -338,7 +350,11 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
         "snippet": "Research using identifiable private information requires..."
       }
     ],
-    "referral": null,
+    "contacts": [
+      { "id": 9, "name": "Research Compliance Services", "email": "rcs@unc.edu", "phone": null, "url": null }
+    ],
+    "disclaimer": "Nora provides general information, not an official determination. For a formal review, contact one of the offices below.",
+    "links": [],
     "created_at": "2026-11-11T15:01:12Z"
   }
 }
@@ -346,19 +362,19 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
 - `kind` is `"document"` or `"question"`. Exactly one of `document` and `question` is set,
   matching `kind`; the other is `null`.
 - `document` is a [DocumentSummary](#documentsummary).
-- `question.outcome` is an Ask `outcome` (`answered`, `referred`, `no_answer`). A question whose
+- `question.outcome` is an Ask `outcome` (`answered`, `referred`, `out_of_scope`, `no_answer`). A question whose
   LLM call failed is stored as `error` in the database but shown as `no_answer`, as it was when
   asked.
 - `question.answer_text` is the answer shown at the time, with its `[n]` markers, or `null` when
   there was none (for example with no LLM configured).
-- `question.citations` and `question.referral` are what the Ask page showed with the answer, in
-  the same [Citation](#post-apiask) and [Office](#office) shapes as `POST /api/ask`:
+- `question.citations`, `contacts`, `disclaimer` and `links` are what the Ask page showed with
+  the answer, in the same shapes as `POST /api/ask`, rebuilt by the same code
+  (`app/rag/answer.py`) from the stored outcome, cited policies and referred office:
   - `citations` lists only the sources the answer cited, ordered by `number` (their retrieval
     rank). `number` matches the `[n]` in `answer_text`. This order can differ from the Ask
     response, which lists them in the order the answer first mentions them. Empty for a referral.
   - If the policy has been re-processed since, its old sections are gone: the citation keeps its
     `number`, `document_id`, `title` and `source_url`, and `section` and `snippet` are `""`.
-  - `referral` is the office the user was referred to, or `null`.
 - A saved document that is later archived stays in the list, so the user can still see it and
   remove it.
 
@@ -716,7 +732,7 @@ Response `200`: an [Analytics](#analytics) object.
 
   "top_questions": [ { "text": "do i need irb approval to use an existing dataset?", "count": 6 } ],
 
-  "questions_by_outcome": { "answered": 71, "referred": 15, "no_answer": 9, "error": 2 },
+  "questions_by_outcome": { "answered": 71, "referred": 15, "out_of_scope": 4, "no_answer": 9, "error": 2 },
   "referrals_by_office": [
     { "office": { "id": 2, "name": "Office of Human Research Ethics", "email": null, "phone": null, "url": null }, "count": 12 }
   ],

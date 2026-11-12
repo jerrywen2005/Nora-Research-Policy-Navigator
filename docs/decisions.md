@@ -18,12 +18,9 @@ an open question is answered, move it into the log.
 - **OKD:** Postgres + pgvector availability, outbound API access, image registry, hostname,
   secrets. *(client's team, who now own hosting)*
 - **Repo:** must the repo move to a UNC GitHub organization? *(coach / ITS)*
-- **Referrals:** the inventory gives each policy's contact. Is that who Nora should refer to, and
-  who handles questions that match no policy? Until answered, Ask refers to the topic's office,
-  the office owning the best-matching policy, or the Office of the Vice Chancellor for Research
-  ([rag.md](rag.md), build log). *(Link)*
-- **Answer standards:** the exact disclaimer wording, the citation and source-link format, and the
-  confidence/referral criteria. *(Link; asked for in Jeanne's 2026-10-29 email)*
+- **Answer standards:** the exact wording of the disclaimer and of the three referral messages
+  (`app/rag/answer.py`; placeholders until approved), and the citation and source-link format.
+  *(Link; asked for in Jeanne's 2026-10-29 email)*
 - **Untagged policy:** Research Service Centers procedure (article 132340) has no tag yet; the
   inventory's review notes say a reviewer must confirm one. *(Link)*
 - **Test questions:** sample researcher questions and use cases for the evaluation. *(Link)*
@@ -42,6 +39,24 @@ an open question is answered, move it into the log.
   users whose role is currently `admin` is easy if wanted. *(Andy / Link)*
 
 ## Log
+
+### 2026-11-12: who Nora refers to (the Link's rule)
+Jeanne set the referral rule, replacing our placeholder (the topic's office, else the Office of
+the Vice Chancellor for Research):
+- **Answered:** the offices that own the cited policies, and Research Compliance Services
+  (rcs@unc.edu).
+- **About research but not answerable:** RCS (`referred`, and `no_answer`).
+- **Not about research:** the University Policy Office, and a link to UNC's Policies,
+  Procedures and Standards (new outcome `out_of_scope`).
+
+Telling the last two apart is the hard part, and neither retrieval score can do it
+([rag.md](rag.md), build log). Below the gate, a short LLM call asks whether the question is
+about research (41/42 right on our test questions, about 0.5 s). Without an LLM, only questions
+far from every policy are sent to the Policy Office; anything unsure goes to RCS, because
+sending a research question away is the worse mistake. The API now returns `contacts` (a list)
+instead of `referral`, plus `links`, and the disclaimer only with policy content. The backend is
+the only copy of every message, and saved answers rebuild them from the stored question, so the
+frontend's copy of the disclaimer is gone. *(Jerry)*
 
 ### 2026-11-12: admin content pages (workflow D admin side)
 - **Policy Library** is for finding documents: every status, with search and status and topic

@@ -93,12 +93,14 @@ panel, the topic grid and a right rail. Search keeps its query in the URL (`/sea
 
 - **Data:** pages get data only through `researcherApi.ts`, which has one function per endpoint in
   [api.md](api.md). All of them call the real API, including `ask()` (`POST /api/ask`).
-- **Answers:** `AnswerCard` renders every Ask outcome, the confidence indicator and the
-  disclaimer. The LLM writes a little Markdown (paragraphs, `- ` lists, `**bold**`) and cites as
+- **Answers:** `AnswerCard` renders every Ask outcome, the confidence indicator, the offices to
+  contact (`contacts`), any `links`, and the disclaimer when the API sends one. All of that
+  wording comes from the backend; the frontend has no copy. The LLM writes a little Markdown (paragraphs, `- ` lists, `**bold**`) and cites as
   `[1]` or `【1】`; `AnswerText` turns exactly those into React elements, so model output is never
   inserted as HTML. Answers take several seconds, and the loading text says so.
-- **Ask:** `components/AnswerCard.tsx` renders every `AskResponse` outcome (answer with `[n]`
-  citations, sources only, referral) and always shows the disclaimer.
+- **Ask:** `components/AnswerCard.tsx` renders every `AskResponse` outcome: an answer with `[n]`
+  citations, sources only, a referral to RCS, and `out_of_scope` (not about research; a
+  neutral card with the University Policy Office and a link to every UNC policy).
 - **Feedback (F7):** `AnswerFeedback` puts Helpful / Not helpful under every fresh answer
   (`PUT /api/questions/{id}/feedback`). Clicking the selected button again removes the rating
   (`DELETE`). Not helpful opens an optional comment box. The API has no way to read a rating
@@ -109,8 +111,7 @@ panel, the topic grid and a right rail. Search keeps its query in the URL (`/sea
   `SaveButton` is a toggle (`aria-pressed`) on each answer and on every `DocumentResultCard`; on
   the Saved page, turning it off removes the item. Saved answers render with the same
   `AnswerCard` via `savedAnswer()` in `components/answerContent.ts`. They have no confidence
-  score, and their disclaimer is a copy of the backend's `DISCLAIMER`, since the saved response
-  doesn't include it: change both together. The home page's right rail lists the three newest
+  score; their contacts, disclaimer and links come from the saved response. The home page's right rail lists the three newest
   saved items.
 - **Citation anchors:** each `AnswerCard` prefixes its `[n]` anchors with `useId()`, because the
   Saved page shows several answers at once.
