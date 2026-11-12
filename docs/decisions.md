@@ -43,6 +43,16 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-12: document and tag pages (workflow D researcher pages)
+- A result card's title now opens the in-app document page; the Repository link stays on the card
+  as a separate link (F3's topic → documents → document page flow).
+- The document page shows the summary, office, topics, tags and related policies, with a button
+  to the Repository, but not the policy text: the Repository is the official copy (F12).
+- The topic page filters by one subtopic tag at a time, matching the API's single `tag`
+  parameter.
+
+*(Anton)*
+
 ### 2026-11-11: MVP deadline moved to Sunday Nov 15
 The MVP is now due by the end of Sun Nov 15, not Thu Nov 12. *(Anton)*
 

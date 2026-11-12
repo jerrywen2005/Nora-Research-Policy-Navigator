@@ -325,6 +325,13 @@
   color: var(--rp-accent);
 }
 
+/* A flex item won't shrink below its longest word unless told to, so a long email address
+   would spill out of the narrow rail. */
+.office-contact__body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .office-contact__name {
   margin: 0 0 0.2rem;
   font-weight: 600;
@@ -375,6 +382,39 @@
   margin: 0;
   font-size: 0.8rem;
   color: var(--rp-muted);
+}
+
+/* ---- Subtopic tags (F3) ---- */
+
+.tag-list,
+.tag-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-filter {
+  margin-bottom: 1rem;
+}
+
+.tag-link {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--rp-accent);
+  text-decoration: none;
+  background: var(--rp-browse);
+  border: 1px solid var(--rp-border);
+  border-radius: 999px;
+}
+
+.tag-link:hover {
+  border-color: var(--rp-blue);
+  text-decoration: underline;
 }
 
 /* ---- Feedback and save (F7, F9) ---- */

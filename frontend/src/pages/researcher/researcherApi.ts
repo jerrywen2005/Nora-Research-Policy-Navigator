@@ -3,6 +3,7 @@ import { apiDelete, apiGet, apiPost, apiPut } from '../../api/client'
 import type {
   AskRequest,
   AskResponse,
+  DocumentDetail,
   DocumentQuery,
   DocumentSummary,
   Feedback,
@@ -10,6 +11,7 @@ import type {
   Page,
   SavedItem,
   SaveRequest,
+  Tag,
   Topic,
   TopicDetail,
 } from '../../api/types'
@@ -32,6 +34,16 @@ export function getDocuments(query: DocumentQuery): Promise<Page<DocumentSummary
     }
   }
   return apiGet<Page<DocumentSummary>>(`/documents?${params}`)
+}
+
+// Rejects with an ApiError (status 404) for an unknown or inactive document.
+export function getDocument(id: string): Promise<DocumentDetail> {
+  return apiGet<DocumentDetail>(`/documents/${encodeURIComponent(id)}`)
+}
+
+// Every subtopic tag, ordered by name.
+export function getTags(): Promise<Tag[]> {
+  return apiGet<Tag[]>('/tags')
 }
 
 // Answers from the policies with citations, or refers to an office (docs/api.md). Takes several

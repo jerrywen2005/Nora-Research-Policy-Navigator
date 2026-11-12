@@ -131,6 +131,37 @@
   color: var(--rp-muted);
 }
 
+.page-header__eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--rp-muted);
+}
+
+.document-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.document-summary {
+  margin: 0 0 1rem;
+}
+
+.document-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--rp-muted);
+}
+
+.related-citation {
+  color: var(--rp-muted);
+}
+
 .result-count {
   margin: 1rem 0 0.75rem;
   font-weight: 600;

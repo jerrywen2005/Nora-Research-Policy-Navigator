@@ -1,6 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../../api/client'
-import { ask, clearRating, getSaved, rateAnswer, saveItem, unsaveItem } from './researcherApi'
+import {
+  ask,
+  clearRating,
+  getDocument,
+  getDocuments,
+  getSaved,
+  getTags,
+  rateAnswer,
+  saveItem,
+  unsaveItem,
+} from './researcherApi'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -78,5 +88,29 @@ describe('saved items', () => {
     fetchMock = stubFetch(204)
     await expect(unsaveItem(7)).resolves.toBeUndefined()
     expect(fetchMock).toHaveBeenCalledWith('/api/saved/7', expect.objectContaining({ method: 'DELETE' }))
+  })
+})
+
+describe('documents and tags', () => {
+  it('gets one document by id, escaping the id', async () => {
+    let fetchMock = stubFetch(200, { id: 12 })
+    await expect(getDocument('12')).resolves.toEqual({ id: 12 })
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/documents/12')
+
+    fetchMock = stubFetch(404, { detail: 'Document not found' })
+    await expect(getDocument('a/b')).rejects.toMatchObject({ status: 404 })
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/documents/a%2Fb')
+  })
+
+  it('lists tags', async () => {
+    const fetchMock = stubFetch(200, [])
+    await expect(getTags()).resolves.toEqual([])
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/tags')
+  })
+
+  it('filters documents by topic and tag, leaving out empty parameters', async () => {
+    const fetchMock = stubFetch(200, { items: [], total: 0 })
+    await getDocuments({ topic: 'irb', tag: '', limit: 100 })
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/documents?topic=irb&limit=100')
   })
 })

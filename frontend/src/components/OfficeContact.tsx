@@ -9,7 +9,7 @@ export function OfficeContact({ office }: { office: Office }) {
       <span className="office-contact__icon">
         <Icon name="office" size={22} />
       </span>
-      <div>
+      <div className="office-contact__body">
         <p className="office-contact__name">{office.name}</p>
         <ul className="office-contact__details">
           {office.email && (
