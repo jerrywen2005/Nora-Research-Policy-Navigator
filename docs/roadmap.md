@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** Current as of 2026-11-10. Update the checkboxes and "Now" section as work lands.
+**Status:** Current as of 2026-11-11. Update the checkboxes and "Now" section as work lands.
 
 ## Milestones
 
@@ -9,8 +9,7 @@
 | Wed Oct 14, 11:59 pm | Demo video: at least 1 core feature and 2 workflows, dummy data |
 | ~~Oct 30~~ | ~~Quarterly client meeting~~ Cancelled (2026-10-27) |
 | Mon Nov 2 | Team tech talk on RAG (20 min), done; the demo is in a separate tutorial repo |
-| **Thu Nov 12** | **MVP due (course):** every MF requirement and at least 8 MNF ([product.md](product.md#requirements)) |
-| Sun Nov 15 | Final product due (course) |
+| **Sun Nov 15, end of day** | **MVP due (course):** every MF requirement and at least 8 MNF ([product.md](product.md#requirements)); moved from Thu Nov 12 (2026-11-11). The final product is also due Sun Nov 15 |
 | Nov 19, 3–4 pm | RCC Steering Group demo: end-to-end researcher experience, with subtopic tags |
 | End of semester (December) | Working prototype and handoff documentation for the client |
 
@@ -167,7 +166,8 @@ the workflows, so each has one owner who makes sure it's met and checked.
 - [ ] Admin Policy Library and Content Management pages
 
 **E. FAQs (Anton backend, Adithi frontend).**
-- [ ] `faqs` table and endpoints; draft → published
+- [x] `faqs` and `faq_documents` tables and endpoints; draft → published → archived, like
+  documents ([api.md](api.md#faqs), [api.md](api.md#admin-faqs))
 - [ ] Admin FAQ editor
 - [ ] Researcher FAQ page, and FAQs on their topic's page
 

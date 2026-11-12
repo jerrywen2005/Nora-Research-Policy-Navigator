@@ -5,6 +5,8 @@ implemented (2026-10-12), and so are **Topics** and **Documents** (2026-10-13); 
 yet. Workflow D's endpoints (content management and subtopic tags, F3, F4, F12, NF7) are
 implemented (2026-11-10): [Tags](#tags), [Offices](#offices), the tag filter and related
 documents under [Documents](#documents), and [Admin: content management](#admin-content-management).
+Workflow E's endpoints ([FAQs](#faqs) and [Admin: FAQs](#admin-faqs), F8) are implemented
+(2026-11-11).
 
 This is the agreement between backend and frontend about what each endpoint accepts and returns.
 The same shapes appear in three places, and they must change together in the same PR:
@@ -360,6 +362,39 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
 - A saved document that is later archived stays in the list, so the user can still see it and
   remove it.
 
+## FAQs
+
+Workflow E, requirement F8. Admins write FAQs (see [Admin: FAQs](#admin-faqs)); researchers see
+only published ones. Requires sign-in (`401` otherwise), any role.
+
+### `GET /api/faqs`
+Published FAQs, ordered by `sort_order`, then question. Query parameters, both optional:
+
+| name | meaning |
+|---|---|
+| `topic` | topic slug; only that topic's FAQs, for its topic page. An unknown slug gives `[]` |
+
+Response `200`: `[ Faq, ... ]`. There are few FAQs, so the list isn't paged.
+
+#### Faq
+```json
+{
+  "id": 3,
+  "question": "Do I need IRB approval to use existing de-identified data?",
+  "answer": "Usually not, if you can't link the data back to individuals...",
+  "topic": { "id": 1, "slug": "human-subjects-research", "name": "Human Subjects Research" },
+  "sources": [
+    { "id": 12, "title": "Use of Existing Data and Specimens in Research", "doc_type": "guidance", "citation": "OHRE SOP 1301" }
+  ],
+  "updated_at": "2026-11-12T18:30:00Z"
+}
+```
+- `answer` is Markdown, written by an admin. Render it with the same safe Markdown renderer as
+  Ask answers.
+- `topic` is a [TopicRef](#documentsummary); it's `null` only if the FAQ's topic was removed.
+- `sources` are the policies the answer is based on, as [DocumentRef](#documentref)s. Researchers
+  only see sources that are `active`, so the list can be empty.
+
 ## Health
 
 ### `GET /api/health`
@@ -508,6 +543,107 @@ as `{ "id", "onyen", "display_name" }`, and may be `null` (seeded documents).
 
 #### AdminDocumentDetail
 An AdminDocument plus `"content_text": "full text..."`.
+
+## Admin: FAQs
+
+Workflow E, requirements F8 and NF7. Every endpoint requires the admin role (`401` signed out,
+`403` researcher). These see FAQs of every status. FAQs are never auto-published: an admin writes
+each one and publishes it.
+
+An FAQ's lifecycle is the same as a document's, except the published status is `published`:
+
+```
+POST → draft ──publish──→ published
+         │                  │
+         └────archive───────┴──→ archived ──restore──→ draft
+                                    │
+                            DELETE ?confirm=true (permanent)
+```
+
+A transition that isn't in the diagram returns `409` with a `detail` that says why.
+
+### `GET /api/admin/faqs`
+Lists FAQs of any status for the admin FAQ editor, ordered by `sort_order`, then question. Query
+parameters, both optional:
+
+| name | meaning |
+|---|---|
+| `status` | `draft`, `published` or `archived`; omitted means all three |
+| `topic` | topic slug |
+
+Response `200`: `[ AdminFaq, ... ]`.
+
+### `GET /api/admin/faqs/{id}`
+Response `200`: an [AdminFaq](#adminfaq), or `404`.
+
+### `POST /api/admin/faqs`
+Creates a draft.
+
+Request:
+```json
+{
+  "question": "Do I need IRB approval to use existing de-identified data?",
+  "answer": "Usually not, if you can't link the data back to individuals...",
+  "topic_id": 1,
+  "document_ids": [12],
+  "sort_order": 0
+}
+```
+- `question` (up to 500 characters) and `answer` (up to 10,000) are required and can't be blank.
+- `topic_id` may be `null` or left out on a draft; `document_ids` defaults to `[]` and
+  `sort_order` to `0`.
+- `document_ids` may name documents of any status, but researchers only see the active ones.
+
+Response `201`: the [AdminFaq](#adminfaq). `422` for a blank field or an unknown id.
+
+### `PATCH /api/admin/faqs/{id}`
+Edits an FAQ. Every field from `POST` is optional; omitted fields stay as they are, and
+`document_ids` replaces the whole list. Edits to a published FAQ show to researchers immediately.
+- `topic_id` may be `null` to clear it, except on a `published` FAQ.
+- `question`, `answer`, `document_ids` and `sort_order` can't be `null`.
+
+Response `200`: the [AdminFaq](#adminfaq). `404` if the FAQ doesn't exist; `422` for a blank or
+`null` field, an unknown id, or clearing a published FAQ's topic.
+
+### `POST /api/admin/faqs/{id}/publish`
+`draft` → `published`. The FAQ must have a topic, otherwise `409`. Response `200`: the
+[AdminFaq](#adminfaq).
+
+### `POST /api/admin/faqs/{id}/archive`
+`draft` or `published` → `archived`. Researchers stop seeing it immediately. Response `200`: the
+[AdminFaq](#adminfaq); `409` if it's already archived.
+
+### `POST /api/admin/faqs/{id}/restore`
+`archived` → `draft`. Response `200`: the [AdminFaq](#adminfaq); `409` if it isn't archived.
+
+### `DELETE /api/admin/faqs/{id}?confirm=true`
+Permanently deletes an archived FAQ and its source links (NF7).
+- Without `confirm=true`: `422`. The frontend sends it only after the admin confirms in a dialog
+  that names the FAQ.
+- `409` if the FAQ isn't archived. Archive it first.
+- `404` if it doesn't exist.
+
+Response `204`, with no body.
+
+#### AdminFaq
+A [Faq](#faq) plus the fields admins need. Its `sources` include every linked document, whatever
+its status.
+```json
+{
+  "id": 3,
+  "question": "Do I need IRB approval to use existing de-identified data?",
+  "answer": "Usually not, if you can't link the data back to individuals...",
+  "topic": { "id": 1, "slug": "human-subjects-research", "name": "Human Subjects Research" },
+  "sources": [
+    { "id": 12, "title": "Use of Existing Data and Specimens in Research", "doc_type": "guidance", "citation": "OHRE SOP 1301" }
+  ],
+  "updated_at": "2026-11-12T18:30:00Z",
+  "status": "draft",
+  "sort_order": 0,
+  "created_at": "2026-11-12T18:00:00Z",
+  "updated_by": { "id": 2, "onyen": "admin1", "display_name": "Test Admin" }
+}
+```
 
 ## Admin analytics
 
@@ -672,5 +808,4 @@ Response `204`; `404` if the Onyen isn't an admin; `409` with
 
 ## Not yet defined
 
-FAQs, and editing topics, offices and tags in the app. Add those endpoints here before building
-them.
+Editing topics, offices and tags in the app. Add those endpoints here before building them.

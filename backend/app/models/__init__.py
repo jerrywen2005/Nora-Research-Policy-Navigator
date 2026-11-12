@@ -10,6 +10,7 @@ from app.models.content import (
     Topic,
     document_topics,
 )
+from app.models.faq import Faq, FaqStatus, faq_documents
 from app.models.feedback import Feedback
 from app.models.question import Outcome, Question, QuestionCitation
 from app.models.saved_item import SavedItem
@@ -24,6 +25,8 @@ __all__ = [
     "DocumentChunk",
     "DocumentStatus",
     "EventType",
+    "Faq",
+    "FaqStatus",
     "Feedback",
     "Office",
     "Outcome",
@@ -37,4 +40,5 @@ __all__ = [
     "User",
     "document_tags",
     "document_topics",
+    "faq_documents",
 ]
