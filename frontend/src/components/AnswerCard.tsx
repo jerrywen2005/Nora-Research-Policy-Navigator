@@ -3,32 +3,11 @@ import type { Citation } from '../api/types'
 import type { AnswerContent } from './answerContent'
 import './components.css'
 import { Icon, type IconName } from './Icon'
+import { MarkdownText } from './MarkdownText'
 import { OfficeContact } from './OfficeContact'
 
-// Inline marks in an answer: **bold**, and citations as [1] or the 【1】 some models write.
-const INLINE = /(\*\*[^*]+\*\*|[[【]\d+[\]】])/
-const LIST_ITEM = /^\s*(?:[-*•]|\d+\.)\s+/
-
-// Bold text, and citation markers as links to the matching source below.
-function Inline({ text, numbers, idPrefix }: { text: string; numbers: Set<number>; idPrefix: string }) {
-  return text.split(INLINE).map((part, index) => {
-    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
-      return <strong key={index}>{part.slice(2, -2)}</strong>
-    }
-    const citation = /^[[【](\d+)[\]】]$/.exec(part)
-    if (citation && numbers.has(Number(citation[1]))) {
-      return (
-        <sup key={index}>
-          <a href={`#${idPrefix}-${citation[1]}`}>[{citation[1]}]</a>
-        </sup>
-      )
-    }
-    return part
-  })
-}
-
-// The LLM writes a little Markdown: paragraphs, "- " or "1. " list items, and **bold**. This
-// renders just that, as React elements, so model output is never inserted as HTML.
+// An answer's text, with its [n] citation markers linked to the matching source below. Markers
+// for numbers that aren't in `citations` stay plain text.
 function AnswerText({
   text,
   citations,
@@ -39,38 +18,20 @@ function AnswerText({
   idPrefix: string
 }) {
   const numbers = new Set(citations.map((c) => c.number))
-  const blocks: ReactNode[] = []
-  let items: string[] = []
-
-  const flushList = () => {
-    if (items.length > 0) {
-      blocks.push(
-        <ul key={blocks.length} className="answer-card__list">
-          {items.map((item, index) => (
-            <li key={index}>
-              <Inline text={item} numbers={numbers} idPrefix={idPrefix} />
-            </li>
-          ))}
-        </ul>,
-      )
-      items = []
-    }
-  }
-
-  for (const line of text.split('\n')) {
-    if (LIST_ITEM.test(line)) {
-      items.push(line.replace(LIST_ITEM, ''))
-    } else if (line.trim()) {
-      flushList()
-      blocks.push(
-        <p key={blocks.length} className="answer-card__text">
-          <Inline text={line.trim()} numbers={numbers} idPrefix={idPrefix} />
-        </p>,
-      )
-    }
-  }
-  flushList()
-  return <>{blocks}</>
+  return (
+    <MarkdownText
+      text={text}
+      paragraphClassName="answer-card__text"
+      listClassName="answer-card__list"
+      renderCitation={(n) =>
+        numbers.has(n) ? (
+          <sup>
+            <a href={`#${idPrefix}-${n}`}>[{n}]</a>
+          </sup>
+        ) : null
+      }
+    />
+  )
 }
 
 // The confidence indicator: how well the best source matched the question (the reranker score
