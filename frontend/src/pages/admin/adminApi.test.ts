@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  analyticsExportUrl,
   changeStatus,
   deleteDocument,
   getAdminDocument,
+  getAnalytics,
   getOffices,
   getTags,
   getTopics,
@@ -83,5 +85,28 @@ describe('adminApi', () => {
     const fetchMock = stubFetch(200, [])
     await get()
     expect(fetchMock.mock.calls[0][0]).toBe(path)
+  })
+})
+
+describe('analytics', () => {
+  it('asks for a date range, or the API default without one', async () => {
+    let fetchMock = stubFetch(200, { from: '2026-11-01' })
+    await expect(getAnalytics({ from: '2026-11-01', to: '2026-11-07' })).resolves.toEqual({
+      from: '2026-11-01',
+    })
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/admin/analytics?from=2026-11-01&to=2026-11-07',
+      expect.objectContaining({ method: 'GET' }),
+    )
+
+    fetchMock = stubFetch(200, {})
+    await getAnalytics({})
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/admin/analytics?')
+  })
+
+  it('links the CSV export for the same range', () => {
+    expect(analyticsExportUrl({ from: '2026-11-01', to: '2026-11-07' })).toBe(
+      '/api/admin/analytics/export.csv?from=2026-11-01&to=2026-11-07',
+    )
   })
 })

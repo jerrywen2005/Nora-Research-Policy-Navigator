@@ -149,7 +149,7 @@ the workflows, so each has one owner who makes sure it's met and checked.
   [product.md](product.md#admin-dashboard-must-have), for a date range, aggregates only
   (`GET /api/admin/analytics`)
 - [x] CSV export (`GET /api/admin/analytics/export.csv`)
-- [ ] Admin Overview on the real API; delete `sampleData.ts`
+- [x] Admin Overview on the real API, with a date range and the CSV download; `sampleData.ts` deleted
 
 **D. Content management and subtopics (Adithi backend, Anton frontend).**
 - [x] `tags` and `document_tags` ([database.md](database.md#content)); seed the 77 tags, their
