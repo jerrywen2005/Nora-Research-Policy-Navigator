@@ -40,6 +40,12 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-12: saved answers carry the user's rating
+The API had no way to read a rating back, so saved answers had no feedback buttons. Instead of a
+separate GET, each saved question now includes the user's own `feedback` (or `null`): the Saved
+page is the only place an answer is shown again, and this costs no extra request. Ratings stay
+per user (only the asker can rate). *(Jerry)*
+
 ### 2026-11-12: who Nora refers to (the Link's rule)
 Jeanne set the referral rule, replacing our placeholder (the topic's office, else the Office of
 the Vice Chancellor for Research):

@@ -217,6 +217,7 @@ describe('AnswerCard', () => {
           contacts: [RCS],
           disclaimer: DISCLAIMER,
           links: [],
+          feedback: null,
           created_at: '2026-11-11T15:01:12Z',
         })}
         actions={<button type="button">Saved</button>}

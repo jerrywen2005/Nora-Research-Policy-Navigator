@@ -15,6 +15,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
 from app.models.content import Document, DocumentChunk, Office
+from app.models.feedback import Feedback
 
 
 class Outcome(StrEnum):
@@ -68,6 +69,9 @@ class Question(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
+    # Read-only: ratings are written through app/api/feedback.py. Only the asker can rate, so
+    # there is at most one, but callers still match on user_id.
+    ratings: Mapped[list["Feedback"]] = relationship(viewonly=True)
 
 
 class QuestionCitation(Base):

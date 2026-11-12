@@ -62,6 +62,8 @@ class SavedQuestion(BaseModel):
     contacts: list[OfficeOut]
     disclaimer: str | None
     links: list[LinkOut]
+    # The user's own rating of this answer, so the Saved page can show it; null if unrated.
+    feedback: FeedbackOut | None
     created_at: datetime
 
 

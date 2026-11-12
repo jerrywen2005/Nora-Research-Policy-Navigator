@@ -266,6 +266,7 @@ export interface SavedQuestion {
   contacts: Office[]
   disclaimer: string | null
   links: Link[]
+  feedback: Feedback | null // the user's own rating, null if unrated
   created_at: string
 }
 

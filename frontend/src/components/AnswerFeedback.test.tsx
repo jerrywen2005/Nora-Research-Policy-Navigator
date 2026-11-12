@@ -65,4 +65,21 @@ describe('AnswerFeedback', () => {
     expect(screen.getByText(/couldn't send your feedback/i)).toBeInTheDocument()
     expect(helpful()).toHaveAttribute('aria-pressed', 'false')
   })
+
+  it('starts from the rating the user already gave, and reports each change', async () => {
+    const onChange = vi.fn()
+    const saved = { question_id: 41, helpful: false, comment: 'Too vague', created_at: '', updated_at: '' }
+    const updated = { ...saved, helpful: true, comment: null }
+    rateMock.mockResolvedValue(updated)
+    render(<AnswerFeedback questionId={41} initial={saved} onChange={onChange} />)
+
+    expect(notHelpful()).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText('Thanks, your comment was sent.')).toBeInTheDocument()
+
+    await userEvent.click(helpful())
+    expect(onChange).toHaveBeenLastCalledWith(updated)
+
+    await userEvent.click(helpful())
+    expect(onChange).toHaveBeenLastCalledWith(null)
+  })
 })

@@ -26,7 +26,7 @@ from app.rag.answer import (
 )
 from app.schemas.ask import CitationOut, LinkOut
 from app.schemas.content import DocumentSummary, OfficeOut
-from app.schemas.feedback import SavedItemOut, SavedQuestion, SaveRequest
+from app.schemas.feedback import FeedbackOut, SavedItemOut, SavedQuestion, SaveRequest
 
 router = APIRouter(tags=["saved"])
 
@@ -49,6 +49,7 @@ def _items(user_id: int) -> Select[tuple[SavedItem]]:
             ),
             selectinload(SavedItem.question).options(
                 selectinload(Question.referred_office),
+                selectinload(Question.ratings),
                 selectinload(Question.citations).options(
                     selectinload(QuestionCitation.chunk),
                     selectinload(QuestionCitation.document).options(
@@ -87,6 +88,7 @@ def _to_out(item: SavedItem, research_compliance: Office | None) -> SavedItemOut
         )
     question = item.question
     cited = [c for c in question.citations if c.was_cited]
+    rating = next((f for f in question.ratings if f.user_id == item.user_id), None)
     contacts = contacts_for(
         question.outcome, [c.document for c in cited], question.referred_office, research_compliance
     )
@@ -105,6 +107,7 @@ def _to_out(item: SavedItem, research_compliance: Office | None) -> SavedItemOut
             contacts=[OfficeOut.model_validate(office) for office in contacts],
             disclaimer=disclaimer_for(question.outcome),
             links=[LinkOut(title=link.title, url=link.url) for link in links_for(question.outcome)],
+            feedback=FeedbackOut.model_validate(rating) if rating else None,
             created_at=question.created_at,
         ),
     )

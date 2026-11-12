@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { AnswerCard } from '../../components/AnswerCard'
+import { AnswerFeedback } from '../../components/AnswerFeedback'
 import { savedAnswer } from '../../components/answerContent'
 import { DocumentResultCard } from '../../components/DocumentResultCard'
 import { Icon } from '../../components/Icon'
@@ -62,10 +63,17 @@ export default function SavedPage() {
                     <AnswerCard
                       response={savedAnswer(item.question)}
                       actions={
-                        <SaveButton
-                          target={{ question_id: item.question.id }}
-                          name={item.question.question_text}
-                        />
+                        <>
+                          <AnswerFeedback
+                            questionId={item.question.id}
+                            initial={item.question.feedback}
+                            onChange={(feedback) => saved.setRating(item.question.id, feedback)}
+                          />
+                          <SaveButton
+                            target={{ question_id: item.question.id }}
+                            name={item.question.question_text}
+                          />
+                        </>
                       }
                     />
                   </article>
