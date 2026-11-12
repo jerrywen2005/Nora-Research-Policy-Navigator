@@ -31,13 +31,25 @@ class CitationOut(BaseModel):
     snippet: str
 
 
+class LinkOut(BaseModel):
+    title: str
+    url: str
+
+
+# What the researcher sees; the log also has "error", shown as "no_answer".
+ShownOutcome = Literal["answered", "referred", "out_of_scope", "no_answer"]
+
+
 class AskResponse(BaseModel):
     """`POST /api/ask` response in docs/api.md."""
 
     question_id: int
-    outcome: Literal["answered", "referred", "no_answer"]
+    outcome: ShownOutcome
     answer: str | None
     citations: list[CitationOut]
-    referral: OfficeOut | None
+    # Who to contact, most specific first: the cited policies' offices then RCS for an answer,
+    # or the one office a referral sends the user to.
+    contacts: list[OfficeOut]
     confidence: float
-    disclaimer: str
+    disclaimer: str | None  # with policy content only, not on a referral
+    links: list[LinkOut]  # e.g. every UNC policy, for an out-of-scope question

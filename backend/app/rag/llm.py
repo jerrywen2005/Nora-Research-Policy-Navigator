@@ -34,15 +34,23 @@ class OpenAICompatibleLLM:
 
 
 class FakeLLM:
-    """A stand-in for tests: always gives the same reply."""
+    """A stand-in for tests: always gives the same answer, and the same reply to the scope check
+    ("is this about research?")."""
 
     model = "fake"
 
-    def __init__(self, reply: str = "Yes, this is covered [1].") -> None:
+    def __init__(self, reply: str = "Yes, this is covered [1].", scope_reply: str = "RESEARCH"):
         self.reply = reply
-        self.prompts: list[str] = []
+        self.scope_reply = scope_reply
+        self.prompts: list[str] = []  # answer prompts
+        self.scope_questions: list[str] = []
 
     def complete(self, instructions: str, prompt: str) -> str:
+        from app.rag.answer import SCOPE_PROMPT  # app.rag.answer imports this module
+
+        if instructions == SCOPE_PROMPT:
+            self.scope_questions.append(prompt)
+            return self.scope_reply
         self.prompts.append(prompt)
         return self.reply
 

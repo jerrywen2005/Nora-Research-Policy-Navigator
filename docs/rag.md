@@ -265,14 +265,16 @@ are in `document_tags`, for metadata filters and context headers.
    [Retrieval design](#retrieval-design-proposed-2026-10-27)). Keyword search over whole
    documents already exists (`search_documents()` in `app/api/documents.py`).
 2. **Gate:** if the best reranker score is below a threshold, or nothing relevant is found, skip the LLM.
-   Return `outcome = no_answer` or `referred`, with the topic's office.
+   Decide whether the question is about research: `referred` (RCS) or `out_of_scope` (the
+   University Policy Office).
 3. **Generate:** the LLM gets the question and the numbered chunks. It must answer only from the
    chunks, cite them by number, say when they don't cover the question, and never make a
    determination. The prompt is versioned (`prompt_version`).
 4. **Check:** drop or flag answers that cite nothing, and map the citation numbers back to
    documents.
-5. **Respond:** answer, citations (title, section, URL), confidence, outcome, referral office if
-   any, and the standard disclaimer, in the shape in [api.md](api.md#ask). The Ask page renders
+5. **Respond:** answer, citations (title, section, URL), confidence, outcome, the offices to
+   contact, any links, and the disclaimer with policy content, in the shape in
+   [api.md](api.md#ask). The Ask page renders
    it (`AnswerCard`).
 6. **Log:** write `questions` and `question_citations`.
 
@@ -293,6 +295,31 @@ change to the prompt or retrieval.
 
 Newest first. One entry per decision or finding: what, why, and the evidence.
 
+### 2026-11-12: three kinds of question, and how to tell them apart
+The Link wants research questions Nora can't answer sent to Research Compliance Services, and
+questions that aren't about research to the University Policy Office (decisions.md). Below the
+gate, Nora has to tell those apart. We measured both retrieval scores on 59 questions: the 20
+answerable ones, 17 research questions no policy covers (drones, open access, invention
+disclosures, lab safety, select agents) and 22 that aren't about research, from pizza to other
+university policy (housing, HR, grade appeals).
+- **The reranker can't.** Unrelated questions scored 0.0001–0.030, uncovered research ones
+  0.002–0.035: it measures whether a passage answers the question, not what it's about.
+- **Embedding similarity mostly can't.** The closest chunk's cosine similarity puts clearly
+  unrelated questions at 0.50–0.60 and uncovered research ones at 0.64–0.76, but other
+  university policy overlaps them (0.60–0.74, e.g. pets in dorms 0.74): it all sounds like
+  policy.
+- **An LLM can.** One short call ("RESEARCH or OTHER", `SCOPE_PROMPT`) sorted 41 of 42
+  correctly (median 0.5 s, max 3.8 s on Groq); its one miss was the graduate-thesis deadline,
+  arguably near research. It's only asked for questions below the gate, and for those the LLM
+  found no answer to in the sources (questions like "pets in dorms" pass the gate on the animal
+  policies' wording), so answered questions pay nothing. Without an LLM, such a question is
+  shown with its (irrelevant) sources: a known limit of the no-LLM mode.
+
+So: with an LLM, it decides. Without one (or if it fails), `SCOPE_THRESHOLD = 0.60`: below it is
+out of scope, which catches the clearly unrelated half and sends every uncovered research
+question to RCS. `questions.relatedness` is logged so the threshold can be re-tuned on real
+questions. `python -m app.rag eval` now reports this no-LLM check as well (`--scope X`).
+
 ### 2026-11-10: `POST /api/ask` built
 `app/rag/answer.py`: retrieve → gate (0.04) → the LLM answers from the 5 numbered chunks →
 citation check → log to `questions` and `question_citations`. Decisions:
@@ -303,9 +330,7 @@ citation check → log to `questions` and `question_citations`. Decisions:
   `[1]` and the `【1】` some models write, and numbers that don't exist are ignored.
 - **An LLM failure never shows an error page.** The researcher gets the sources and an office;
   the question is logged as `error` (shown to the browser as `no_answer`).
-- **Referrals** (until the Link decides, see decisions.md): a gate referral goes to the topic's
-  office when asked from a topic, otherwise to the Office of the Vice Chancellor for Research; a
-  `no_answer` goes to the office that owns the best-matching policy.
+- **Referrals:** superseded on 2026-11-12 by the Link's rule (entry above).
 - **The prompt is versioned** (`PROMPT_VERSION`, logged per question) and tells the model to
   answer only from the sources, cite every claim, never make a determination, and treat source
   text as content, not instructions. Version `2026-11-10.2` adds "only name an office if it

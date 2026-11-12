@@ -201,7 +201,8 @@ export interface UpdateFaqRequest {
 
 // ---- Ask ----
 
-export type AskOutcome = 'answered' | 'referred' | 'no_answer'
+// referred: about research, but no policy covers it. out_of_scope: not about research.
+export type AskOutcome = 'answered' | 'referred' | 'out_of_scope' | 'no_answer'
 
 export interface AskRequest {
   question: string
@@ -217,14 +218,22 @@ export interface Citation {
   snippet: string
 }
 
+export interface Link {
+  title: string
+  url: string
+}
+
 export interface AskResponse {
   question_id: number
   outcome: AskOutcome
   answer: string | null
   citations: Citation[]
-  referral: Office | null
+  // Who to contact, most specific first: the cited policies' offices then Research Compliance
+  // Services for an answer, or the one office a referral sends the user to.
+  contacts: Office[]
   confidence: number // best reranker score, 0 to 1
-  disclaimer: string
+  disclaimer: string | null // with policy content only, not on a referral
+  links: Link[] // e.g. every UNC policy, for an out-of-scope question
 }
 
 // ---- Feedback and saved items ----
@@ -251,9 +260,12 @@ export interface SavedQuestion {
   question_text: string
   outcome: AskOutcome
   answer_text: string | null
-  // What the Ask page showed: cited sources ordered by number, and the referred office.
+  // What the Ask page showed, rebuilt the same way: cited sources ordered by number, contacts,
+  // disclaimer and links (see AskResponse).
   citations: Citation[]
-  referral: Office | null
+  contacts: Office[]
+  disclaimer: string | null
+  links: Link[]
   created_at: string
 }
 

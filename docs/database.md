@@ -144,10 +144,11 @@ Admins review them and write the FAQ.
 | id, user_id | user_id is nullable so it can be anonymized (see the open privacy question) |
 | question_text | |
 | topic_id | the topic the user asked from, nullable |
-| outcome | `answered`, `referred`, `no_answer`, `error` (the LLM failed; the user saw sources and an office) |
+| outcome | `answered`, `referred` (about research, sent to RCS), `out_of_scope` (not about research, sent to the University Policy Office), `no_answer`, `error` (the LLM failed; the user saw sources and an office) |
 | confidence | the best reranker score, 0 to 1 |
+| relatedness | cosine similarity of the closest chunk, -1 to 1; decides `referred` vs `out_of_scope` without an LLM. Null before 2026-11-12 |
 | answer_text | stored. It's small, and admins need it to review weak answers |
-| referred_office_id | nullable |
+| referred_office_id | the office a referral sent the user to (RCS or the University Policy Office); null for an answer, whose contacts come from its cited policies |
 | model, prompt_version, latency_ms | for comparing pipeline versions |
 | parent_question_id | nullable; for multi-turn follow-ups later |
 | created_at | |

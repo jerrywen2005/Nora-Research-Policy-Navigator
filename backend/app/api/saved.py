@@ -7,9 +7,24 @@ from sqlalchemy.orm import Session, defer, joinedload, selectinload
 
 from app.auth import CurrentUser
 from app.db import get_session
-from app.models import Document, DocumentStatus, Outcome, Question, QuestionCitation, SavedItem
-from app.rag.answer import Citation
-from app.schemas.ask import CitationOut
+from app.models import (
+    Document,
+    DocumentStatus,
+    Office,
+    Outcome,
+    Question,
+    QuestionCitation,
+    SavedItem,
+)
+from app.rag.answer import (
+    RESEARCH_COMPLIANCE,
+    Citation,
+    contacts_for,
+    disclaimer_for,
+    links_for,
+    office_named,
+)
+from app.schemas.ask import CitationOut, LinkOut
 from app.schemas.content import DocumentSummary, OfficeOut
 from app.schemas.feedback import SavedItemOut, SavedQuestion, SaveRequest
 
@@ -36,7 +51,9 @@ def _items(user_id: int) -> Select[tuple[SavedItem]]:
                 selectinload(Question.referred_office),
                 selectinload(Question.citations).options(
                     selectinload(QuestionCitation.chunk),
-                    selectinload(QuestionCitation.document).options(defer(Document.content_text)),
+                    selectinload(QuestionCitation.document).options(
+                        defer(Document.content_text), joinedload(Document.office)
+                    ),
                 ),
             ),
         )
@@ -59,7 +76,7 @@ def _citation_out(citation: QuestionCitation) -> CitationOut:
     )
 
 
-def _to_out(item: SavedItem) -> SavedItemOut:
+def _to_out(item: SavedItem, research_compliance: Office | None) -> SavedItemOut:
     if item.document is not None:
         return SavedItemOut(
             id=item.id,
@@ -69,6 +86,10 @@ def _to_out(item: SavedItem) -> SavedItemOut:
             question=None,
         )
     question = item.question
+    cited = [c for c in question.citations if c.was_cited]
+    contacts = contacts_for(
+        question.outcome, [c.document for c in cited], question.referred_office, research_compliance
+    )
     return SavedItemOut(
         id=item.id,
         created_at=item.created_at,
@@ -80,12 +101,10 @@ def _to_out(item: SavedItem) -> SavedItemOut:
             # Shown as it was when asked; the log keeps "error" for the dashboard.
             outcome="no_answer" if question.outcome == Outcome.ERROR else question.outcome,
             answer_text=question.answer_text,
-            citations=[_citation_out(c) for c in question.citations if c.was_cited],
-            referral=(
-                OfficeOut.model_validate(question.referred_office)
-                if question.referred_office
-                else None
-            ),
+            citations=[_citation_out(c) for c in cited],
+            contacts=[OfficeOut.model_validate(office) for office in contacts],
+            disclaimer=disclaimer_for(question.outcome),
+            links=[LinkOut(title=link.title, url=link.url) for link in links_for(question.outcome)],
             created_at=question.created_at,
         ),
     )
@@ -94,7 +113,8 @@ def _to_out(item: SavedItem) -> SavedItemOut:
 @router.get("/saved", response_model=list[SavedItemOut])
 def list_saved(user: CurrentUser, session: SessionDep) -> list[SavedItemOut]:
     """The signed-in user's saved documents and questions, newest first."""
-    return [_to_out(item) for item in session.scalars(_items(user.id))]
+    research_compliance = office_named(session, RESEARCH_COMPLIANCE)
+    return [_to_out(item, research_compliance) for item in session.scalars(_items(user.id))]
 
 
 @router.post("/saved", response_model=SavedItemOut, status_code=status.HTTP_201_CREATED)
@@ -136,7 +156,7 @@ def save(body: SaveRequest, user: CurrentUser, session: SessionDep, response: Re
     item = session.scalars(
         _items(user.id).where(target == value), execution_options={"populate_existing": True}
     ).one()
-    return _to_out(item)
+    return _to_out(item, office_named(session, RESEARCH_COMPLIANCE))
 
 
 @router.delete("/saved/{item_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -28,6 +28,14 @@ RRF_K = 60  # the standard constant in 1 / (k + rank)
 # policies): off-topic questions scored at most 0.030, the lowest correctly retrieved real one
 # 0.051. Re-tune it whenever the reranker, the chunking or the document set changes.
 GATE_THRESHOLD = 0.04
+# When the gate refers and there's no LLM to ask whether the question is about research: below
+# this cosine similarity to the closest chunk, Nora treats it as not about research and sends it
+# to the University Policy Office; otherwise to Research Compliance Services. Kept low on
+# purpose (2026-11-12 evaluation): clearly unrelated questions (dining hall, tickets) score
+# 0.50-0.60, research questions no policy covers 0.64 and up, and other university policy
+# (housing, HR) overlaps them at 0.60-0.74, so an unsure question goes to RCS, who can redirect
+# it. Sending a research question away is the worse mistake.
+SCOPE_THRESHOLD = 0.60
 
 MODES = ("dense", "keyword", "hybrid", "rerank")
 
@@ -190,6 +198,13 @@ def search(
     raise ValueError(f"Unknown retrieval mode: {mode!r}")
 
 
+@dataclass
+class Retrieved:
+    hits: list[tuple[DocumentChunk, float]]  # the top chunks, best first, with reranker scores
+    # Cosine similarity of the closest chunk by meaning (SCOPE_THRESHOLD), 0 if there are none.
+    relatedness: float
+
+
 def retrieve(
     session: Session,
     question: str,
@@ -197,8 +212,10 @@ def retrieve(
     reranker: Reranker,
     *,
     topic: str | None = None,
-) -> list[tuple[DocumentChunk, float]]:
-    """The full pipeline: the top chunks for a question, best first, with reranker scores."""
-    return load_chunks(
-        session, search(session, question, "rerank", embedder, reranker, topic=topic)
-    )
+) -> Retrieved:
+    """The full pipeline, the same as search(mode="rerank"), keeping the vector search's best
+    score as well."""
+    dense = dense_search(session, embedder.embed_query(question), topic=topic)
+    merged = rrf(dense, keyword_search(session, question, topic=topic))[:CANDIDATES]
+    hits = rerank(session, question, merged, reranker)[:TOP_K]
+    return Retrieved(load_chunks(session, hits), dense[0].score if dense else 0.0)

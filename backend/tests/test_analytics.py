@@ -207,6 +207,7 @@ def test_outcomes_and_referrals(admin, week):
     assert body["questions_by_outcome"] == {
         "answered": 2,
         "referred": 1,
+        "out_of_scope": 0,
         "no_answer": 1,
         "error": 1,
     }
@@ -495,6 +496,7 @@ def test_export_matches_the_json(admin, week):
     assert csv_sections["Questions by outcome"][1:] == [
         ["answered", "2"],
         ["referred", "1"],
+        ["out_of_scope", "0"],
         ["no_answer", "1"],
         ["error", "1"],
     ]

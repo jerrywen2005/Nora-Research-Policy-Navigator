@@ -8,11 +8,11 @@ from app.auth import CurrentUser
 from app.config import get_settings
 from app.db import get_session
 from app.models import Outcome, Topic
-from app.rag.answer import DISCLAIMER, ask
+from app.rag.answer import ask, disclaimer_for, links_for
 from app.rag.embeddings import EmbeddingProvider, get_embedding_provider
 from app.rag.llm import LLMProvider, get_llm
 from app.rag.reranking import Reranker, get_reranker
-from app.schemas.ask import AskRequest, AskResponse, CitationOut
+from app.schemas.ask import AskRequest, AskResponse, CitationOut, LinkOut
 from app.schemas.content import OfficeOut
 
 router = APIRouter(tags=["ask"])
@@ -81,7 +81,8 @@ def ask_question(
             )
             for c in result.citations
         ],
-        referral=OfficeOut.model_validate(result.referral) if result.referral else None,
+        contacts=[OfficeOut.model_validate(office) for office in result.contacts],
         confidence=round(result.confidence, 4),
-        disclaimer=DISCLAIMER,
+        disclaimer=disclaimer_for(result.outcome),
+        links=[LinkOut(title=link.title, url=link.url) for link in links_for(result.outcome)],
     )

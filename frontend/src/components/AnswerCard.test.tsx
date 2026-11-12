@@ -1,10 +1,11 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { AskResponse, Citation } from '../api/types'
 import { AnswerCard } from './AnswerCard'
-import { DISCLAIMER as SAVED_DISCLAIMER, savedAnswer } from './answerContent'
+import { savedAnswer } from './answerContent'
 
 const DISCLAIMER = 'Nora provides general information, not an official determination.'
+const RCS = { id: 9, name: 'Research Compliance Services', email: 'rcs@unc.edu', phone: null, url: null }
 
 function citation(number: number, title = `Policy ${number}`): Citation {
   return {
@@ -23,9 +24,10 @@ function response(overrides: Partial<AskResponse> = {}): AskResponse {
     outcome: 'answered',
     answer: 'Ninety days before the term ends [1].',
     citations: [citation(1, 'Postdoctoral Scholar Policy')],
-    referral: null,
+    contacts: [RCS],
     confidence: 0.98,
     disclaimer: DISCLAIMER,
+    links: [],
     ...overrides,
   }
 }
@@ -53,7 +55,8 @@ describe('AnswerCard', () => {
     const answer = 'Yes, under conditions.\n- **Minimal risk:** the IRB may waive it [1].\n- Otherwise a witness signs [2].\nSo ask the IRB.'
     render(<AnswerCard response={response({ answer, citations: [citation(1), citation(2)] })} />)
 
-    const items = screen.getAllByRole('listitem').filter((li) => !li.id)
+    // The first list on the card is the answer's own, before the sources and contacts.
+    const items = within(screen.getAllByRole('list')[0]).getAllByRole('listitem')
     expect(items.map((li) => li.textContent)).toEqual([
       'Minimal risk: the IRB may waive it [1].',
       'Otherwise a witness signs [2].',
@@ -98,35 +101,76 @@ describe('AnswerCard', () => {
     expect(screen.getByText('Snippet 2')).toBeInTheDocument()
   })
 
-  it('shows a referral with the office and no confidence label', () => {
-    const referral = {
-      id: 3,
-      name: 'Office of the Vice Chancellor for Research',
-      email: 'research@unc.edu',
-      phone: null,
-      url: null,
-    }
+  it('lists every office to contact with an answer', () => {
+    const osp = { id: 2, name: 'Office of Sponsored Programs', email: null, phone: null, url: null }
+    render(<AnswerCard response={response({ contacts: [osp, RCS] })} />)
+
+    expect(screen.getByText('Contact these offices')).toBeInTheDocument()
+    expect(screen.getAllByRole('listitem').map((item) => item.textContent)).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Office of Sponsored Programs'),
+        expect.stringContaining('Research Compliance Services'),
+      ]),
+    )
+  })
+
+  it('refers a research question it cannot answer to RCS, without a disclaimer', () => {
     render(
       <AnswerCard
         response={response({
           outcome: 'referred',
-          answer: "Nora couldn't find this in the research policies it covers.",
+          answer: "Nora couldn't find a confident answer in UNC's research policies.",
           citations: [],
-          referral,
+          contacts: [RCS],
           confidence: 0.0001,
+          disclaimer: null,
         })}
       />,
     )
 
     expect(screen.getByRole('heading', { name: /couldn't find a confident answer/i })).toBeInTheDocument()
-    expect(screen.getByText(/couldn't find this in the research policies/i)).toBeInTheDocument()
-    expect(screen.getByText(referral.name)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'research@unc.edu' })).toHaveAttribute(
+    expect(screen.getByText(/couldn't find a confident answer in unc/i)).toBeInTheDocument()
+    expect(screen.getByText('Contact this office')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'rcs@unc.edu' })).toHaveAttribute(
       'href',
-      'mailto:research@unc.edu',
+      'mailto:rcs@unc.edu',
     )
     expect(screen.queryByText(/match with the policies/i)).not.toBeInTheDocument()
-    expect(screen.getByText(DISCLAIMER)).toBeInTheDocument()
+    expect(screen.queryByText(DISCLAIMER)).not.toBeInTheDocument()
+  })
+
+  it('sends a question that is not about research to the Policy Office and every UNC policy', () => {
+    const policyOffice = {
+      id: 10,
+      name: 'University Policy Office',
+      email: null,
+      phone: null,
+      url: 'https://universitypolicy.unc.edu/about/contact/',
+    }
+    render(
+      <AnswerCard
+        response={response({
+          outcome: 'out_of_scope',
+          answer: "This doesn't look like a question about research policy.",
+          citations: [],
+          contacts: [policyOffice],
+          disclaimer: null,
+          links: [{ title: 'UNC Policies, Procedures and Standards', url: 'https://policies.unc.edu/' }],
+        })}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: /outside research policy/i })).toBeInTheDocument()
+    expect(screen.getByText('University Policy Office')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /office website/i })).toHaveAttribute(
+      'href',
+      policyOffice.url,
+    )
+    expect(screen.getByRole('link', { name: /policies, procedures and standards/i })).toHaveAttribute(
+      'href',
+      'https://policies.unc.edu/',
+    )
+    expect(screen.queryByText(DISCLAIMER)).not.toBeInTheDocument()
   })
 
   it('shows sources and an office when the policies matched but gave no answer', () => {
@@ -136,7 +180,7 @@ describe('AnswerCard', () => {
           outcome: 'no_answer',
           answer: "The policies Nora found don't clearly answer this.",
           citations: [citation(1, 'Export Controls Policy')],
-          referral: { id: 4, name: 'Export Compliance Office', email: null, phone: null, url: null },
+          contacts: [{ id: 4, name: 'Export Compliance Office', email: null, phone: null, url: null }],
         })}
       />,
     )
@@ -170,7 +214,9 @@ describe('AnswerCard', () => {
           outcome: 'answered',
           answer_text: 'Five years [1].',
           citations: [{ ...citation(1, 'Postdoctoral Scholar Policy'), section: '', snippet: '' }],
-          referral: null,
+          contacts: [RCS],
+          disclaimer: DISCLAIMER,
+          links: [],
           created_at: '2026-11-11T15:01:12Z',
         })}
         actions={<button type="button">Saved</button>}
@@ -180,7 +226,8 @@ describe('AnswerCard', () => {
     expect(screen.getByText(/five years/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /postdoctoral scholar policy/i })).toBeInTheDocument()
     expect(screen.queryByText(/match with the policies/i)).not.toBeInTheDocument()
-    expect(screen.getByText(SAVED_DISCLAIMER)).toBeInTheDocument()
+    expect(screen.getByText(DISCLAIMER)).toBeInTheDocument()
+    expect(screen.getByText('Research Compliance Services')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Saved' })).toBeInTheDocument()
   })
 })

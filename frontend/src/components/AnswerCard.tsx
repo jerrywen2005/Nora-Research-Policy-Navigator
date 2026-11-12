@@ -2,7 +2,7 @@ import { useId, type ReactNode } from 'react'
 import type { Citation } from '../api/types'
 import type { AnswerContent } from './answerContent'
 import './components.css'
-import { Icon } from './Icon'
+import { Icon, type IconName } from './Icon'
 import { OfficeContact } from './OfficeContact'
 
 // Inline marks in an answer: **bold**, and citations as [1] or the 【1】 some models write.
@@ -111,27 +111,35 @@ function CitationList({
   )
 }
 
-// Renders every answer outcome. The disclaimer is always shown (docs/api.md). `actions` (the
-// feedback and save buttons) go between the answer and the disclaimer.
+const CARD_ICONS: Record<AnswerContent['outcome'], IconName> = {
+  answered: 'check',
+  referred: 'alert',
+  no_answer: 'alert',
+  out_of_scope: 'info',
+}
+
+const HEADINGS: Record<AnswerContent['outcome'], string> = {
+  answered: 'Answer based on UNC Research guidance',
+  referred: "We couldn't find a confident answer",
+  no_answer: "We couldn't find a confident answer",
+  out_of_scope: 'This looks outside research policy',
+}
+
+// Renders every answer outcome with what the API sends for it: the contacts, any links, and the
+// disclaimer when there is one (docs/api.md). `actions` (the feedback and save buttons) go
+// between the answer and the disclaimer.
 export function AnswerCard({ response, actions }: { response: AnswerContent; actions?: ReactNode }) {
   // Citation anchors must be unique: the Saved page shows many answers at once.
   const idPrefix = `citation${useId().replace(/:/g, '')}`
   const answered = response.outcome === 'answered'
   const answer = answered ? response.answer : null
 
-  let heading: string
-  if (answer) {
-    heading = 'Answer based on UNC Research guidance'
-  } else if (answered) {
-    heading = 'Relevant sources'
-  } else {
-    heading = "We couldn't find a confident answer"
-  }
+  const heading = answered && !answer ? 'Relevant sources' : HEADINGS[response.outcome]
 
   return (
-    <section className={answered ? 'answer-card' : 'answer-card answer-card--referred'}>
+    <section className={`answer-card answer-card--${response.outcome.replace(/_/g, '-')}`}>
       <h3 className="answer-card__heading">
-        <Icon name={answered ? 'check' : 'alert'} size={20} />
+        <Icon name={CARD_ICONS[response.outcome]} size={20} />
         {heading}
       </h3>
 
@@ -156,19 +164,41 @@ export function AnswerCard({ response, actions }: { response: AnswerContent; act
         </>
       )}
 
-      {response.referral && (
+      {response.contacts.length > 0 && (
         <>
-          <p className="answer-card__label">Contact the responsible office</p>
-          <OfficeContact office={response.referral} />
+          <p className="answer-card__label">
+            {response.contacts.length === 1 ? 'Contact this office' : 'Contact these offices'}
+          </p>
+          <ul className="answer-card__contacts">
+            {response.contacts.map((office) => (
+              <li key={office.id}>
+                <OfficeContact office={office} />
+              </li>
+            ))}
+          </ul>
         </>
+      )}
+
+      {response.links.length > 0 && (
+        <ul className="answer-card__links">
+          {response.links.map((link) => (
+            <li key={link.url}>
+              <a href={link.url} target="_blank" rel="noreferrer">
+                {link.title} <Icon name="external" size={14} />
+              </a>
+            </li>
+          ))}
+        </ul>
       )}
 
       {actions && <div className="answer-card__actions">{actions}</div>}
 
-      <p className="answer-card__disclaimer">
-        <Icon name="info" size={16} />
-        <span>{response.disclaimer}</span>
-      </p>
+      {response.disclaimer && (
+        <p className="answer-card__disclaimer">
+          <Icon name="info" size={16} />
+          <span>{response.disclaimer}</span>
+        </p>
+      )}
     </section>
   )
 }

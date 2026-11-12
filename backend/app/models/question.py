@@ -19,7 +19,8 @@ from app.models.content import Document, DocumentChunk, Office
 
 class Outcome(StrEnum):
     ANSWERED = "answered"  # an answer that cites the policies
-    REFERRED = "referred"  # the gate found nothing relevant; sent to an office
+    REFERRED = "referred"  # about research, but no policy covers it; sent to RCS
+    OUT_OF_SCOPE = "out_of_scope"  # not about research; sent to the University Policy Office
     NO_ANSWER = "no_answer"  # relevant sources, but they don't support an answer
     ERROR = "error"  # the LLM call failed; the user got the sources and a referral
 
@@ -43,6 +44,9 @@ class Question(Base):
     outcome: Mapped[str] = mapped_column(String(20))
     # The best reranker score, 0 to 1; the gate compares it with the threshold.
     confidence: Mapped[float]
+    # Cosine similarity of the closest chunk, -1 to 1: how close the question is to the policies'
+    # subject at all. Decides referred vs out_of_scope when there's no LLM. Null before 2026-11-12.
+    relatedness: Mapped[float | None]
     answer_text: Mapped[str | None] = mapped_column(Text)
     referred_office_id: Mapped[int | None] = mapped_column(
         ForeignKey("offices.id", ondelete="SET NULL")

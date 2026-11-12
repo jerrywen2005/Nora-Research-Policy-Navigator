@@ -43,6 +43,7 @@ class ZeroResultSearches(BaseModel):
 class QuestionsByOutcome(BaseModel):
     answered: int
     referred: int
+    out_of_scope: int
     no_answer: int
     error: int
 

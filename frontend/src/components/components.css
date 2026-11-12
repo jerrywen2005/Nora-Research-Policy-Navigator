@@ -221,8 +221,14 @@
   border-radius: var(--rp-radius);
 }
 
-.answer-card--referred {
+.answer-card--referred,
+.answer-card--no-answer {
   border-left-color: var(--rp-warning);
+}
+
+/* Not about research: nothing went wrong, so no warning color. */
+.answer-card--out-of-scope {
+  border-left-color: var(--rp-accent);
 }
 
 .answer-card__heading {
@@ -234,8 +240,28 @@
   color: var(--rp-success);
 }
 
-.answer-card--referred .answer-card__heading {
+.answer-card--referred .answer-card__heading,
+.answer-card--no-answer .answer-card__heading {
   color: var(--rp-warning);
+}
+
+.answer-card--out-of-scope .answer-card__heading {
+  color: var(--color-navy);
+}
+
+.answer-card__contacts {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.answer-card__links {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 600;
 }
 
 .answer-card__text {
