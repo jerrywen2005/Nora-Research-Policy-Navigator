@@ -167,10 +167,40 @@ Partial unique indexes stop duplicates: `uq_saved_items_user_document` on (user_
 where document_id is set, and `uq_saved_items_user_question` on (user_id, question_id) where
 question_id is set.
 
-**usage_events**: everything that isn't an Ask: `login`, `browse_topic`, `search`,
-`view_document`, `open_source_link`, `view_faq`. Columns: id, user_id, event_type, topic_id,
-document_id, query, result_count, created_at, `metadata jsonb`. Used for activity and
-"most accessed" analytics.
+**usage_events** *(Proposed 2026-11-11, workflow C)*: every logged interaction that isn't an Ask
+(Asks are already in `questions`). Written by `app/analytics/logging.py`, one row per request,
+never blocking it.
+| column | notes |
+|---|---|
+| id | |
+| user_id | nullable; `ON DELETE SET NULL`, so removing a user keeps the counts |
+| event_type | `login`, `topic_view`, `document_view`, `search`; CHECK `ck_usage_events_event_type_valid` |
+| topic_id | the topic viewed; `ON DELETE SET NULL` |
+| document_id | the document viewed; `ON DELETE SET NULL` |
+| query | searches only: the search text, trimmed and lowercased |
+| result_count | searches only: the total number of matches |
+| created_at | `timestamptz`, default `now()` |
+
+Indexes: `ix_usage_events_event_type_created_at` on (event_type, created_at) for per-type counts
+over a range, and `ix_usage_events_created_at` on created_at for "any activity" queries (active
+users, the daily series). The `metadata jsonb` column and the `open_source_link` and `view_faq`
+events from the original notes are left out until something needs them.
+
+**Which tables feed each dashboard measure** ([api.md](api.md#admin-analytics)):
+| measure | tables |
+|---|---|
+| 1. Users and visits | `usage_events` (logins; any event) and `questions` (askers), for distinct users |
+| 2. Browse, Search and Ask interactions | `usage_events` (topic_view, document_view, search), `questions` |
+| 3. Top topics, documents, most cited | `usage_events` + `topics`/`documents` for names; `question_citations` (`was_cited`) for citations |
+| 4. Common search terms | `usage_events.query` |
+| 5. Searches with no results | `usage_events` where `result_count = 0` |
+| 6. Most asked questions | `questions.question_text` |
+| 7. Unanswered and referred | `questions.outcome`, `questions.referred_office_id` + `offices` |
+| 8. Feedback | `feedback` joined to `questions` (by when the question was asked) |
+| 9. Patterns over time | all of the above by day; `questions.topic_id` for questions per topic |
+| 10. Export | the same numbers as CSV |
+
+All of it is computed with SQL aggregates at request time; there are no stats tables.
 
 ## Not in the database
 

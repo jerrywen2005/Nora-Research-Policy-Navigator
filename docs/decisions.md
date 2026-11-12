@@ -32,6 +32,13 @@ an open question is answered, move it into the log.
   Is that intended? The mockup also has no disclaimer on its answer; we show one anyway. Its
   feedback buttons, Related Resources, Announcements and FAQs have no endpoints yet. The 9 topic
   names currently come from the mockup. *(Link)*
+- **Analytics free-text threshold (proposed 2026-11-11):** the dashboard and CSV show a search
+  term or question text only if at least **2 different people** used it in the range; rarer text
+  is left out of the lists but still counted in totals. This stops one researcher's unusual
+  question being readable on the dashboard (NF6). Raise it if 2 is too low. *(Andy to confirm)*
+- **Analytics and admin activity:** should admins' own logins, views, searches and questions be
+  counted? The contract counts everyone, so testing by admins inflates the numbers. Excluding
+  users whose role is currently `admin` is easy if wanted. *(Andy / Link)*
 
 ## Log
 

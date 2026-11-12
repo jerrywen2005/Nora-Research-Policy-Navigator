@@ -212,6 +212,71 @@ export type SavedItem =
   | { id: number; created_at: string; kind: 'document'; document: DocumentSummary; question: null }
   | { id: number; created_at: string; kind: 'question'; document: null; question: SavedQuestion }
 
+// ---- Admin analytics (workflow C) ----
+// Aggregates only (NF6): no user ids or names anywhere.
+
+// Query parameters for GET /api/admin/analytics and /api/admin/analytics/export.csv
+export interface AnalyticsQuery {
+  from?: string // "YYYY-MM-DD", inclusive, America/New_York
+  to?: string // "YYYY-MM-DD", inclusive
+}
+
+export interface TextCount {
+  text: string // trimmed, lowercased
+  count: number
+}
+
+export interface TopicCount {
+  topic: TopicRef
+  count: number
+}
+
+export interface DocumentCount {
+  document_id: number
+  title: string
+  count: number
+}
+
+export interface OfficeCount {
+  office: Office
+  count: number
+}
+
+export interface DailyActivity {
+  date: string // "YYYY-MM-DD"
+  logins: number
+  topic_views: number
+  document_views: number
+  searches: number
+  questions: number
+}
+
+export interface DailyTopicQuestions {
+  date: string
+  topic: TopicRef | null // null: asked without a topic
+  count: number
+}
+
+export interface Analytics {
+  from: string
+  to: string
+  min_distinct_users: number
+  activity: { active_users: number; logins: number }
+  interactions: { topic_views: number; document_views: number; searches: number; questions: number }
+  top_topics: TopicCount[]
+  top_documents: DocumentCount[]
+  most_cited_documents: DocumentCount[]
+  top_search_terms: TextCount[]
+  zero_result_searches: { total: number; top_terms: TextCount[] }
+  top_questions: TextCount[]
+  // Includes 'error', unlike AskOutcome: the dashboard keeps LLM failures separate.
+  questions_by_outcome: Record<AskOutcome | 'error', number>
+  referrals_by_office: OfficeCount[]
+  feedback: { rated: number; helpful: number; helpful_share: number | null }
+  daily: DailyActivity[] // every day in the range, oldest first
+  daily_questions_by_topic: DailyTopicQuestions[] // non-zero entries only
+}
+
 // ---- Health ----
 
 export interface HealthResponse {

@@ -509,6 +509,136 @@ as `{ "id", "onyen", "display_name" }`, and may be `null` (seeded documents).
 #### AdminDocumentDetail
 An AdminDocument plus `"content_text": "full text..."`.
 
+## Admin analytics
+
+Workflow C, requirements F10, F11 and NF6: the data behind the admin Overview dashboard, every
+measure in [product.md](product.md#admin-dashboard-must-have). Both endpoints require the admin
+role (`401` signed out, `403` researcher).
+
+**Aggregates only (NF6).** No response contains a user id, Onyen, name, email or any per-user
+row. Users appear only as counts. Free-text lists (search terms, questions) show the text and a
+count, and only for text used by at least `min_distinct_users` different people; anything rarer
+is left out of the list but still counted in the totals. *The threshold of 2 is proposed and
+awaiting confirmation; see [decisions.md](decisions.md).*
+
+**Dates.** `from` and `to` are calendar dates (`YYYY-MM-DD`) in UNC's time zone,
+`America/New_York`, and both are inclusive: `from=2026-11-01&to=2026-11-07` covers 00:00 on
+Nov 1 to the end of Nov 7, Eastern. Every measure counts only activity inside the range.
+
+**Sources.** Asks come from `questions` and `question_citations` (written by `POST /api/ask`),
+ratings from `feedback`, and everything else from `usage_events`
+([database.md](database.md#usage-and-analytics)).
+
+### `GET /api/admin/analytics`
+Query parameters, both optional:
+
+| name | meaning |
+|---|---|
+| `from` | first day, inclusive. Default: 29 days before `to` (30 days in all) |
+| `to` | last day, inclusive. Default: today |
+
+`422` if `to` is before `from`, if the range is longer than 366 days, or if a date isn't
+`YYYY-MM-DD`.
+
+Response `200`: an [Analytics](#analytics) object.
+
+#### Analytics
+```json
+{
+  "from": "2026-10-13",
+  "to": "2026-11-11",
+  "min_distinct_users": 2,
+
+  "activity": { "active_users": 42, "logins": 118 },
+
+  "interactions": { "topic_views": 310, "document_views": 522, "searches": 204, "questions": 97 },
+
+  "top_topics": [
+    { "topic": { "id": 1, "slug": "human-subjects-research", "name": "Human Subjects Research" }, "count": 88 }
+  ],
+  "top_documents": [
+    { "document_id": 12, "title": "Use of Existing Data and Specimens in Research", "count": 41 }
+  ],
+  "most_cited_documents": [
+    { "document_id": 12, "title": "Use of Existing Data and Specimens in Research", "count": 23 }
+  ],
+
+  "top_search_terms": [ { "text": "irb exempt", "count": 17 } ],
+  "zero_result_searches": {
+    "total": 31,
+    "top_terms": [ { "text": "lab notebook retention", "count": 4 } ]
+  },
+
+  "top_questions": [ { "text": "do i need irb approval to use an existing dataset?", "count": 6 } ],
+
+  "questions_by_outcome": { "answered": 71, "referred": 15, "no_answer": 9, "error": 2 },
+  "referrals_by_office": [
+    { "office": { "id": 2, "name": "Office of Human Research Ethics", "email": null, "phone": null, "url": null }, "count": 12 }
+  ],
+
+  "feedback": { "rated": 40, "helpful": 33, "helpful_share": 0.825 },
+
+  "daily": [
+    { "date": "2026-10-13", "logins": 4, "topic_views": 9, "document_views": 15, "searches": 6, "questions": 3 }
+  ],
+  "daily_questions_by_topic": [
+    { "date": "2026-10-13", "topic": { "id": 1, "slug": "human-subjects-research", "name": "Human Subjects Research" }, "count": 2 }
+  ]
+}
+```
+
+What each field measures (the numbers are the measures in product.md):
+
+| field | measure | how it's counted |
+|---|---|---|
+| `activity.active_users` | 1 | distinct people with any logged activity (a login, view, search or question) in the range |
+| `activity.logins` | 1 | sign-ins (`login` events); the closest thing to "visits" |
+| `interactions` | 2 | `topic_view`, `document_view` and `search` events, and questions asked |
+| `top_topics` | 3 | topics by `topic_view` count |
+| `top_documents` | 3 | documents by `document_view` count |
+| `most_cited_documents` | 3 | documents by how often an answer cited them (`question_citations.was_cited`) |
+| `top_search_terms` | 4 | search text (trimmed, lowercased) by number of searches |
+| `zero_result_searches` | 5 | `total`: every search that returned nothing; `top_terms`: its most common text |
+| `top_questions` | 6 | question text (trimmed, lowercased, exact match) by times asked |
+| `questions_by_outcome` | 7 | questions by `outcome`. Unlike the researcher API, `error` (the LLM failed) is kept separate from `no_answer` |
+| `referrals_by_office` | 7 | questions that named an office to contact, by that office |
+| `feedback` | 8 | ratings on questions asked in the range. `helpful_share` is `helpful / rated`, rounded to 3 places, or `null` when `rated` is 0 |
+| `daily` | 9 | one entry for **every** day in the range, oldest first, zeros included |
+| `daily_questions_by_topic` | 9 | questions per topic per day, oldest first; only non-zero entries. `topic` is `null` for questions not asked from a topic |
+
+- Every top-N list has at most 10 items, highest count first; ties are broken by name or text,
+  A to Z. An empty range gives zeros, empty lists and `helpful_share: null`, never an error.
+- `topic` is a [TopicRef](#topic) and `office` an [Office](#office). A topic, document or office
+  deleted since is left out of its list (the events behind it remain in the totals).
+- The free-text threshold applies to `top_search_terms`, `zero_result_searches.top_terms` and
+  `top_questions`. Signed-out activity can't exist (every endpoint requires sign-in), so each
+  event has a user unless the user was later removed; an event without a user counts toward
+  totals but never toward a threshold.
+
+### `GET /api/admin/analytics/export.csv`
+Measure 10. The same parameters, rules and numbers as `GET /api/admin/analytics`, as a CSV file
+(`text/csv; charset=utf-8`) with
+`Content-Disposition: attachment; filename="nora-analytics_2026-10-13_to_2026-11-11.csv"`.
+
+The file has one section per measure, in this order, separated by a blank line. Each section
+starts with a one-cell title row, then a header row, then its data rows:
+
+| section title | columns |
+|---|---|
+| `Summary` | `measure`, `value`: from, to, min_distinct_users, active_users, logins, topic_views, document_views, searches, questions, feedback_rated, feedback_helpful, feedback_helpful_share |
+| `Top topics` | `topic_slug`, `topic_name`, `views` |
+| `Top documents viewed` | `document_id`, `title`, `views` |
+| `Most cited documents` | `document_id`, `title`, `citations` |
+| `Top search terms` | `term`, `searches` |
+| `Zero-result search terms` | `term`, `searches` |
+| `Most asked questions` | `question`, `times_asked` |
+| `Questions by outcome` | `outcome`, `questions` |
+| `Referrals by office` | `office`, `questions` |
+| `Daily activity` | `date`, `logins`, `topic_views`, `document_views`, `searches`, `questions` |
+| `Daily questions by topic` | `date`, `topic_slug`, `topic_name`, `questions` (`topic_slug` and `topic_name` empty for no topic) |
+
+An empty `helpful_share` is an empty cell. A section with no rows still has its title and header.
+
 ## Admin: managing admins (proposed, not built)
 
 All three require the admin role (`401` signed out, `403` researcher). See
@@ -530,5 +660,5 @@ Response `204`; `404` if the Onyen isn't an admin; `409` with
 
 ## Not yet defined
 
-FAQs, usage logging and analytics, and editing topics, offices and tags in the app. The admin
-Overview page is still a mockup with fake data. Add those endpoints here before building them.
+FAQs, and editing topics, offices and tags in the app. Add those endpoints here before building
+them.
