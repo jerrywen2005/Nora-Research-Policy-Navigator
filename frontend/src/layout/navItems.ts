@@ -23,6 +23,7 @@ export const adminNav: NavItem[] = [
   { label: 'Policy Library', to: '/admin/library' },
   { label: 'Topics' },
   { label: 'Content Management', to: '/admin/content' },
+  { label: 'FAQs', to: '/admin/faqs' },
   { label: 'Users & Roles' },
   { label: 'Analytics & Reports' },
 ]

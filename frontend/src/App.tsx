@@ -7,6 +7,8 @@ import { adminNav, researcherNav } from './layout/navItems'
 import AdminOverview from './pages/admin/AdminOverview'
 import ContentManagementPage from './pages/admin/ContentManagementPage'
 import DocumentEditorPage from './pages/admin/DocumentEditorPage'
+import FaqEditorPage from './pages/admin/FaqEditorPage'
+import FaqListPage from './pages/admin/FaqListPage'
 import PolicyLibraryPage from './pages/admin/PolicyLibraryPage'
 import AskPage from './pages/researcher/AskPage'
 import BrowsePage from './pages/researcher/BrowsePage'
@@ -50,6 +52,8 @@ export default function App() {
             <Route path="library" element={<PolicyLibraryPage />} />
             <Route path="content" element={<ContentManagementPage />} />
             <Route path="documents/:id" element={<DocumentEditorPage />} />
+            <Route path="faqs" element={<FaqListPage />} />
+            <Route path="faqs/:id" element={<FaqEditorPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Route>

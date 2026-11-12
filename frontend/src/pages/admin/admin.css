@@ -101,7 +101,8 @@
 }
 
 .admin-field input,
-.admin-field select {
+.admin-field select,
+.admin-field textarea {
   min-width: 0;
   padding: var(--space-2) var(--space-3);
   font: inherit;
@@ -339,4 +340,55 @@
   .admin-panel {
     padding: var(--space-4);
   }
+}
+
+/* FAQ editor: the answer text area, its preview and the source policy search. */
+.admin-field textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.admin-preview {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.95rem;
+  background: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+}
+
+.admin-preview__label {
+  margin: 0 0 var(--space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-fieldset .admin-filters {
+  margin-bottom: var(--space-2);
+}
+
+.admin-source-results {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-source-results li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  font-size: 0.9rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-source-results__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
 }
