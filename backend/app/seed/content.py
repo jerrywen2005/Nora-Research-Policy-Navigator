@@ -58,6 +58,21 @@ SEED_OFFICES = {
         "phone": "919-962-9982",
         "url": "https://research.unc.edu/postdocs/",
     },
+    # The two referral offices the Link chose (Jeanne, 2026-11-12): research questions Nora
+    # can't answer go to RCS, and questions that aren't about research to the Policy Office.
+    # Their names are looked up in app/rag/answer.py.
+    "rcs": {
+        "name": "Research Compliance Services",
+        "email": "rcs@unc.edu",
+        "phone": None,
+        "url": None,
+    },
+    "upo": {
+        "name": "University Policy Office",
+        "email": None,
+        "phone": None,
+        "url": "https://universitypolicy.unc.edu/about/contact/",
+    },
 }
 
 # The nine categories of the Research section of the UNC Policies knowledge base

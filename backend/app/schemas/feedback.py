@@ -4,7 +4,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.models.feedback import COMMENT_MAX_LENGTH
-from app.schemas.ask import CitationOut
+from app.schemas.ask import CitationOut, LinkOut, ShownOutcome
 from app.schemas.content import DocumentSummary, OfficeOut
 
 
@@ -55,11 +55,13 @@ class SavedQuestion(BaseModel):
 
     id: int
     question_text: str
-    outcome: Literal["answered", "referred", "no_answer"]
+    outcome: ShownOutcome
     answer_text: str | None
-    # What the Ask page showed with the answer: the cited sources by rank, and the office.
+    # What the Ask page showed with the answer, rebuilt the same way (app/rag/answer.py).
     citations: list[CitationOut]
-    referral: OfficeOut | None
+    contacts: list[OfficeOut]
+    disclaimer: str | None
+    links: list[LinkOut]
     created_at: datetime
 
 

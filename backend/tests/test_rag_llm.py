@@ -2,6 +2,7 @@ from types import SimpleNamespace
 
 from app.config import Settings
 from app.rag import llm
+from app.rag.answer import SCOPE_PROMPT
 from app.rag.llm import FakeLLM, OpenAICompatibleLLM, get_llm
 
 
@@ -36,9 +37,10 @@ def test_openai_compatible_llm_sends_instructions_and_prompt(monkeypatch):
 
 
 def test_fake_llm_records_prompts():
-    fake = FakeLLM("Reply.")
+    fake = FakeLLM("Reply.", scope_reply="OTHER")
     assert fake.complete("instructions", "prompt") == "Reply."
-    assert fake.prompts == ["prompt"]
+    assert fake.complete(SCOPE_PROMPT, "Pizza?") == "OTHER"
+    assert (fake.prompts, fake.scope_questions) == (["prompt"], ["Pizza?"])
 
 
 def test_get_llm_follows_settings(monkeypatch):

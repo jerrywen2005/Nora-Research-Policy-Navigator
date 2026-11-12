@@ -16,7 +16,13 @@ from app.models import (
     SavedItem,
     User,
 )
-from app.rag.answer import SNIPPET_CHARS
+from app.rag.answer import (
+    DISCLAIMER,
+    POLICY_OFFICE,
+    POLICY_SITE,
+    RESEARCH_COMPLIANCE,
+    SNIPPET_CHARS,
+)
 from tests.conftest import login
 from tests.questions import add_question
 
@@ -88,7 +94,9 @@ def test_save_a_question(client: TestClient, me, db_session):
         "outcome",
         "answer_text",
         "citations",
-        "referral",
+        "contacts",
+        "disclaimer",
+        "links",
         "created_at",
     }
     assert body["question"]["id"] == question.id
@@ -175,7 +183,7 @@ def test_someone_elses_question_is_404(client: TestClient, me, make_user, db_ses
     assert saved_ids(db_session, me.id) == []
 
 
-# ---- What the Ask page showed: citations and referral ----
+# ---- What the Ask page showed: citations, contacts, disclaimer and links ----
 
 
 def add_chunk(db_session: Session, document: Document, index: int, heading: str, text: str):
@@ -228,26 +236,58 @@ def test_saved_answer_lists_its_citations_by_rank(client: TestClient, me, policy
     }
     assert third["section"] == "2. Review"
     assert third["snippet"].endswith("…") and len(third["snippet"]) <= SNIPPET_CHARS + 1
-    assert body["question"]["referral"] is None
     assert client.get("/api/saved").json()[0]["question"]["citations"] == citations
 
 
+def test_saved_answer_shows_what_the_ask_page_showed(client: TestClient, me, content, db_session):
+    osp, rcs = content.office("OSP"), content.office(RESEARCH_COMPLIANCE)
+    budgets = content.document("Budgets", office=osp)
+    question = add_question(db_session, me.id, answer_text="Yes [1].")
+    retrieved(question, (add_chunk(db_session, budgets, 0, "1. Scope", "Budgets."), True))
+    db_session.flush()
+
+    saved = client.post("/api/saved", json={"question_id": question.id}).json()["question"]
+
+    # The cited policy's office, then RCS; the disclaimer, since it's an answer.
+    assert [c["id"] for c in saved["contacts"]] == [osp.id, rcs.id]
+    assert saved["disclaimer"] == DISCLAIMER
+    assert saved["links"] == []
+
+
 def test_saved_referral_has_its_office(client: TestClient, me, content, db_session):
-    office = content.office("Office of Sponsored Programs", email="osp@example.unc.edu")
-    question = add_question(db_session, me.id, outcome=Outcome.REFERRED, answer_text="Ask OSP.")
+    office = content.office(RESEARCH_COMPLIANCE, email="rcs@unc.edu")
+    question = add_question(db_session, me.id, outcome=Outcome.REFERRED, answer_text="Ask RCS.")
     question.referred_office_id = office.id
     db_session.flush()
 
     body = client.post("/api/saved", json={"question_id": question.id}).json()
 
     assert body["question"]["citations"] == []
-    assert body["question"]["referral"] == {
-        "id": office.id,
-        "name": "Office of Sponsored Programs",
-        "email": "osp@example.unc.edu",
-        "phone": None,
-        "url": None,
-    }
+    assert body["question"]["disclaimer"] is None
+    assert body["question"]["contacts"] == [
+        {
+            "id": office.id,
+            "name": RESEARCH_COMPLIANCE,
+            "email": "rcs@unc.edu",
+            "phone": None,
+            "url": None,
+        }
+    ]
+
+
+def test_saved_out_of_scope_question_has_the_policy_site(
+    client: TestClient, me, content, db_session
+):
+    office = content.office(POLICY_OFFICE)
+    question = add_question(db_session, me.id, outcome=Outcome.OUT_OF_SCOPE, answer_text="No.")
+    question.referred_office_id = office.id
+    db_session.flush()
+
+    saved = client.post("/api/saved", json={"question_id": question.id}).json()["question"]
+
+    assert saved["outcome"] == "out_of_scope"
+    assert [c["id"] for c in saved["contacts"]] == [office.id]
+    assert saved["links"] == [{"title": POLICY_SITE.title, "url": POLICY_SITE.url}]
 
 
 def test_citation_whose_chunk_was_rechunked_keeps_title_and_link(

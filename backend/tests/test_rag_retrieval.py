@@ -101,10 +101,15 @@ def test_search_modes_and_retrieve(db_session, corpus):
         assert len(hits) == 2
         assert titles(db_session, hits)[0] == "Export Controls Policy", mode
 
-    [(chunk, score), *_] = retrieve(db_session, question, embedder, reranker)
+    result = retrieve(db_session, question, embedder, reranker)
+    [(chunk, score), *_] = result.hits
     assert chunk.document.title == "Export Controls Policy"
     assert chunk.section_heading == "2. Travel"
     assert 0 < score <= 1
+    # The vector search's best score, the same one dense mode ranks first by.
+    assert result.relatedness == search(db_session, question, "dense", embedder, reranker)[0].score
+    # Nothing to search in an empty topic.
+    assert retrieve(db_session, question, embedder, reranker, topic="nope").relatedness == 0.0
 
     with pytest.raises(ValueError, match="Unknown retrieval mode"):
         search(db_session, question, "magic", embedder, reranker)
