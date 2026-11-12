@@ -1,9 +1,9 @@
 # Frontend
 
-**Status:** Current as of 2026-11-12. Shell, sign-in, the admin Overview mockup and the admin
-content pages (Policy Library, Content Management, document editor) are built.
-Every researcher page uses the real API, including the document page, the subtopic tag page and
-the topic page's tag filter (workflow D, F3).
+**Status:** Current as of 2026-11-12. Shell, sign-in, the admin Overview mockup, the admin
+content pages (Policy Library, Content Management, document editor) and the admin FAQ pages are
+built. Every researcher page uses the real API, including the document page, the subtopic tag
+page, the topic page's tag filter (workflow D, F3) and the FAQ page (workflow E, F8).
 
 React + TypeScript + Vite, with React Router v7 in declarative mode (`<BrowserRouter>` +
 `<Routes>`). API calls go through `src/api/client.ts` (see [api.md](api.md)).
@@ -35,10 +35,13 @@ src/components/     shared components for the researcher pages
 | `/saved` | `pages/researcher/SavedPage` | researcher |
 | `/documents/:id` | `pages/researcher/DocumentPage` | researcher |
 | `/tags/:slug` | `pages/researcher/TagPage` | researcher |
+| `/faqs` | `pages/researcher/FaqPage` | researcher |
 | `/admin` | `pages/admin/AdminOverview` | admin |
 | `/admin/library` | `pages/admin/PolicyLibraryPage` | admin |
 | `/admin/content` | `pages/admin/ContentManagementPage` | admin |
 | `/admin/documents/:id` | `pages/admin/DocumentEditorPage` | admin |
+| `/admin/faqs` | `pages/admin/FaqListPage` | admin |
+| `/admin/faqs/new`, `/admin/faqs/:id` | `pages/admin/FaqEditorPage` | admin |
 | anything else | `layout/NotFound` | inside the area it falls under |
 
 Researcher and admin pages render inside `AppLayout`, which takes the nav items for its area.
@@ -94,6 +97,24 @@ Workflow D's admin side (F12, NF7), on the endpoints in
 - Publishing or editing a document doesn't update its Ask chunks yet; that's the open
   "re-run ingestion" item in [roadmap.md](roadmap.md).
 
+## Admin FAQ pages
+
+Workflow E's admin side (F8, NF7), on the endpoints in [api.md](api.md#admin-faqs), through
+`pages/admin/adminApi.ts`. FAQs have their own "FAQs" item in the admin sidebar.
+
+- **FAQ list** (`/admin/faqs`): every FAQ in any status, with status and topic filters in the
+  URL. There are few FAQs, so it isn't paged. A missing topic shows as "None", since publishing
+  needs one.
+- **FAQ editor** (`/admin/faqs/new` and `/admin/faqs/:id`): question, answer, topic, source
+  policies and display order, saved together (`POST` for a new draft, then `PATCH`). The answer
+  has a live preview with the same renderer researchers see. Source policies are found by
+  searching every document (`GET /api/admin/documents?q=`); results that aren't published say
+  researchers won't see them. The search box isn't a nested form, so Enter in it searches
+  instead of saving the FAQ. Publish, archive, restore and the confirmed permanent delete work
+  like the document editor's, and Publish is disabled until the saved FAQ has a topic.
+- `StatusBadge` shows both document and FAQ statuses; a published FAQ looks like a published
+  (`active`) document.
+
 ## Researcher pages
 
 The pages in `src/pages/researcher/` follow the client mockup. The home page has equal-weight
@@ -133,6 +154,15 @@ panel, the topic grid and a right rail. Search keeps its query in the URL (`/sea
   Repository. It deliberately doesn't show `content_text`: the Repository has the official, current
   text (F12). `TagPage` lists every policy with one tag across topics. There's no single-tag
   endpoint, so it finds the tag in `GET /api/tags`.
+- **FAQs (F8):** `FaqPage` (`/faqs`) loads every published FAQ once and groups them by topic,
+  in the topics' display order, with a one-at-a-time topic filter in the URL (`/faqs?topic=`).
+  An FAQ whose topic was removed goes under "Other". Each FAQ is a `FaqItem` (`<details>`): the
+  question opens to the answer and the policies it's based on, linking to `/documents/:id`.
+  Topic pages show their first three FAQs, in the admins' order, and link to the rest; the
+  section is left out when there are none or they fail to load.
+- **Markdown:** `components/MarkdownText` renders the small Markdown that Ask answers and FAQ
+  answers use (paragraphs, `- ` lists, `**bold**`) as React elements, never as HTML.
+  `AnswerCard` passes it a `renderCitation` callback for its `[n]` links; FAQs pass none.
 - **Topic tag filter:** `TopicPage` shows the topic's tags as one-at-a-time filter chips, kept in
   the URL (`/browse/:slug?tag=`). The topic and its documents load separately, so changing the
   filter doesn't call `GET /api/topics/{slug}` again, which would log another topic view. Topic
