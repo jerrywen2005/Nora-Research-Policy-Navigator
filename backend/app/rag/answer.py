@@ -9,7 +9,8 @@ cites nothing, it isn't shown as an answer. Either way the user gets an office t
 Who to contact (the Link's rule, 2026-11-12):
 - answered: the offices that own the cited policies, and Research Compliance Services (RCS)
 - about research but not answerable: RCS
-- not about research: the University Policy Office, and a link to every UNC policy
+- not about research: the University Policy Office, and a link to every UNC policy. Decided for
+  questions below the gate, and for those the LLM found no answer to in the sources
 """
 
 import logging
@@ -251,7 +252,14 @@ def ask(
                 (Outcome.ANSWERED, reply) if cited else (Outcome.NO_ANSWER, NO_ANSWER_MESSAGE)
             )
         if outcome == Outcome.NO_ANSWER:
-            referral = office_named(session, RESEARCH_COMPLIANCE)
+            # Matching words but no answer can also mean it isn't a research question at all
+            # ("pets in dorms" matches the animal policies). Only the LLM can tell; if it says
+            # so, send it to the Policy Office like any other out-of-scope question.
+            if is_about_research(llm, question) is False:
+                outcome, answer = Outcome.OUT_OF_SCOPE, OUT_OF_SCOPE_MESSAGE
+                referral = office_named(session, POLICY_OFFICE)
+            else:
+                referral = office_named(session, RESEARCH_COMPLIANCE)
 
     record = Question(
         user_id=user.id if user else None,

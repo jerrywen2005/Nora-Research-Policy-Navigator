@@ -250,7 +250,8 @@ Response `200`:
   - `"referred"`: the question is about research, but nothing in the policies matched (the
     confidence gate). `answer` is a short explanation, `citations` is empty, and `contacts` is
     RCS.
-  - `"out_of_scope"`: below the gate and not about research. `answer` is a short explanation,
+  - `"out_of_scope"`: not about research, either below the gate or when the sources matched
+    words but the LLM found no answer in them (e.g. "pets in dorms" and the animal policies). `answer` is a short explanation,
     `contacts` is the University Policy Office, and `links` points to every UNC policy.
   - `"no_answer"`: sources matched but the answer didn't cite them, or the LLM failed. `answer`
     is a short explanation and `contacts` is RCS; after an LLM failure `citations` lists the
@@ -362,8 +363,8 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
 - `kind` is `"document"` or `"question"`. Exactly one of `document` and `question` is set,
   matching `kind`; the other is `null`.
 - `document` is a [DocumentSummary](#documentsummary).
-- `question.outcome` is an Ask `outcome` (`answered`, `referred`, `out_of_scope`, `no_answer`). A question whose
-  LLM call failed is stored as `error` in the database but shown as `no_answer`, as it was when
+- `question.outcome` is an Ask `outcome` (`answered`, `referred`, `out_of_scope`,
+  `no_answer`). A question whose LLM call failed is stored as `error` in the database but shown as `no_answer`, as it was when
   asked.
 - `question.answer_text` is the answer shown at the time, with its `[n]` markers, or `null` when
   there was none (for example with no LLM configured).

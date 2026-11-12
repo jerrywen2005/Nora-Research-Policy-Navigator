@@ -310,8 +310,10 @@ university policy (housing, HR, grade appeals).
   policy.
 - **An LLM can.** One short call ("RESEARCH or OTHER", `SCOPE_PROMPT`) sorted 41 of 42
   correctly (median 0.5 s, max 3.8 s on Groq); its one miss was the graduate-thesis deadline,
-  arguably near research. It's only asked for questions below the gate, so answered questions
-  pay nothing.
+  arguably near research. It's only asked for questions below the gate, and for those the LLM
+  found no answer to in the sources (questions like "pets in dorms" pass the gate on the animal
+  policies' wording), so answered questions pay nothing. Without an LLM, such a question is
+  shown with its (irrelevant) sources: a known limit of the no-LLM mode.
 
 So: with an LLM, it decides. Without one (or if it fails), `SCOPE_THRESHOLD = 0.60`: below it is
 out of scope, which catches the clearly unrelated half and sends every uncovered research

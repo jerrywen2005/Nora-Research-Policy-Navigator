@@ -198,13 +198,32 @@ def test_without_an_llm_the_matching_sources_are_shown(run, offices):
 
 def test_an_answer_that_cites_nothing_is_not_shown(db_session, run, offices):
     rcs, _ = offices
+    llm = FakeLLM("The sources don't say.")
 
-    result = run(llm=FakeLLM("The sources don't say."))
+    result = run(llm=llm)
 
     assert (result.outcome, result.answer) == (Outcome.NO_ANSWER, NO_ANSWER_MESSAGE)
     assert result.citations == []
     assert result.contacts == [rcs]
+    assert llm.scope_questions == [EXPORT_QUESTION]
     assert not any(c.was_cited for c in logged(db_session, result).citations)
+
+
+@pytest.mark.parametrize("scope_reply", ["RESEARCH", "Unsure"])
+def test_no_answer_stays_with_rcs_unless_the_llm_says_it_isnt_research(run, offices, scope_reply):
+    result = run(llm=FakeLLM("The sources don't say.", scope_reply=scope_reply))
+
+    assert (result.outcome, result.contacts) == (Outcome.NO_ANSWER, [offices[0]])
+
+
+def test_matching_words_without_an_answer_can_still_be_out_of_scope(db_session, run, offices):
+    _, policy_office = offices
+
+    result = run(llm=FakeLLM("The sources don't say.", scope_reply="OTHER"))
+
+    assert (result.outcome, result.answer) == (Outcome.OUT_OF_SCOPE, OUT_OF_SCOPE_MESSAGE)
+    assert (result.citations, result.contacts) == ([], [policy_office])
+    assert logged(db_session, result).referred_office_id == policy_office.id
 
 
 def test_an_llm_failure_shows_the_sources_and_is_logged_as_an_error(db_session, run, offices):
