@@ -127,8 +127,8 @@ the workflows, so each has one owner who makes sure it's met and checked.
   all 197 documents (title, link, topic, contact); D loads the tags from the same file
 - [x] Ingestion: each policy's text → `document_chunks` with embeddings (`python -m app.rag`)
 - [x] Hybrid retrieval (pgvector + BM25), reranking and the confidence gate threshold
-- [x] Referral to the
-  topic's office
+- [x] Referral by the Link's rule (2026-11-12): research questions to Research Compliance
+  Services, others to the University Policy Office; answers list their policies' offices and RCS
 - [x] `POST /api/ask` writes `questions` and `question_citations` and returns `question_id`
 - [x] Ask page on the real API, with citations, the confidence indicator and the disclaimer;
   delete `fakeData.ts`
