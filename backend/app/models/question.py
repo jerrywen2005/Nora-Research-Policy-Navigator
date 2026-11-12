@@ -14,6 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
+from app.models.content import Document, DocumentChunk, Office
 
 
 class Outcome(StrEnum):
@@ -56,6 +57,7 @@ class Question(Base):
         DateTime(timezone=True), server_default=func.now(), index=True
     )
 
+    referred_office: Mapped[Office | None] = relationship()
     citations: Mapped[list["QuestionCitation"]] = relationship(
         back_populates="question",
         order_by="QuestionCitation.rank",
@@ -87,3 +89,6 @@ class QuestionCitation(Base):
     was_cited: Mapped[bool]
 
     question: Mapped[Question] = relationship(back_populates="citations")
+    # Null once re-chunking deletes the chunk; `document` stays.
+    chunk: Mapped[DocumentChunk | None] = relationship()
+    document: Mapped[Document] = relationship()
