@@ -5,6 +5,7 @@ import {
   clearRating,
   getDocument,
   getDocuments,
+  getFaqs,
   getSaved,
   getTags,
   rateAnswer,
@@ -112,5 +113,17 @@ describe('documents and tags', () => {
     const fetchMock = stubFetch(200, { items: [], total: 0 })
     await getDocuments({ topic: 'irb', tag: '', limit: 100 })
     expect(fetchMock.mock.calls[0][0]).toBe('/api/documents?topic=irb&limit=100')
+  })
+})
+
+describe('faqs', () => {
+  it('lists published FAQs, for one topic or all', async () => {
+    let fetchMock = stubFetch(200, [])
+    await expect(getFaqs({ topic: 'irb' })).resolves.toEqual([])
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/faqs?topic=irb')
+
+    fetchMock = stubFetch(200, [])
+    await getFaqs()
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/faqs?')
   })
 })
