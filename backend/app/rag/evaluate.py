@@ -1,9 +1,11 @@
 """Measure retrieval and the confidence gate on a fixed question set. Design: docs/rag.md.
 
 Each question in data/eval_questions.json lists the articles that answer it (any one counts), or
-null if the policies don't cover it. For each retrieval method we count how often an expected
-article is ranked first and how often it's among the top 5 chunks the LLM would see. No LLM is
-called, so it's free to run after every retrieval or model change: `python -m app.rag eval`.
+null if the policies don't cover it; those also say whether they're `related` to research (so
+Nora should refer them to RCS) or not (the University Policy Office). For each retrieval method
+we count how often an expected article is ranked first and how often it's among the top 5 chunks
+the LLM would see. No LLM is called, so it's free to run after every retrieval or model change:
+`python -m app.rag eval`. The scope check here is the no-LLM fallback (SCOPE_THRESHOLD).
 
 The questions are the team's own until the Link sends realistic ones; replace them then.
 """
@@ -40,6 +42,9 @@ class Evaluation:
     retrieval: dict[str, list[int]] = field(default_factory=lambda: {m: [0, 0] for m in MODES})
     # (question, is it answerable, best reranker score): what the gate decides on
     best_scores: list[tuple[str, bool, float]] = field(default_factory=list)
+    # (question, is it about research, relatedness) for the unanswerable questions: what the
+    # no-LLM scope check decides on
+    scope_scores: list[tuple[str, bool, float]] = field(default_factory=list)
 
 
 def evaluate(
@@ -57,6 +62,9 @@ def evaluate(
             result.answerable += 1
         for mode in MODES:
             hits = search(session, question, mode, embedder, reranker)
+            if mode == "dense" and expected is None:
+                relatedness = hits[0].score if hits else 0.0
+                result.scope_scores.append((question, item["related"], relatedness))
             if mode == "rerank":
                 best = hits[0].score if hits else 0.0
                 result.best_scores.append((question, expected is not None, best))
@@ -80,3 +88,22 @@ def check_gate(best_scores: list[tuple[str, bool, float]], threshold: float) -> 
         if answerable != (best >= threshold)
     ]
     return {"answered": answered, "referred": referred, "mistakes": mistakes}
+
+
+def check_scope(scope_scores: list[tuple[str, bool, float]], threshold: float) -> dict:
+    """Where the no-LLM scope check would send each unanswerable question: research questions
+    to RCS (relatedness at or above the threshold), the rest to the University Policy Office."""
+    to_rcs = sum(related and score >= threshold for _, related, score in scope_scores)
+    to_policy_office = sum(not related and score < threshold for _, related, score in scope_scores)
+    mistakes = [
+        (question, score, "to RCS" if score >= threshold else "to the Policy Office")
+        for question, related, score in scope_scores
+        if related != (score >= threshold)
+    ]
+    return {
+        "related": sum(related for _, related, _ in scope_scores),
+        "unrelated": sum(not related for _, related, _ in scope_scores),
+        "to_rcs": to_rcs,
+        "to_policy_office": to_policy_office,
+        "mistakes": mistakes,
+    }

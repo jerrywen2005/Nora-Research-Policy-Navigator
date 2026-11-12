@@ -131,26 +131,197 @@
   },
   {
     "question": "Where is the best pizza in Chapel Hill?",
-    "expected_articles": null
+    "expected_articles": null,
+    "related": false
   },
   {
     "question": "How do I get a parking permit?",
-    "expected_articles": null
+    "expected_articles": null,
+    "related": false
   },
   {
     "question": "What is the deadline for submitting my thesis to the graduate school?",
-    "expected_articles": null
+    "expected_articles": null,
+    "related": false
   },
   {
     "question": "How do I reserve a study room in Davis Library?",
-    "expected_articles": null
+    "expected_articles": null,
+    "related": false
   },
   {
     "question": "When is spring break this year?",
-    "expected_articles": null
+    "expected_articles": null,
+    "related": false
   },
   {
     "question": "How do I reset my Onyen password?",
-    "expected_articles": null
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "How do I file an invention disclosure for something my lab developed?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Do I need a permit to fly a drone for field research?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "How do I dispose of hazardous chemical waste from my lab?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Does my grant require me to publish my paper open access?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "What safety training do I need before working with a laser in my lab?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Can I use a select agent toxin in my experiments?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Who decides the order of authors on a research paper?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "How do I write a data management plan for an NSF proposal?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Do I need approval to collect plant samples in a national park?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Do I need approval to use radioactive isotopes in my lab?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "How do I set up a material transfer agreement to receive cell lines?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "What are the rules for keeping my lab notebook electronic?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Can I use generative AI to write parts of my grant proposal?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Do I need special training to handle bloodborne pathogens in the lab?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Who reviews research that uses recombinant viruses?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "Can I share my research data with a company that wants to license it?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "What are the requirements for publishing results from a clinical trial?",
+    "expected_articles": null,
+    "related": true
+  },
+  {
+    "question": "What time does the dining hall close on weekends?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "How do I apply for an on-campus job?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "Where can I buy tickets for the basketball game?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "How do I change my meal plan?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "Who do I talk to about a roommate conflict?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "How do I register for spring classes?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "Can I get reimbursed for a parking ticket?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "What's the university's policy on pets in dorms?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "How do I request vacation days as a staff member?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "Is there a dress code for employees?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "How do I report a broken streetlight on campus?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "What is the university's alcohol policy?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "How do I appeal a grade?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "Where do I get a replacement One Card?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "What are the rules for posting flyers on campus?",
+    "expected_articles": null,
+    "related": false
+  },
+  {
+    "question": "How much parental leave do faculty get?",
+    "expected_articles": null,
+    "related": false
   }
 ]
