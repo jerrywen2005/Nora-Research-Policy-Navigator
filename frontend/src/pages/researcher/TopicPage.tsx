@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router'
+import { Link, useParams, useSearchParams } from 'react-router'
 import { ApiError } from '../../api/client'
 import { DocumentResultCard } from '../../components/DocumentResultCard'
 import { Icon } from '../../components/Icon'
@@ -8,10 +8,25 @@ import './researcher.css'
 import { getDocuments, getTopic } from './researcherApi'
 import { useLoad } from './useLoad'
 
-// A topic's documents, plus the office that owns the topic. Route: /browse/:slug
+// The most documents the API returns at once; the largest topic has fewer.
+const PAGE_SIZE = 100
+
+// A topic's documents, filtered by one subtopic tag (F3), plus the office that owns the topic.
+// Route: /browse/:slug?tag=
+// The topic and its documents load separately, so changing the filter doesn't reload the topic
+// (and doesn't log another topic view).
 export default function TopicPage() {
   const slug = useParams().slug ?? ''
-  const page = useLoad(slug, () => Promise.all([getTopic(slug), getDocuments({ topic: slug })]))
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tagSlug = searchParams.get('tag') ?? ''
+  const topic = useLoad(slug, () => getTopic(slug))
+  const documents = useLoad(`${slug}?tag=${tagSlug}`, () =>
+    getDocuments({ topic: slug, tag: tagSlug, limit: PAGE_SIZE }),
+  )
+
+  function filterBy(tag: string) {
+    setSearchParams(tag ? { tag } : {}, { replace: true })
+  }
 
   return (
     <div className="researcher">
@@ -19,44 +34,87 @@ export default function TopicPage() {
         <Icon name="arrowLeft" size={16} /> All topics
       </Link>
 
-      {page.status === 'loading' && <p className="status">Loading…</p>}
-      {page.status === 'error' && (
+      {topic.status === 'loading' && <p className="status">Loading…</p>}
+      {topic.status === 'error' && (
         <p className="status status--error">
-          {page.error instanceof ApiError && page.error.status === 404
+          {topic.error instanceof ApiError && topic.error.status === 404
             ? 'This topic was not found.'
             : "This topic couldn't be loaded."}
         </p>
       )}
-      {page.status === 'ready' && (
+      {topic.status === 'ready' && (
         <>
           <header className="page-header">
             <span className="page-header__icon">
-              <Icon name={topicIcon(page.data[0].slug)} size={36} />
+              <Icon name={topicIcon(topic.data.slug)} size={36} />
             </span>
             <div>
-              <h1 className="page-header__title">{page.data[0].name}</h1>
-              <p className="page-header__intro">{page.data[0].description}</p>
+              <h1 className="page-header__title">{topic.data.name}</h1>
+              <p className="page-header__intro">{topic.data.description}</p>
             </div>
           </header>
 
           <div className="researcher-layout">
             <div className="researcher-main">
-              <p className="result-count">
-                {page.data[1].total} {page.data[1].total === 1 ? 'document' : 'documents'}
-              </p>
-              <ul className="result-list">
-                {page.data[1].items.map((doc) => (
-                  <li key={doc.id}>
-                    <DocumentResultCard document={doc} />
-                  </li>
-                ))}
-              </ul>
+              {topic.data.tags.length > 0 && (
+                <div className="tag-filter" role="group" aria-label="Filter by subtopic">
+                  <button
+                    type="button"
+                    className={tagSlug ? 'chip-button' : 'chip-button chip-button--on'}
+                    aria-pressed={!tagSlug}
+                    onClick={() => filterBy('')}
+                  >
+                    All
+                  </button>
+                  {topic.data.tags.map((tag) => (
+                    <button
+                      key={tag.id}
+                      type="button"
+                      className={tag.slug === tagSlug ? 'chip-button chip-button--on' : 'chip-button'}
+                      aria-pressed={tag.slug === tagSlug}
+                      title={tag.definition ?? undefined}
+                      onClick={() => filterBy(tag.slug)}
+                    >
+                      {tag.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div aria-live="polite">
+                {documents.status === 'loading' && <p className="status">Loading…</p>}
+                {documents.status === 'error' && (
+                  <p className="status status--error">The documents couldn't be loaded.</p>
+                )}
+                {documents.status === 'ready' && (
+                  <>
+                    <p className="result-count">
+                      {documents.data.total} {documents.data.total === 1 ? 'document' : 'documents'}
+                      {tagSlug && (
+                        <>
+                          {' · '}
+                          <Link to={`/tags/${tagSlug}`} className="text-link">
+                            This subtopic across all topics
+                          </Link>
+                        </>
+                      )}
+                    </p>
+                    <ul className="result-list">
+                      {documents.data.items.map((doc) => (
+                        <li key={doc.id}>
+                          <DocumentResultCard document={doc} />
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
             </div>
-            {page.data[0].office && (
+            {topic.data.office && (
               <aside className="researcher-rail">
                 <section className="panel">
                   <h2 className="panel__title">Responsible office</h2>
-                  <OfficeContact office={page.data[0].office} />
+                  <OfficeContact office={topic.data.office} />
                 </section>
               </aside>
             )}
