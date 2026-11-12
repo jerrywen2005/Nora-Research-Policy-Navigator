@@ -7,8 +7,10 @@ from sqlalchemy.orm import Session, defer, joinedload, selectinload
 
 from app.auth import CurrentUser
 from app.db import get_session
-from app.models import Document, DocumentStatus, Outcome, Question, SavedItem
-from app.schemas.content import DocumentSummary
+from app.models import Document, DocumentStatus, Outcome, Question, QuestionCitation, SavedItem
+from app.rag.answer import Citation
+from app.schemas.ask import CitationOut
+from app.schemas.content import DocumentSummary, OfficeOut
 from app.schemas.feedback import SavedItemOut, SavedQuestion, SaveRequest
 
 router = APIRouter(tags=["saved"])
@@ -30,10 +32,30 @@ def _items(user_id: int) -> Select[tuple[SavedItem]]:
                 joinedload(Document.office),
                 selectinload(Document.topics),
             ),
-            selectinload(SavedItem.question),
+            selectinload(SavedItem.question).options(
+                selectinload(Question.referred_office),
+                selectinload(Question.citations).options(
+                    selectinload(QuestionCitation.chunk),
+                    selectinload(QuestionCitation.document).options(defer(Document.content_text)),
+                ),
+            ),
         )
         # id breaks ties between items saved in the same transaction.
         .order_by(SavedItem.created_at.desc(), SavedItem.id.desc())
+    )
+
+
+def _citation_out(citation: QuestionCitation) -> CitationOut:
+    """A cited source as POST /api/ask showed it; `number` is the `[n]` in the answer."""
+    chunk = citation.chunk
+    return CitationOut(
+        number=citation.rank,
+        document_id=citation.document_id,
+        title=citation.document.title,
+        # Re-chunking the policy since then deleted the chunk; the title and link still work.
+        section=chunk.section_heading if chunk else "",
+        source_url=citation.document.source_url,
+        snippet=Citation(citation.rank, chunk).snippet if chunk else "",
     )
 
 
@@ -58,6 +80,12 @@ def _to_out(item: SavedItem) -> SavedItemOut:
             # Shown as it was when asked; the log keeps "error" for the dashboard.
             outcome="no_answer" if question.outcome == Outcome.ERROR else question.outcome,
             answer_text=question.answer_text,
+            citations=[_citation_out(c) for c in question.citations if c.was_cited],
+            referral=(
+                OfficeOut.model_validate(question.referred_office)
+                if question.referred_office
+                else None
+            ),
             created_at=question.created_at,
         ),
     )

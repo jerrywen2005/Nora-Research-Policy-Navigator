@@ -2,10 +2,21 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import delete, select
+from sqlalchemy import delete, event, select
 from sqlalchemy.orm import Session
 
-from app.models import Document, DocumentStatus, Outcome, Question, SavedItem, User
+from app.models import (
+    EMBEDDING_DIMENSIONS,
+    Document,
+    DocumentChunk,
+    DocumentStatus,
+    Outcome,
+    Question,
+    QuestionCitation,
+    SavedItem,
+    User,
+)
+from app.rag.answer import SNIPPET_CHARS
 from tests.conftest import login
 from tests.questions import add_question
 
@@ -71,7 +82,15 @@ def test_save_a_question(client: TestClient, me, db_session):
     assert set(body) == SAVED_ITEM_FIELDS
     assert body["kind"] == "question"
     assert body["document"] is None
-    assert set(body["question"]) == {"id", "question_text", "outcome", "answer_text", "created_at"}
+    assert set(body["question"]) == {
+        "id",
+        "question_text",
+        "outcome",
+        "answer_text",
+        "citations",
+        "referral",
+        "created_at",
+    }
     assert body["question"]["id"] == question.id
     assert body["question"]["question_text"] == "Can I reuse a dataset?"
     assert body["question"]["outcome"] == "answered"
@@ -154,6 +173,135 @@ def test_someone_elses_question_is_404(client: TestClient, me, make_user, db_ses
     assert response.status_code == 404
     assert response.json() == {"detail": "Question not found"}
     assert saved_ids(db_session, me.id) == []
+
+
+# ---- What the Ask page showed: citations and referral ----
+
+
+def add_chunk(db_session: Session, document: Document, index: int, heading: str, text: str):
+    chunk = DocumentChunk(
+        document_id=document.id,
+        chunk_index=index,
+        section_heading=heading,
+        context=f"{document.title} > {heading}",
+        text=text,
+        word_count=len(text.split()),
+        content_hash="test",
+        embedding=[0.1] * EMBEDDING_DIMENSIONS,
+    )
+    db_session.add(chunk)
+    db_session.flush()
+    return chunk
+
+
+def retrieved(question: Question, *sources: tuple[DocumentChunk, bool]) -> None:
+    """Record the chunks retrieved for a question, best first, and whether the answer cited each."""
+    question.citations = [
+        QuestionCitation(
+            rank=rank, chunk_id=chunk.id, document_id=chunk.document_id, score=0.5, was_cited=cited
+        )
+        for rank, (chunk, cited) in enumerate(sources, start=1)
+    ]
+
+
+def test_saved_answer_lists_its_citations_by_rank(client: TestClient, me, policy, db_session):
+    scope = add_chunk(db_session, policy, 0, "1. Scope", "Applies to all human subjects research.")
+    review = add_chunk(db_session, policy, 1, "2. Review", "Existing data needs IRB review. " * 20)
+    unused = add_chunk(db_session, policy, 2, "3. Records", "Keep records for three years.")
+    question = add_question(db_session, me.id, answer_text="Yes [3], see also [1].")
+    # The answer cites ranks 1 and 3; rank 2 was retrieved but not cited.
+    retrieved(question, (scope, True), (unused, False), (review, True))
+    db_session.flush()
+
+    body = client.post("/api/saved", json={"question_id": question.id}).json()
+
+    citations = body["question"]["citations"]
+    assert [c["number"] for c in citations] == [1, 3]
+    first, third = citations
+    assert first == {
+        "number": 1,
+        "document_id": policy.id,
+        "title": "Use of Existing Data",
+        "section": "1. Scope",
+        "source_url": None,
+        "snippet": "Applies to all human subjects research.",
+    }
+    assert third["section"] == "2. Review"
+    assert third["snippet"].endswith("…") and len(third["snippet"]) <= SNIPPET_CHARS + 1
+    assert body["question"]["referral"] is None
+    assert client.get("/api/saved").json()[0]["question"]["citations"] == citations
+
+
+def test_saved_referral_has_its_office(client: TestClient, me, content, db_session):
+    office = content.office("Office of Sponsored Programs", email="osp@example.unc.edu")
+    question = add_question(db_session, me.id, outcome=Outcome.REFERRED, answer_text="Ask OSP.")
+    question.referred_office_id = office.id
+    db_session.flush()
+
+    body = client.post("/api/saved", json={"question_id": question.id}).json()
+
+    assert body["question"]["citations"] == []
+    assert body["question"]["referral"] == {
+        "id": office.id,
+        "name": "Office of Sponsored Programs",
+        "email": "osp@example.unc.edu",
+        "phone": None,
+        "url": None,
+    }
+
+
+def test_citation_whose_chunk_was_rechunked_keeps_title_and_link(
+    client: TestClient, me, content, db_session
+):
+    document = content.document("Export Controls", source_url="https://example.unc.edu/export")
+    chunk = add_chunk(db_session, document, 0, "1. Scope", "ITAR applies.")
+    question = add_question(db_session, me.id, answer_text="It applies [1].")
+    retrieved(question, (chunk, True))
+    db_session.flush()
+    # Re-ingesting the policy deletes its chunks; the citation's chunk_id becomes null.
+    db_session.execute(delete(DocumentChunk).where(DocumentChunk.id == chunk.id))
+    db_session.expunge_all()
+
+    body = client.post("/api/saved", json={"question_id": question.id}).json()
+
+    assert body["question"]["citations"] == [
+        {
+            "number": 1,
+            "document_id": document.id,
+            "title": "Export Controls",
+            "section": "",
+            "source_url": "https://example.unc.edu/export",
+            "snippet": "",
+        }
+    ]
+
+
+def test_list_query_count_doesnt_grow_with_items(client: TestClient, me, policy, db_session):
+    chunk = add_chunk(db_session, policy, 0, "1. Scope", "Applies to research.")
+
+    def save_question() -> None:
+        question = add_question(db_session, me.id, answer_text="Yes [1].")
+        retrieved(question, (chunk, True))
+        db_session.add(SavedItem(user_id=me.id, question_id=question.id))
+        db_session.flush()
+
+    def queries_to_list() -> int:
+        statements = []
+        listener = lambda *args: statements.append(args[2])  # noqa: E731
+        connection = db_session.connection()
+        event.listen(connection, "before_cursor_execute", listener)
+        try:
+            assert client.get("/api/saved").status_code == 200
+        finally:
+            event.remove(connection, "before_cursor_execute", listener)
+        return len(statements)
+
+    save_question()
+    with_one = queries_to_list()
+    save_question()
+    save_question()
+
+    assert queries_to_list() == with_one
 
 
 # ---- Listing ----
