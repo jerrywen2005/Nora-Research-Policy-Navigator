@@ -35,6 +35,16 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-11: feedback and saved items frontend (workflow B)
+Built the researcher side of F7 and F9 on Andy's endpoints. Helpful / Not helpful sits under
+every fresh answer; clicking the selected one again undoes it, and Not helpful offers an optional
+comment so the dashboard can show why answers miss. Save is a toggle on answers and on every
+document result, and the Saved page lists both, newest first, with saved answers rendered by the
+same `AnswerCard` (sources and office included) and the disclaimer always shown (NF2). Open
+points: the API can't read a rating back, so feedback isn't shown on saved answers or after a
+reload; and the saved response doesn't carry the disclaimer, so the frontend keeps a copy of the
+backend's text. Adding `disclaimer` to `SavedQuestion` would remove that copy. *(Jerry)*
+
 ### 2026-11-11: saved questions include their citations and referral (contract change)
 `SavedItem.question` in [api.md](api.md#saveditem) and `types.ts` gains `citations` and
 `referral`, so the Saved page can show what the Ask page showed, not just the answer text. This

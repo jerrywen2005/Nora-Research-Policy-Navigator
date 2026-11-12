@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../../api/client'
-import { ask } from './researcherApi'
+import { ask, clearRating, getSaved, rateAnswer, saveItem, unsaveItem } from './researcherApi'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -28,5 +28,55 @@ describe('ask', () => {
 
     await expect(result).rejects.toBeInstanceOf(ApiError)
     await expect(result).rejects.toMatchObject({ status: 404, detail: 'Topic not found' })
+  })
+})
+
+function stubFetch(status: number, body?: unknown) {
+  const fetchMock = vi
+    .fn()
+    .mockResolvedValue(new Response(body === undefined ? null : JSON.stringify(body), { status }))
+  vi.stubGlobal('fetch', fetchMock)
+  return fetchMock
+}
+
+describe('feedback', () => {
+  it('rates an answer with PUT and removes the rating with DELETE', async () => {
+    const feedback = { question_id: 41, helpful: false, comment: 'Too vague' }
+    let fetchMock = stubFetch(200, feedback)
+
+    await expect(rateAnswer(41, { helpful: false, comment: 'Too vague' })).resolves.toEqual(feedback)
+    expect(fetchMock).toHaveBeenCalledWith('/api/questions/41/feedback', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ helpful: false, comment: 'Too vague' }),
+    })
+
+    fetchMock = stubFetch(204)
+    await expect(clearRating(41)).resolves.toBeUndefined()
+    expect(fetchMock).toHaveBeenCalledWith('/api/questions/41/feedback', {
+      method: 'DELETE',
+      headers: undefined,
+      body: undefined,
+    })
+  })
+})
+
+describe('saved items', () => {
+  it('lists, saves and removes saved items', async () => {
+    let fetchMock = stubFetch(200, [])
+    await expect(getSaved()).resolves.toEqual([])
+    expect(fetchMock).toHaveBeenCalledWith('/api/saved', expect.objectContaining({ method: 'GET' }))
+
+    const item = { id: 7, kind: 'document' }
+    fetchMock = stubFetch(201, item)
+    await expect(saveItem({ document_id: 12 })).resolves.toEqual(item)
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/saved',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ document_id: 12 }) }),
+    )
+
+    fetchMock = stubFetch(204)
+    await expect(unsaveItem(7)).resolves.toBeUndefined()
+    expect(fetchMock).toHaveBeenCalledWith('/api/saved/7', expect.objectContaining({ method: 'DELETE' }))
   })
 })
