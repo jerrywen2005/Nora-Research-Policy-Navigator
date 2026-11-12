@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
+from app.analytics.logging import EventType, log_event
 from app.auth import CurrentUser
 from app.auth.dependencies import SESSION_USER_KEY
 from app.auth.users import record_login
@@ -39,4 +40,5 @@ def mock_login(
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Account is disabled")
     session.commit()
     request.session[SESSION_USER_KEY] = user.id
+    log_event(session, user, EventType.LOGIN)
     return user

@@ -145,10 +145,11 @@ the workflows, so each has one owner who makes sure it's met and checked.
 - [x] Save buttons on answers and documents, a Saved page, and saved items in the right rail
 
 **C. Usage logging and admin dashboard (Andy backend, Jerry frontend).**
-- [ ] `usage_events` for topic views, document views and searches (terms, result count)
-- [ ] Analytics endpoints for every measure in
+- [x] `usage_events` for logins, topic views, document views and searches (terms, result count)
+- [x] Analytics endpoints for every measure in
   [product.md](product.md#admin-dashboard-must-have), for a date range, aggregates only
-- [ ] CSV export
+  (`GET /api/admin/analytics`)
+- [x] CSV export (`GET /api/admin/analytics/export.csv`)
 - [ ] Admin Overview on the real API; delete `sampleData.ts`
 
 **D. Content management and subtopics (Adithi backend, Anton frontend).**

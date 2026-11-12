@@ -4,6 +4,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.api import (
     admin_documents,
+    analytics,
     ask,
     auth,
     documents,
@@ -57,6 +58,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_documents.router, prefix=API_PREFIX)
     app.include_router(feedback.router, prefix=API_PREFIX)
     app.include_router(saved.router, prefix=API_PREFIX)
+    app.include_router(analytics.router, prefix=API_PREFIX)
     return app
 
 

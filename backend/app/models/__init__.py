@@ -14,6 +14,7 @@ from app.models.feedback import Feedback
 from app.models.question import Outcome, Question, QuestionCitation
 from app.models.saved_item import SavedItem
 from app.models.tags import Tag, document_tags
+from app.models.usage_event import EventType, UsageEvent
 from app.models.user import Role, User
 
 __all__ = [
@@ -22,6 +23,7 @@ __all__ = [
     "Document",
     "DocumentChunk",
     "DocumentStatus",
+    "EventType",
     "Feedback",
     "Office",
     "Outcome",
@@ -31,6 +33,7 @@ __all__ = [
     "SavedItem",
     "Tag",
     "Topic",
+    "UsageEvent",
     "User",
     "document_tags",
     "document_topics",
