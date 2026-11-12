@@ -35,9 +35,10 @@ const ANSWER: AskResponse = {
       snippet: '...',
     },
   ],
-  referral: null,
+  contacts: [],
   confidence: 0.98,
   disclaimer: 'General information only.',
+  links: [],
 }
 
 describe('AskSection', () => {
@@ -95,7 +96,9 @@ describe('AskSection', () => {
         outcome: 'answered',
         answer_text: ANSWER.answer,
         citations: ANSWER.citations,
-        referral: null,
+        contacts: [],
+        disclaimer: ANSWER.disclaimer,
+        links: [],
         created_at: '2026-11-11T15:01:12Z',
       },
     })

@@ -2,7 +2,6 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { DISCLAIMER } from '../../components/answerContent'
 import SavedProvider from '../../saved/SavedProvider'
 import { savedDocumentItem, savedQuestion, savedQuestionItem } from '../../test/fixtures'
 import { getSaved, saveItem, unsaveItem } from './researcherApi'
@@ -40,7 +39,7 @@ describe('SavedPage', () => {
       'href',
       'https://policies.unc.edu/Article/3',
     )
-    expect(within(answer).getByText(DISCLAIMER)).toBeInTheDocument()
+    expect(within(answer).getByText(/not an official determination/i)).toBeInTheDocument()
     expect(within(answer).getByText('Nov 11, 2026')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Export Controls' })).toHaveAttribute('href', '/documents/12')
   })
@@ -50,7 +49,13 @@ describe('SavedPage', () => {
     getSavedMock.mockResolvedValue([
       savedQuestionItem(
         8,
-        savedQuestion({ outcome: 'referred', answer_text: 'Contact the office below.', citations: [], referral: office }),
+        savedQuestion({
+          outcome: 'referred',
+          answer_text: 'Contact the office below.',
+          citations: [],
+          contacts: [office],
+          disclaimer: null,
+        }),
       ),
     ])
     renderPage()
