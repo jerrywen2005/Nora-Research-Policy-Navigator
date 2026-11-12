@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react'
-import type { AskResponse, Citation } from '../api/types'
+import { useId, type ReactNode } from 'react'
+import type { Citation } from '../api/types'
+import type { AnswerContent } from './answerContent'
 import './components.css'
 import { Icon } from './Icon'
 import { OfficeContact } from './OfficeContact'
@@ -9,7 +10,7 @@ const INLINE = /(\*\*[^*]+\*\*|[[【]\d+[\]】])/
 const LIST_ITEM = /^\s*(?:[-*•]|\d+\.)\s+/
 
 // Bold text, and citation markers as links to the matching source below.
-function Inline({ text, numbers }: { text: string; numbers: Set<number> }) {
+function Inline({ text, numbers, idPrefix }: { text: string; numbers: Set<number>; idPrefix: string }) {
   return text.split(INLINE).map((part, index) => {
     if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
       return <strong key={index}>{part.slice(2, -2)}</strong>
@@ -18,7 +19,7 @@ function Inline({ text, numbers }: { text: string; numbers: Set<number> }) {
     if (citation && numbers.has(Number(citation[1]))) {
       return (
         <sup key={index}>
-          <a href={`#citation-${citation[1]}`}>[{citation[1]}]</a>
+          <a href={`#${idPrefix}-${citation[1]}`}>[{citation[1]}]</a>
         </sup>
       )
     }
@@ -28,7 +29,15 @@ function Inline({ text, numbers }: { text: string; numbers: Set<number> }) {
 
 // The LLM writes a little Markdown: paragraphs, "- " or "1. " list items, and **bold**. This
 // renders just that, as React elements, so model output is never inserted as HTML.
-function AnswerText({ text, citations }: { text: string; citations: Citation[] }) {
+function AnswerText({
+  text,
+  citations,
+  idPrefix,
+}: {
+  text: string
+  citations: Citation[]
+  idPrefix: string
+}) {
   const numbers = new Set(citations.map((c) => c.number))
   const blocks: ReactNode[] = []
   let items: string[] = []
@@ -39,7 +48,7 @@ function AnswerText({ text, citations }: { text: string; citations: Citation[] }
         <ul key={blocks.length} className="answer-card__list">
           {items.map((item, index) => (
             <li key={index}>
-              <Inline text={item} numbers={numbers} />
+              <Inline text={item} numbers={numbers} idPrefix={idPrefix} />
             </li>
           ))}
         </ul>,
@@ -55,7 +64,7 @@ function AnswerText({ text, citations }: { text: string; citations: Citation[] }
       flushList()
       blocks.push(
         <p key={blocks.length} className="answer-card__text">
-          <Inline text={line.trim()} numbers={numbers} />
+          <Inline text={line.trim()} numbers={numbers} idPrefix={idPrefix} />
         </p>,
       )
     }
@@ -72,11 +81,19 @@ function confidenceLabel(confidence: number): string {
   return 'Partial match: check the sources below'
 }
 
-function CitationList({ citations, showSnippets }: { citations: Citation[]; showSnippets: boolean }) {
+function CitationList({
+  citations,
+  showSnippets,
+  idPrefix,
+}: {
+  citations: Citation[]
+  showSnippets: boolean
+  idPrefix: string
+}) {
   return (
     <ol className="answer-card__sources">
       {citations.map((citation) => (
-        <li key={citation.number} id={`citation-${citation.number}`} value={citation.number}>
+        <li key={citation.number} id={`${idPrefix}-${citation.number}`} value={citation.number}>
           {citation.source_url ? (
             <a href={citation.source_url} target="_blank" rel="noreferrer">
               {citation.title} <Icon name="external" size={14} />
@@ -85,15 +102,20 @@ function CitationList({ citations, showSnippets }: { citations: Citation[]; show
             <span>{citation.title}</span>
           )}
           {citation.section && <span className="answer-card__section"> · {citation.section}</span>}
-          {showSnippets && <p className="answer-card__snippet">{citation.snippet}</p>}
+          {showSnippets && citation.snippet && (
+            <p className="answer-card__snippet">{citation.snippet}</p>
+          )}
         </li>
       ))}
     </ol>
   )
 }
 
-// Renders every AskResponse outcome. The disclaimer is always shown (docs/api.md).
-export function AnswerCard({ response }: { response: AskResponse }) {
+// Renders every answer outcome. The disclaimer is always shown (docs/api.md). `actions` (the
+// feedback and save buttons) go between the answer and the disclaimer.
+export function AnswerCard({ response, actions }: { response: AnswerContent; actions?: ReactNode }) {
+  // Citation anchors must be unique: the Saved page shows many answers at once.
+  const idPrefix = `citation${useId().replace(/:/g, '')}`
   const answered = response.outcome === 'answered'
   const answer = answered ? response.answer : null
 
@@ -113,20 +135,24 @@ export function AnswerCard({ response }: { response: AskResponse }) {
         {heading}
       </h3>
 
-      {answered && (
+      {answered && response.confidence !== null && (
         <p className="answer-card__confidence">
           <Icon name="info" size={14} />
           {confidenceLabel(response.confidence)}
         </p>
       )}
 
-      {answer && <AnswerText text={answer} citations={response.citations} />}
+      {answer && <AnswerText text={answer} citations={response.citations} idPrefix={idPrefix} />}
       {!answered && response.answer && <p className="answer-card__text">{response.answer}</p>}
 
       {response.citations.length > 0 && (
         <>
           {answer && <p className="answer-card__label">Sources</p>}
-          <CitationList citations={response.citations} showSnippets={!answer} />
+          <CitationList
+            citations={response.citations}
+            showSnippets={!answer}
+            idPrefix={idPrefix}
+          />
         </>
       )}
 
@@ -136,6 +162,8 @@ export function AnswerCard({ response }: { response: AskResponse }) {
           <OfficeContact office={response.referral} />
         </>
       )}
+
+      {actions && <div className="answer-card__actions">{actions}</div>}
 
       <p className="answer-card__disclaimer">
         <Icon name="info" size={16} />

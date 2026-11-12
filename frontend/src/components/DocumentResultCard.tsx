@@ -1,6 +1,7 @@
 import type { DocType, DocumentSummary } from '../api/types'
 import './components.css'
 import { Icon } from './Icon'
+import { SaveButton } from './SaveButton'
 
 const docTypeLabels: Record<DocType, string> = {
   policy: 'Policy',
@@ -15,7 +16,7 @@ const docTypeLabels: Record<DocType, string> = {
 }
 
 // A browse or search result. Every result shows its citation and, when there is one, a link to
-// the source.
+// the source, and a Save toggle (F9).
 export function DocumentResultCard({ document }: { document: DocumentSummary }) {
   return (
     <article className="result-card">
@@ -23,6 +24,9 @@ export function DocumentResultCard({ document }: { document: DocumentSummary }) 
         <span className="badge">{docTypeLabels[document.doc_type]}</span>
         {document.is_authoritative && <span className="badge badge--authoritative">Official</span>}
         {document.citation && <span className="result-card__citation">{document.citation}</span>}
+        <span className="result-card__save">
+          <SaveButton target={{ document_id: document.id }} name={document.title} />
+        </span>
       </div>
       <h3 className="result-card__title">
         {document.source_url ? (
