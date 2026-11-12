@@ -1,6 +1,7 @@
 # Frontend
 
-**Status:** Current as of 2026-11-12. Shell, sign-in and the admin Overview mockup are built.
+**Status:** Current as of 2026-11-12. Shell, sign-in, the admin Overview mockup and the admin
+content pages (Policy Library, Content Management, document editor) are built.
 Every researcher page uses the real API, including the document page, the subtopic tag page and
 the topic page's tag filter (workflow D, F3).
 
@@ -35,6 +36,9 @@ src/components/     shared components for the researcher pages
 | `/documents/:id` | `pages/researcher/DocumentPage` | researcher |
 | `/tags/:slug` | `pages/researcher/TagPage` | researcher |
 | `/admin` | `pages/admin/AdminOverview` | admin |
+| `/admin/library` | `pages/admin/PolicyLibraryPage` | admin |
+| `/admin/content` | `pages/admin/ContentManagementPage` | admin |
+| `/admin/documents/:id` | `pages/admin/DocumentEditorPage` | admin |
 | anything else | `layout/NotFound` | inside the area it falls under |
 
 Researcher and admin pages render inside `AppLayout`, which takes the nav items for its area.
@@ -60,6 +64,26 @@ Every route except `/signin` sits under `RequireAuth`, and `/admin` also under
 page shows a "Sample data" badge. The charts in `src/pages/admin/charts/` are plain SVG/CSS (no
 chart library). Their series colors are `--chart-series-1`/`-2` in `charts.css`; they passed a
 color-blind and contrast check, which Carolina Blue on its own doesn't.
+
+## Admin content pages
+
+Workflow D's admin side (F12, NF7), on the endpoints in
+[api.md](api.md#admin-content-management). Data goes through `pages/admin/adminApi.ts`.
+
+- **Policy Library** (`/admin/library`): every document in any status, with keyword search and
+  status and topic filters, 20 per page. The filters and page are in the URL.
+- **Content Management** (`/admin/content`): add a document by its Repository link (it lands as
+  a draft and opens in the editor; a duplicate's error links to the existing document), and the
+  drafts waiting for review.
+- **Document editor** (`/admin/documents/:id`): type, owning office, topics, up to 5 tags and the
+  official-source flag, saved together with one `PATCH`. Publish, archive and restore buttons
+  are disabled while there are unsaved changes, and Publish also until the saved document has an
+  office and a topic. Permanent delete appears only for archived documents and asks for
+  confirmation, naming the document, before it sends `confirm=true`. The Repository text is shown
+  (open by default for drafts) so it can be checked before publishing.
+- The API's `active` status is shown as "Published" (`adminFormat.ts`).
+- Publishing or editing a document doesn't update its Ask chunks yet; that's the open
+  "re-run ingestion" item in [roadmap.md](roadmap.md).
 
 ## Researcher pages
 

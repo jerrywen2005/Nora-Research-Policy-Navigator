@@ -43,6 +43,15 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-12: admin content pages (workflow D admin side)
+- **Policy Library** is for finding documents: every status, with search and status and topic
+  filters. **Content Management** is the workflow: add by Repository link, then a review queue
+  of drafts. Both open the same **document editor** page, `/admin/documents/:id`.
+- The editor is its own page rather than a side panel, so it can be linked to and works on a
+  phone.
+
+*(Anton)*
+
 ### 2026-11-12: document and tag pages (workflow D researcher pages)
 - A result card's title now opens the in-app document page; the Repository link stays on the card
   as a separate link (F3's topic → documents → document page flow).
