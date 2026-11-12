@@ -1,7 +1,7 @@
 """create feedback
 
 Revision ID: f31dd62e0247
-Revises: b3f26accf7c2
+Revises: 3405a4fb20ce
 Create Date: 2026-11-11 13:58:26.151953
 
 """
@@ -13,7 +13,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "f31dd62e0247"
-down_revision: str | Sequence[str] | None = "b3f26accf7c2"
+down_revision: str | Sequence[str] | None = "3405a4fb20ce"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
