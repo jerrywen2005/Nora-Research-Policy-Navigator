@@ -192,3 +192,23 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* FAQ page: one section per topic. */
+.faq-group + .faq-group {
+  margin-top: 1.75rem;
+}
+
+.faq-group__title {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+  color: var(--rp-navy);
+}
+
+/* Topic page: the topic's FAQs, below its documents. */
+.topic-faqs {
+  margin-top: 2rem;
+}
+
+.topic-faqs__more {
+  margin: 0.75rem 0 0;
+}

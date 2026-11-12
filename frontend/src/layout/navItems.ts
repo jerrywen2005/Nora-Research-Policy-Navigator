@@ -13,7 +13,7 @@ export const researcherNav: NavItem[] = [
   { label: 'Search Policies', to: '/search' },
   { label: 'Browse Topics', to: '/browse' },
   { label: 'Saved Items', to: '/saved' },
-  { label: 'FAQs' },
+  { label: 'FAQs', to: '/faqs' },
   { label: 'Help & Support' },
   { label: 'Contact Compliance' },
 ]
