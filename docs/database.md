@@ -116,14 +116,22 @@ matches topic and tag names (F4); they're joined in at query time instead of bei
 
 When a document's text changes, ingestion deletes its chunks and makes new ones.
 
-**faqs**: curated by admins, never auto-published.
+**faqs**: curated by admins, never auto-published (workflow E, F8; `app/models/faq.py`).
 | column | notes |
 |---|---|
-| id, question, answer, topic_id | |
-| status | `draft`, `published`, `archived` |
-| sort_order, created_by, updated_at | |
+| id | |
+| question | up to 500 characters |
+| answer | Markdown, written by an admin |
+| topic_id | the one topic page it shows on; required to publish. `ON DELETE SET NULL` |
+| status | `draft`, `published`, `archived`; the same lifecycle as documents ([api.md](api.md#admin-faqs)) |
+| sort_order | display order, then question |
+| created_by, updated_by | users; may be `null` |
+| created_at, updated_at | `timestamptz` |
 
-**faq_documents** (faq_id, document_id): the sources an FAQ cites.
+Index on (status, topic_id) for the researcher list and topic pages.
+
+**faq_documents** (faq_id, document_id): the sources an FAQ cites. Deleting either side deletes
+the link, so permanently deleting a document never leaves an FAQ pointing at it.
 
 FAQ candidates come from analytics queries over `questions` (frequent or similar questions).
 Admins review them and write the FAQ.

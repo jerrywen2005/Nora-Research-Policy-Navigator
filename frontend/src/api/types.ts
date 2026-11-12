@@ -150,6 +150,55 @@ export interface UpdateDocumentRequest {
   is_authoritative?: boolean
 }
 
+// ---- FAQs (workflow E) ----
+
+export interface Faq {
+  id: number
+  question: string
+  answer: string // Markdown; render with the same safe renderer as Ask answers
+  topic: TopicRef | null
+  sources: DocumentRef[] // researchers only get active documents
+  updated_at: string // ISO 8601 timestamp
+}
+
+// Query parameters for GET /api/faqs
+export interface FaqQuery {
+  topic?: string // topic slug, for its topic page
+}
+
+export type FaqStatus = 'draft' | 'published' | 'archived'
+
+export interface AdminFaq extends Faq {
+  status: FaqStatus
+  sort_order: number
+  created_at: string // ISO 8601 timestamp
+  updated_by: UserRef | null
+}
+
+// Query parameters for GET /api/admin/faqs
+export interface AdminFaqQuery {
+  status?: FaqStatus
+  topic?: string
+}
+
+// POST /api/admin/faqs; creates a draft
+export interface CreateFaqRequest {
+  question: string // up to 500 characters
+  answer: string // up to 10,000 characters
+  topic_id?: number | null
+  document_ids?: number[]
+  sort_order?: number
+}
+
+// PATCH /api/admin/faqs/{id}; omitted fields are unchanged, document_ids replaces the whole list
+export interface UpdateFaqRequest {
+  question?: string
+  answer?: string
+  topic_id?: number | null // can't be null on a published FAQ
+  document_ids?: number[]
+  sort_order?: number
+}
+
 // ---- Ask ----
 
 export type AskOutcome = 'answered' | 'referred' | 'no_answer'
