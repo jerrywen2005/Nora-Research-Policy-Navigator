@@ -1,22 +1,12 @@
-import type { DocType, DocumentSummary } from '../api/types'
+import { Link } from 'react-router'
+import type { DocumentSummary } from '../api/types'
 import './components.css'
+import { docTypeLabels } from './docType'
 import { Icon } from './Icon'
 import { SaveButton } from './SaveButton'
 
-const docTypeLabels: Record<DocType, string> = {
-  policy: 'Policy',
-  standard: 'Standard',
-  procedure: 'Procedure',
-  sop: 'SOP',
-  guidance: 'Guidance',
-  faq: 'FAQ',
-  webpage: 'Web page',
-  job_aid: 'Job aid',
-  other: 'Document',
-}
-
-// A browse or search result. Every result shows its citation and, when there is one, a link to
-// the source, and a Save toggle (F9).
+// A browse or search result. The title opens the document's page (F3); every result also shows
+// its citation, a link to the source in the Repository when there is one, and a Save toggle (F9).
 export function DocumentResultCard({ document }: { document: DocumentSummary }) {
   return (
     <article className="result-card">
@@ -29,18 +19,18 @@ export function DocumentResultCard({ document }: { document: DocumentSummary }) 
         </span>
       </div>
       <h3 className="result-card__title">
-        {document.source_url ? (
-          <a href={document.source_url} target="_blank" rel="noreferrer">
-            {document.title} <Icon name="external" size={16} />
-          </a>
-        ) : (
-          document.title
-        )}
+        <Link to={`/documents/${document.id}`}>{document.title}</Link>
       </h3>
       {document.summary && <p className="result-card__summary">{document.summary}</p>}
       <p className="result-card__footer">
         {document.office && <span>{document.office.name}</span>}
         {document.last_reviewed_at && <span>Last reviewed {document.last_reviewed_at}</span>}
+        {document.source_url && (
+          <a href={document.source_url} target="_blank" rel="noreferrer">
+            Repository<span className="visually-hidden">: {document.title}</span>{' '}
+            <Icon name="external" size={14} />
+          </a>
+        )}
       </p>
     </article>
   )

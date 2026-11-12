@@ -42,7 +42,7 @@ describe('SavedPage', () => {
     )
     expect(within(answer).getByText(DISCLAIMER)).toBeInTheDocument()
     expect(within(answer).getByText('Nov 11, 2026')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /export controls/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Export Controls' })).toHaveAttribute('href', '/documents/12')
   })
 
   it('shows a saved referral with the office to contact', async () => {

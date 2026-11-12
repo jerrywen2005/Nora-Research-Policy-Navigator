@@ -11,6 +11,7 @@ import DocumentPage from './pages/researcher/DocumentPage'
 import HomePage from './pages/researcher/HomePage'
 import SavedPage from './pages/researcher/SavedPage'
 import SearchPage from './pages/researcher/SearchPage'
+import TagPage from './pages/researcher/TagPage'
 import TopicPage from './pages/researcher/TopicPage'
 import SignIn from './pages/SignIn'
 import SavedProvider from './saved/SavedProvider'
@@ -31,6 +32,7 @@ export default function App() {
             <Route index element={<HomePage />} />
             <Route path="browse" element={<BrowsePage />} />
             <Route path="browse/:slug" element={<TopicPage />} />
+            <Route path="tags/:slug" element={<TagPage />} />
             <Route path="search" element={<SearchPage />} />
             <Route path="ask" element={<AskPage />} />
             <Route path="saved" element={<SavedPage />} />
