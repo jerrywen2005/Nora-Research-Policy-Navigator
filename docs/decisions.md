@@ -5,6 +5,8 @@ an open question is answered, move it into the log.
 
 ## Open questions
 
+- **FAQ content:** can the Link provide an initial list of FAQs (questions, approved answers and
+  the policies they cite)? Until then we seed none; admins write them in the app. *(Link)*
 - **Privacy:** can telemetry (researchers' questions, Onyens) be stored off UNC infrastructure, for
   example in Supabase cloud or an interim host? Should questions be stored with user_id or
   anonymized, and for how long? *(clients / ITS)*
@@ -40,6 +42,19 @@ an open question is answered, move it into the log.
   users whose role is currently `admin` is easy if wanted. *(Andy / Link)*
 
 ## Log
+
+### 2026-11-11: MVP deadline moved to Sunday Nov 15
+The MVP is now due by the end of Sun Nov 15, not Thu Nov 12. *(Anton)*
+
+### 2026-11-11: FAQ design (workflow E)
+- Each FAQ has **one topic**, the topic page it shows on; it needs one to be published.
+- FAQs follow the **document lifecycle**: draft → published → archived → restore to draft, with
+  a permanent delete only for archived FAQs and only with `confirm=true` (NF7).
+- FAQs can cite **source policies** (`faq_documents`); researchers see only active ones.
+- **No seeded FAQs.** We don't write policy answers ourselves; admins write them in the app, and
+  we've asked the Link for an initial list (see Open questions).
+
+Contract: [api.md](api.md#faqs). *(Anton)*
 
 ### 2026-11-11: analytics are aggregates only (NF6)
 The admin dashboard and its CSV export (workflow C) never return a user id, Onyen, name or email,
