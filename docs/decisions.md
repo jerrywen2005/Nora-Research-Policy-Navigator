@@ -35,6 +35,36 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-11: saved questions include their citations and referral (contract change)
+`SavedItem.question` in [api.md](api.md#saveditem) and `types.ts` gains `citations` and
+`referral`, so the Saved page can show what the Ask page showed, not just the answer text. This
+changes the contract Jerry's Saved page builds against. Details:
+- The shapes are Ask's own `Citation` and `Office`, built with Ask's `CitationOut` schema and
+  snippet helper, so the two can't drift apart.
+- Only cited sources (`question_citations.was_cited`) are listed, ordered by rank. Their numbers
+  match the `[n]` in the answer, but the list order can differ from the Ask response, which
+  follows the order the answer first mentions them.
+- When a policy has been re-processed, its old chunks are gone. A saved citation then keeps its
+  number, title and link, with an empty `section` and `snippet`, so every `[n]` still resolves.
+- `QuestionCitation.chunk`, `QuestionCitation.document` and `Question.referred_office`
+  relationships were added to `app/models/question.py` so they load with `selectinload` (no
+  N+1). They are read-only additions with no migration. *(Andy, agreed with the team review)*
+
+### 2026-11-11: only active documents can be saved
+`POST /api/saved` returns `404` for a draft document as well as for an unknown or archived one,
+because researchers can't see drafts anywhere else (`GET /api/documents/{id}` is also `404` for
+them). A document that was saved while active stays in the user's Saved list after it is archived,
+as the contract says, so they can still see and remove it. Saving someone else's question is the
+same `404` as a missing one (NF6), like feedback. (Andy)
+
+### 2026-11-11: only the asker can rate a question (NF6)
+`PUT /api/questions/{id}/feedback` accepts a rating only from the user who asked the question.
+Anyone else, admins included, gets the same `404` as for a question that doesn't exist, so the
+API never reveals that another user's question exists. Feedback is only ever read or changed for
+the signed-in user; admins will see it only as aggregates on the dashboard (workflow C). A blank
+comment is stored as `null`. A question whose user was anonymized (`user_id` null) can no longer
+be rated. (Andy)
+
 ### 2026-11-11: frontend tests with Vitest
 The frontend had no tests; CI only linted and type-checked it. It now uses Vitest and React
 Testing Library (the standard pairing with Vite), and CI runs `npm test`. The first tests cover

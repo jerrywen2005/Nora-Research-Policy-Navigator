@@ -10,7 +10,9 @@ from app.models.content import (
     Topic,
     document_topics,
 )
+from app.models.feedback import Feedback
 from app.models.question import Outcome, Question, QuestionCitation
+from app.models.saved_item import SavedItem
 from app.models.tags import Tag, document_tags
 from app.models.user import Role, User
 
@@ -20,11 +22,13 @@ __all__ = [
     "Document",
     "DocumentChunk",
     "DocumentStatus",
+    "Feedback",
     "Office",
     "Outcome",
     "Question",
     "QuestionCitation",
     "Role",
+    "SavedItem",
     "Tag",
     "Topic",
     "User",

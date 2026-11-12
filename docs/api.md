@@ -254,6 +254,112 @@ Response `200`:
 - `question_id` identifies the logged question; feedback will refer to it.
 - The UI always shows `disclaimer`.
 
+## Feedback and saved items
+
+Workflow B (F7, F9). Every endpoint requires sign-in (`401`) and only ever reads or changes the
+current user's own rows (NF6). There is no admin access to another user's feedback or saved
+items; the dashboard will show aggregates only.
+
+### `PUT /api/questions/{question_id}/feedback`
+Rates an answer: helpful or not helpful, with an optional comment. Calling it again replaces the
+earlier rating (one per question per user), so the UI can switch between the two buttons.
+
+Request:
+```json
+{ "helpful": false, "comment": "It didn't cover student researchers." }
+```
+`comment` is optional, at most 1000 characters (`422` otherwise); a blank comment is stored as
+`null`.
+
+Response `200`: a [Feedback](#feedback).
+
+Only the user who asked the question can rate it. Someone else's question, or one that doesn't
+exist, is `404`, so the response doesn't reveal that it exists.
+
+### `DELETE /api/questions/{question_id}/feedback`
+Removes the current user's rating (undo). Response `204`. `404` if the question isn't theirs or
+they haven't rated it.
+
+#### Feedback
+```json
+{
+  "question_id": 41,
+  "helpful": false,
+  "comment": "It didn't cover student researchers.",
+  "created_at": "2026-11-11T15:02:00Z",
+  "updated_at": "2026-11-11T15:04:30Z"
+}
+```
+`comment` may be `null`. `updated_at` equals `created_at` until the rating is changed.
+
+### `GET /api/saved`
+Response `200`: a list of [SavedItem](#saveditem) for the current user, newest first. Not paged;
+a user saves at most a few dozen items.
+
+### `POST /api/saved`
+Saves a document or one of the user's own questions. Send exactly one of the two ids (`422` if
+both or neither):
+```json
+{ "document_id": 12 }
+```
+```json
+{ "question_id": 41 }
+```
+- Response `201`: the new [SavedItem](#saveditem).
+- Saving something already saved returns the existing item with `200`, so a double click is
+  harmless.
+- `404` for an unknown or archived document, or for a question that doesn't exist or belongs to
+  someone else.
+
+### `DELETE /api/saved/{id}`
+Response `204`. `404` if the item doesn't exist or belongs to another user.
+
+#### SavedItem
+```json
+{
+  "id": 7,
+  "created_at": "2026-11-11T15:10:00Z",
+  "kind": "question",
+  "document": null,
+  "question": {
+    "id": 41,
+    "question_text": "Do I need IRB approval to use an existing dataset?",
+    "outcome": "answered",
+    "answer_text": "Usually yes, unless the data are publicly available or fully de-identified. [1]",
+    "citations": [
+      {
+        "number": 1,
+        "document_id": 12,
+        "title": "Use of Existing Data and Specimens in Research",
+        "section": "When IRB review is required",
+        "source_url": "https://research.unc.edu/...",
+        "snippet": "Research using identifiable private information requires..."
+      }
+    ],
+    "referral": null,
+    "created_at": "2026-11-11T15:01:12Z"
+  }
+}
+```
+- `kind` is `"document"` or `"question"`. Exactly one of `document` and `question` is set,
+  matching `kind`; the other is `null`.
+- `document` is a [DocumentSummary](#documentsummary).
+- `question.outcome` is an Ask `outcome` (`answered`, `referred`, `no_answer`). A question whose
+  LLM call failed is stored as `error` in the database but shown as `no_answer`, as it was when
+  asked.
+- `question.answer_text` is the answer shown at the time, with its `[n]` markers, or `null` when
+  there was none (for example with no LLM configured).
+- `question.citations` and `question.referral` are what the Ask page showed with the answer, in
+  the same [Citation](#post-apiask) and [Office](#office) shapes as `POST /api/ask`:
+  - `citations` lists only the sources the answer cited, ordered by `number` (their retrieval
+    rank). `number` matches the `[n]` in `answer_text`. This order can differ from the Ask
+    response, which lists them in the order the answer first mentions them. Empty for a referral.
+  - If the policy has been re-processed since, its old sections are gone: the citation keeps its
+    `number`, `document_id`, `title` and `source_url`, and `section` and `snippet` are `""`.
+  - `referral` is the office the user was referred to, or `null`.
+- A saved document that is later archived stays in the list, so the user can still see it and
+  remove it.
+
 ## Health
 
 ### `GET /api/health`
@@ -424,6 +530,5 @@ Response `204`; `404` if the Onyen isn't an admin; `409` with
 
 ## Not yet defined
 
-Feedback, saved items, FAQs, usage logging and analytics, and editing topics, offices and tags
-in the app. The admin Overview page is still a mockup with fake data. Add those endpoints here
-before building them.
+FAQs, usage logging and analytics, and editing topics, offices and tags in the app. The admin
+Overview page is still a mockup with fake data. Add those endpoints here before building them.

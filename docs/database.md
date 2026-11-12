@@ -3,8 +3,9 @@
 **Status:** `users` is **Current** (migration `6ddc0a734e48`, 2026-10-12), and so are
 `offices`, `topics`, `documents` and `document_topics` (migration `6de3ee5b4d8c`, 2026-10-13),
 `document_chunks` (migration `2743ef7700b3`, 2026-11-10), `questions` and
-`question_citations` (migration `b3f26accf7c2`, 2026-11-10), and `tags` and `document_tags`
-(migration `3405a4fb20ce`, 2026-11-10).
+`question_citations` (migration `b3f26accf7c2`, 2026-11-10), `tags` and `document_tags`
+(migration `3405a4fb20ce`, 2026-11-10), `feedback` (migration `f31dd62e0247`, 2026-11-11) and
+`saved_items` (migration `1964bb3cf788`, 2026-11-11).
 Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
@@ -147,16 +148,24 @@ retrieved for a question, best first (primary key: question_id + rank), and whet
 cited each. This drives the "most cited resources" analytics. `chunk_id` becomes null when
 re-chunking deletes the chunk; `document_id` is stored alongside so counts survive.
 
-**feedback**
+**feedback** *(Current)*: a rating on an answer (F7). Only the user who asked can rate it.
 | column | notes |
 |---|---|
-| id, question_id, user_id | unique (question_id, user_id) |
+| id, question_id, user_id | `uq_feedback_question_id_user_id` (question_id, user_id): one rating per user per question, so `PUT` upserts. Deleting the question or the user deletes the feedback |
 | helpful | boolean |
-| comment | optional |
-| created_at | |
+| comment | optional, at most 1000 characters |
+| created_at, updated_at | `updated_at` changes when the rating is replaced |
 
-**saved_items**: id, user_id, document_id or question_id (exactly one, enforced by a CHECK),
-created_at.
+**saved_items** *(Current)*: documents and questions a user saved (F9).
+| column | notes |
+|---|---|
+| id, user_id | indexed; deleting the user deletes their items |
+| document_id, question_id | exactly one is set (`ck_saved_items_one_target`). Deleting the document or question deletes the item |
+| created_at | the Saved list is ordered by this, newest first |
+
+Partial unique indexes stop duplicates: `uq_saved_items_user_document` on (user_id, document_id)
+where document_id is set, and `uq_saved_items_user_question` on (user_id, question_id) where
+question_id is set.
 
 **usage_events**: everything that isn't an Ask: `login`, `browse_topic`, `search`,
 `view_document`, `open_source_link`, `view_faq`. Columns: id, user_id, event_type, topic_id,
