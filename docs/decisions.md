@@ -32,15 +32,33 @@ an open question is answered, move it into the log.
   Is that intended? The mockup also has no disclaimer on its answer; we show one anyway. Its
   feedback buttons, Related Resources, Announcements and FAQs have no endpoints yet. The 9 topic
   names currently come from the mockup. *(Link)*
-- **Analytics free-text threshold (proposed 2026-11-11):** the dashboard and CSV show a search
-  term or question text only if at least **2 different people** used it in the range; rarer text
-  is left out of the lists but still counted in totals. This stops one researcher's unusual
-  question being readable on the dashboard (NF6). Raise it if 2 is too low. *(Andy to confirm)*
+- **Analytics free-text threshold:** built with 2 different people (see the 2026-11-11 log
+  entry). Confirm the value, or change `MIN_DISTINCT_USERS` in `app/analytics/dashboard.py`.
+  *(Andy)*
 - **Analytics and admin activity:** should admins' own logins, views, searches and questions be
   counted? The contract counts everyone, so testing by admins inflates the numbers. Excluding
   users whose role is currently `admin` is easy if wanted. *(Andy / Link)*
 
 ## Log
+
+### 2026-11-11: analytics are aggregates only (NF6)
+The admin dashboard and its CSV export (workflow C) never return a user id, Onyen, name or email,
+or any per-user row: people are only counted (active users, and distinct users behind the
+threshold below). Everything is computed with SQL aggregates at request time from `usage_events`,
+`questions`, `question_citations` and `feedback`, so no per-user report exists anywhere to leak.
+The raw tables still hold `user_id` (needed for distinct counts and for Saved and feedback);
+whether to anonymize them after a period is part of the open privacy question. Days are
+`America/New_York` calendar days. A search counts once, on its first page of results. The CSV
+neutralizes cells that start like a formula, because researchers type the search terms and
+questions in it. *(Andy)*
+
+### 2026-11-11: free text needs 2 different people (proposed)
+Search terms, zero-result terms and most-asked questions are listed only when at least 2 different
+people used the same text (after trimming and lowercasing) in the range; rarer text still counts
+in the totals. One researcher's unusual question, which could identify them or what they're
+working on, never appears on its own. The value is proposed and awaits confirmation (open
+questions above). Admin activity is counted like anyone else's until that open question is
+answered. *(Andy)*
 
 ### 2026-11-11: saved questions include their citations and referral (contract change)
 `SavedItem.question` in [api.md](api.md#saveditem) and `types.ts` gains `citations` and

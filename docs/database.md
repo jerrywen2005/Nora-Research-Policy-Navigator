@@ -5,7 +5,8 @@
 `document_chunks` (migration `2743ef7700b3`, 2026-11-10), `questions` and
 `question_citations` (migration `b3f26accf7c2`, 2026-11-10), `tags` and `document_tags`
 (migration `3405a4fb20ce`, 2026-11-10), `feedback` (migration `f31dd62e0247`, 2026-11-11) and
-`saved_items` (migration `1964bb3cf788`, 2026-11-11).
+`saved_items` (migration `1964bb3cf788`, 2026-11-11), and `usage_events` (migration
+`dd2a43db592e`, 2026-11-11).
 Every other table is *Proposed*. Tables are added through Alembic migrations as features need them. Update this file
 when a migration changes the schema.
 
@@ -167,9 +168,10 @@ Partial unique indexes stop duplicates: `uq_saved_items_user_document` on (user_
 where document_id is set, and `uq_saved_items_user_question` on (user_id, question_id) where
 question_id is set.
 
-**usage_events** *(Proposed 2026-11-11, workflow C)*: every logged interaction that isn't an Ask
-(Asks are already in `questions`). Written by `app/analytics/logging.py`, one row per request,
-never blocking it.
+**usage_events** *(Current)*: every logged interaction that isn't an Ask (Asks are already in
+`questions`). Written by `log_event()` in `app/analytics/logging.py`, one row per request: it
+inserts in a savepoint and commits, and never fails the request. A search is logged only for the
+first page of results, so paging doesn't count as more searches.
 | column | notes |
 |---|---|
 | id | |

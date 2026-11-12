@@ -527,7 +527,16 @@ Nov 1 to the end of Nov 7, Eastern. Every measure counts only activity inside th
 
 **Sources.** Asks come from `questions` and `question_citations` (written by `POST /api/ask`),
 ratings from `feedback`, and everything else from `usage_events`
-([database.md](database.md#usage-and-analytics)).
+([database.md](database.md#usage-and-analytics)), which these endpoints write as a side effect:
+
+| endpoint | event |
+|---|---|
+| `POST /api/auth/mock-login` (and the SSO login later) | `login` |
+| `GET /api/topics/{slug}` | `topic_view` |
+| `GET /api/documents/{id}` | `document_view` |
+| `GET /api/documents` with `q`, first page only (`offset=0`) | `search`, with the trimmed, lowercased text and `total` |
+
+Logging never changes a response or fails a request.
 
 ### `GET /api/admin/analytics`
 Query parameters, both optional:
@@ -638,6 +647,9 @@ starts with a one-cell title row, then a header row, then its data rows:
 | `Daily questions by topic` | `date`, `topic_slug`, `topic_name`, `questions` (`topic_slug` and `topic_name` empty for no topic) |
 
 An empty `helpful_share` is an empty cell. A section with no rows still has its title and header.
+A text cell that starts with `=`, `+`, `-`, `@`, a tab or a carriage return is prefixed with `'`
+so a spreadsheet shows it as text instead of running it as a formula (search terms and questions
+are typed by researchers).
 
 ## Admin: managing admins (proposed, not built)
 
