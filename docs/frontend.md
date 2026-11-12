@@ -1,8 +1,8 @@
 # Frontend
 
-**Status:** Current as of 2026-10-13. Shell, sign-in and the admin Overview mockup are built.
-Researcher Browse, Topic and Search pages use the real API; Ask still uses fake data, and
-`DocumentPage` is still a placeholder.
+**Status:** Current as of 2026-11-12. Shell, sign-in and the admin Overview mockup are built.
+Every researcher page uses the real API, including the document page, the subtopic tag page and
+the topic page's tag filter (workflow D, F3).
 
 React + TypeScript + Vite, with React Router v7 in declarative mode (`<BrowserRouter>` +
 `<Routes>`). API calls go through `src/api/client.ts` (see [api.md](api.md)).
@@ -33,6 +33,7 @@ src/components/     shared components for the researcher pages
 | `/ask` | `pages/researcher/AskPage` | researcher |
 | `/saved` | `pages/researcher/SavedPage` | researcher |
 | `/documents/:id` | `pages/researcher/DocumentPage` | researcher |
+| `/tags/:slug` | `pages/researcher/TagPage` | researcher |
 | `/admin` | `pages/admin/AdminOverview` | admin |
 | anything else | `layout/NotFound` | inside the area it falls under |
 
@@ -91,6 +92,16 @@ panel, the topic grid and a right rail. Search keeps its query in the URL (`/sea
   Saved page shows several answers at once.
 - **Styles:** `components/components.css` defines `--rp-*` tokens on `.researcher`, mapped onto
   `theme.css`, and uses the theme's `.button` and `.badge`.
+- **Documents and subtopics (F3):** a `DocumentResultCard`'s title opens `/documents/:id`, and a
+  separate "Repository" link opens the source. `DocumentPage` shows the summary, owning office,
+  topics, tags (`TagList`, linking to `/tags/:slug`) and related policies, plus a button to the
+  Repository. It deliberately doesn't show `content_text`: the Repository has the official, current
+  text (F12). `TagPage` lists every policy with one tag across topics. There's no single-tag
+  endpoint, so it finds the tag in `GET /api/tags`.
+- **Topic tag filter:** `TopicPage` shows the topic's tags as one-at-a-time filter chips, kept in
+  the URL (`/browse/:slug?tag=`). The topic and its documents load separately, so changing the
+  filter doesn't call `GET /api/topics/{slug}` again, which would log another topic view. Topic
+  and tag pages ask for 100 documents, the API's maximum; the largest topic has 74.
 - Topic icons are picked by slug in `components/topicIcon.ts`, since the API has no icon field.
 
 ## Navigation

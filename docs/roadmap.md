@@ -1,6 +1,6 @@
 # Roadmap
 
-**Status:** Current as of 2026-11-11. Update the checkboxes and "Now" section as work lands.
+**Status:** Current as of 2026-11-12. Update the checkboxes and "Now" section as work lands.
 
 ## Milestones
 
@@ -161,8 +161,8 @@ the workflows, so each has one owner who makes sure it's met and checked.
 - [x] Backend: search also matches topic and tag names; `GET /api/documents?tag=` lists every
   policy with a tag across topics; topics list their tags; documents return their tags and
   related policies
-- [ ] Researcher pages for the above: tag page, tag filter on topic pages, tags and related
-  policies on document pages
+- [x] Researcher pages for the above: tag page, tag filter on topic pages, tags and related
+  policies on document pages (Anton; [frontend.md](frontend.md#researcher-pages))
 - [ ] Admin Policy Library and Content Management pages
 
 **E. FAQs (Anton backend, Adithi frontend).**
