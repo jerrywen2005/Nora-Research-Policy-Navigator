@@ -1,10 +1,11 @@
 from datetime import date, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy.orm import Session
 
 from app.analytics import dashboard
+from app.analytics.export import to_csv
 from app.auth import require_role
 from app.db import get_session
 from app.models import Role
@@ -42,3 +43,19 @@ DateRange = Annotated[tuple[date, date], Depends(date_range)]
 def get_analytics(days: DateRange, session: SessionDep) -> Analytics:
     """Every dashboard measure for the range (product.md measures 1-9)."""
     return dashboard.compute(session, *days)
+
+
+@router.get(
+    "/admin/analytics/export.csv",
+    response_class=Response,
+    responses={200: {"content": {"text/csv": {}}, "description": "The dashboard as CSV"}},
+)
+def export_analytics(days: DateRange, session: SessionDep) -> Response:
+    """The same numbers as GET /api/admin/analytics, one CSV section per measure (measure 10)."""
+    start, end = days
+    filename = f"nora-analytics_{start.isoformat()}_to_{end.isoformat()}.csv"
+    return Response(
+        content=to_csv(dashboard.compute(session, start, end)),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

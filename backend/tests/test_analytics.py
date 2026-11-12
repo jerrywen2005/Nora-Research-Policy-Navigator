@@ -1,3 +1,5 @@
+import csv
+import io
 import json
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
@@ -404,3 +406,150 @@ def test_no_user_identity_anywhere(admin, week, db_session):
         "min_distinct_users",
         "email",  # an office's contact email, not a person's
     }
+
+
+# ---- CSV export (measure 10) ----
+
+
+def sections(text: str) -> dict[str, list[list[str]]]:
+    """Parse the export into {title: [header, *rows]}; sections are split by a blank row."""
+    parsed: dict[str, list[list[str]]] = {}
+    title = None
+    for row in csv.reader(io.StringIO(text)):
+        if not row:
+            title = None
+        elif title is None:
+            title = row[0]
+            parsed[title] = []
+        else:
+            parsed[title].append(row)
+    return parsed
+
+
+def export(client: TestClient, **params):
+    response = client.get("/api/admin/analytics/export.csv", params=params or WEEK)
+    assert response.status_code == 200, response.text
+    return response
+
+
+def test_export_headers_and_filename(admin, week):
+    response = export(admin)
+
+    assert response.headers["content-type"] == "text/csv; charset=utf-8"
+    assert response.headers["content-disposition"] == (
+        'attachment; filename="nora-analytics_2026-11-01_to_2026-11-07.csv"'
+    )
+
+
+def test_export_has_every_section_in_order(admin, week):
+    assert list(sections(export(admin).text)) == [
+        "Summary",
+        "Top topics",
+        "Top documents viewed",
+        "Most cited documents",
+        "Top search terms",
+        "Zero-result search terms",
+        "Most asked questions",
+        "Questions by outcome",
+        "Referrals by office",
+        "Daily activity",
+        "Daily questions by topic",
+    ]
+
+
+def test_export_matches_the_json(admin, week):
+    body = get(admin)
+    csv_sections = sections(export(admin).text)
+
+    summary = dict(csv_sections["Summary"][1:])
+    assert summary == {
+        "from": "2026-11-01",
+        "to": "2026-11-07",
+        "min_distinct_users": "2",
+        "active_users": str(body["activity"]["active_users"]),
+        "logins": str(body["activity"]["logins"]),
+        "topic_views": "4",
+        "document_views": "4",
+        "searches": "7",
+        "questions": "5",
+        "feedback_rated": "3",
+        "feedback_helpful": "2",
+        "feedback_helpful_share": "0.667",
+    }
+    assert csv_sections["Top topics"] == [
+        ["topic_slug", "topic_name", "views"],
+        ["human-subjects-research", "Human Subjects Research", "3"],
+        ["export-controls", "Export Controls", "1"],
+    ]
+    assert csv_sections["Top documents viewed"][1:] == [
+        [str(week["a"].id), "A Policy", "2"],
+        [str(week["b"].id), "B Policy", "2"],
+    ]
+    assert csv_sections["Most cited documents"][0] == ["document_id", "title", "citations"]
+    assert csv_sections["Top search terms"][1:] == [["irb", "2"], ["nothing here", "2"]]
+    assert csv_sections["Zero-result search terms"][1:] == [["nothing here", "2"]]
+    assert csv_sections["Most asked questions"] == [
+        ["question", "times_asked"],
+        ["do i need irb?", "2"],
+    ]
+    assert csv_sections["Questions by outcome"][1:] == [
+        ["answered", "2"],
+        ["referred", "1"],
+        ["no_answer", "1"],
+        ["error", "1"],
+    ]
+    assert csv_sections["Referrals by office"][1:] == [
+        ["Office of Human Research Ethics", "2"],
+        ["Office of Sponsored Programs", "1"],
+    ]
+    daily = csv_sections["Daily activity"]
+    assert daily[0] == ["date", "logins", "topic_views", "document_views", "searches", "questions"]
+    assert daily[1] == ["2026-11-01", "2", "2", "0", "0", "1"]
+    assert len(daily) == 1 + 7
+    assert csv_sections["Daily questions by topic"][1:] == [
+        ["2026-11-01", "human-subjects-research", "Human Subjects Research", "1"],
+        ["2026-11-02", "human-subjects-research", "Human Subjects Research", "1"],
+        ["2026-11-02", "", "", "1"],
+        ["2026-11-03", "export-controls", "Export Controls", "1"],
+        ["2026-11-03", "", "", "1"],
+    ]
+
+
+def test_export_of_an_empty_range_keeps_every_header(admin):
+    csv_sections = sections(export(admin, **{"from": "2025-01-01", "to": "2025-01-01"}).text)
+
+    assert dict(csv_sections["Summary"][1:])["feedback_helpful_share"] == ""
+    assert csv_sections["Top topics"] == [["topic_slug", "topic_name", "views"]]
+    assert csv_sections["Daily questions by topic"] == [
+        ["date", "topic_slug", "topic_name", "questions"]
+    ]
+
+
+@pytest.mark.parametrize("term", ["=HYPERLINK(1)", "+1", "-1", "@SUM(A1)", "\tx", "\rx"])
+def test_export_neutralizes_formulas_in_free_text(admin, make_user, log, term):
+    for user in [make_user("one"), make_user("two")]:
+        log(user, EventType.SEARCH, at(1), query=term, result_count=1)
+
+    rows = sections(export(admin).text)["Top search terms"][1:]
+
+    assert rows == [["'" + term, "2"]]
+
+
+def test_export_uses_the_same_rules_and_access(admin):
+    assert (
+        admin.get(
+            "/api/admin/analytics/export.csv", params={"from": "2026-11-07", "to": "2026-11-01"}
+        ).status_code
+        == 422
+    )
+    admin.post("/api/auth/logout")
+    assert admin.get("/api/admin/analytics/export.csv").status_code == 401
+    login(admin, "researcher-only")
+    assert admin.get("/api/admin/analytics/export.csv").status_code == 403
+
+
+def test_export_has_no_user_identity(admin, week):
+    text = export(admin).text
+
+    for onyen in ["alice", "bob", "carol", "boss"]:
+        assert onyen not in text
