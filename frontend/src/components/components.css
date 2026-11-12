@@ -325,6 +325,13 @@
   color: var(--rp-accent);
 }
 
+/* A flex item won't shrink below its longest word unless told to, so a long email address
+   would spill out of the narrow rail. */
+.office-contact__body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .office-contact__name {
   margin: 0 0 0.2rem;
   font-weight: 600;
