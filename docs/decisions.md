@@ -35,6 +35,21 @@ an open question is answered, move it into the log.
 
 ## Log
 
+### 2026-11-11: saved questions include their citations and referral (contract change)
+`SavedItem.question` in [api.md](api.md#saveditem) and `types.ts` gains `citations` and
+`referral`, so the Saved page can show what the Ask page showed, not just the answer text. This
+changes the contract Jerry's Saved page builds against. Details:
+- The shapes are Ask's own `Citation` and `Office`, built with Ask's `CitationOut` schema and
+  snippet helper, so the two can't drift apart.
+- Only cited sources (`question_citations.was_cited`) are listed, ordered by rank. Their numbers
+  match the `[n]` in the answer, but the list order can differ from the Ask response, which
+  follows the order the answer first mentions them.
+- When a policy has been re-processed, its old chunks are gone. A saved citation then keeps its
+  number, title and link, with an empty `section` and `snippet`, so every `[n]` still resolves.
+- `QuestionCitation.chunk`, `QuestionCitation.document` and `Question.referred_office`
+  relationships were added to `app/models/question.py` so they load with `selectinload` (no
+  N+1). They are read-only additions with no migration. *(Andy, agreed with the team review)*
+
 ### 2026-11-11: only active documents can be saved
 `POST /api/saved` returns `404` for a draft document as well as for an unknown or archived one,
 because researchers can't see drafts anywhere else (`GET /api/documents/{id}` is also `404` for

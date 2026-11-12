@@ -202,6 +202,9 @@ export interface SavedQuestion {
   question_text: string
   outcome: AskOutcome
   answer_text: string | null
+  // What the Ask page showed: cited sources ordered by number, and the referred office.
+  citations: Citation[]
+  referral: Office | null
   created_at: string
 }
 

@@ -326,6 +326,17 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
     "question_text": "Do I need IRB approval to use an existing dataset?",
     "outcome": "answered",
     "answer_text": "Usually yes, unless the data are publicly available or fully de-identified. [1]",
+    "citations": [
+      {
+        "number": 1,
+        "document_id": 12,
+        "title": "Use of Existing Data and Specimens in Research",
+        "section": "When IRB review is required",
+        "source_url": "https://research.unc.edu/...",
+        "snippet": "Research using identifiable private information requires..."
+      }
+    ],
+    "referral": null,
     "created_at": "2026-11-11T15:01:12Z"
   }
 }
@@ -338,6 +349,14 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
   asked.
 - `question.answer_text` is the answer shown at the time, with its `[n]` markers, or `null` when
   there was none (for example with no LLM configured).
+- `question.citations` and `question.referral` are what the Ask page showed with the answer, in
+  the same [Citation](#post-apiask) and [Office](#office) shapes as `POST /api/ask`:
+  - `citations` lists only the sources the answer cited, ordered by `number` (their retrieval
+    rank). `number` matches the `[n]` in `answer_text`. This order can differ from the Ask
+    response, which lists them in the order the answer first mentions them. Empty for a referral.
+  - If the policy has been re-processed since, its old sections are gone: the citation keeps its
+    `number`, `document_id`, `title` and `source_url`, and `section` and `snippet` are `""`.
+  - `referral` is the office the user was referred to, or `null`.
 - A saved document that is later archived stays in the list, so the user can still see it and
   remove it.
 
