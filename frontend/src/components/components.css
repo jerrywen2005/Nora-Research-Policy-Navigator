@@ -376,3 +376,131 @@
   font-size: 0.8rem;
   color: var(--rp-muted);
 }
+
+/* ---- Feedback and save (F7, F9) ---- */
+
+/* A small toggle button; --on is the selected state (aria-pressed="true"). */
+.chip-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--rp-border);
+  border-radius: 999px;
+  background: var(--rp-surface);
+  color: var(--color-navy);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip-button:hover:not(:disabled) {
+  background: var(--color-accent-soft);
+}
+
+.chip-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.chip-button--on {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: #fff;
+}
+
+.chip-button--on:hover:not(:disabled) {
+  background: #1d3a66;
+}
+
+.save-button {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.save-button__error {
+  font-size: 0.8rem;
+  color: var(--rp-warning);
+}
+
+.answer-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rp-border);
+}
+
+.answer-feedback__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.answer-feedback__prompt {
+  font-size: 0.9rem;
+  color: var(--rp-muted);
+}
+
+.answer-feedback__comment {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  max-width: 32rem;
+  font-size: 0.9rem;
+}
+
+.answer-feedback__comment textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--rp-border);
+  border-radius: var(--radius);
+  font: inherit;
+  resize: vertical;
+}
+
+.answer-feedback__comment .button {
+  justify-self: start;
+}
+
+.answer-feedback__status {
+  min-height: 1.2em;
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--rp-muted);
+}
+
+.result-card__save {
+  margin-left: auto;
+}
+
+.saved-question {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.saved-question__asked {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--rp-muted);
+}
+
+.saved-question__label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.saved-question__text {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}

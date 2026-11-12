@@ -4,6 +4,7 @@ import { AskSection } from '../../components/AskSection'
 import { Icon } from '../../components/Icon'
 import { TopicGrid } from '../../components/TopicGrid'
 import { topicIcon } from '../../components/topicIcon'
+import { useSaved } from '../../saved/SavedContext'
 import './researcher.css'
 import { getTopics } from './researcherApi'
 import { useLoad } from './useLoad'
@@ -12,6 +13,7 @@ import { useLoad } from './useLoad'
 export default function HomePage() {
   const navigate = useNavigate()
   const topics = useLoad('topics', getTopics)
+  const saved = useSaved()
   const openTopic = (slug: string) => navigate(`/browse/${slug}`)
 
   return (
@@ -88,6 +90,30 @@ export default function HomePage() {
             )}
             <Link to="/browse" className="text-link">
               View all topics <Icon name="arrowRight" size={14} />
+            </Link>
+          </section>
+
+          <section className="panel">
+            <h2 className="panel__title">Saved Items</h2>
+            {saved.items.length === 0 ? (
+              <p className="rail-text">Save answers and documents to find them here later.</p>
+            ) : (
+              <ul className="rail-list">
+                {saved.items.slice(0, 3).map((item) => (
+                  <li key={item.id}>
+                    <Link to="/saved">
+                      <Icon name={item.kind === 'document' ? 'book' : 'chat'} size={18} />
+                      <span>
+                        {item.kind === 'document' ? item.document.title : item.question.question_text}
+                      </span>
+                      <Icon name="chevronRight" size={16} />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Link to="/saved" className="text-link">
+              View saved items <Icon name="arrowRight" size={14} />
             </Link>
           </section>
 

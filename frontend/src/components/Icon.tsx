@@ -104,6 +104,19 @@ const paths = {
     </>
   ),
   folder: <path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />,
+  bookmark: <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z" />,
+  thumbUp: (
+    <>
+      <path d="M7 10v11H3V10z" />
+      <path d="M7 10l4-7a2 2 0 0 1 3 2l-1 5h6a2 2 0 0 1 2 2.3l-1.4 7a2 2 0 0 1-2 1.7H7" />
+    </>
+  ),
+  thumbDown: (
+    <g transform="rotate(180 12 12)">
+      <path d="M7 10v11H3V10z" />
+      <path d="M7 10l4-7a2 2 0 0 1 3 2l-1 5h6a2 2 0 0 1 2 2.3l-1.4 7a2 2 0 0 1-2 1.7H7" />
+    </g>
+  ),
 } satisfies Record<string, ReactNode>
 
 export type IconName = keyof typeof paths

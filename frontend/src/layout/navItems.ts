@@ -12,6 +12,7 @@ export const researcherNav: NavItem[] = [
   { label: 'Ask a Question', to: '/ask' },
   { label: 'Search Policies', to: '/search' },
   { label: 'Browse Topics', to: '/browse' },
+  { label: 'Saved Items', to: '/saved' },
   { label: 'FAQs' },
   { label: 'Help & Support' },
   { label: 'Contact Compliance' },

@@ -31,11 +31,13 @@ src/components/     shared components for the researcher pages
 | `/browse/:slug` | `pages/researcher/TopicPage` | researcher |
 | `/search` | `pages/researcher/SearchPage` | researcher |
 | `/ask` | `pages/researcher/AskPage` | researcher |
+| `/saved` | `pages/researcher/SavedPage` | researcher |
 | `/documents/:id` | `pages/researcher/DocumentPage` | researcher |
 | `/admin` | `pages/admin/AdminOverview` | admin |
 | anything else | `layout/NotFound` | inside the area it falls under |
 
 Researcher and admin pages render inside `AppLayout`, which takes the nav items for its area.
+Researcher pages also sit under `SavedProvider` (see Saved items below).
 Every route except `/signin` sits under `RequireAuth`, and `/admin` also under
 `RequireRole role="admin"`.
 
@@ -72,6 +74,21 @@ panel, the topic grid and a right rail. Search keeps its query in the URL (`/sea
   inserted as HTML. Answers take several seconds, and the loading text says so.
 - **Ask:** `components/AnswerCard.tsx` renders every `AskResponse` outcome (answer with `[n]`
   citations, sources only, referral) and always shows the disclaimer.
+- **Feedback (F7):** `AnswerFeedback` puts Helpful / Not helpful under every fresh answer
+  (`PUT /api/questions/{id}/feedback`). Clicking the selected button again removes the rating
+  (`DELETE`). Not helpful opens an optional comment box. The API has no way to read a rating
+  back, so the buttons start unselected each time an answer is shown, and saved answers don't
+  show them.
+- **Saved items (F9):** `SavedProvider` (`src/saved/`) loads `GET /api/saved` once and shares it
+  through `useSaved()`, so every `SaveButton` and the Saved page agree without refetching.
+  `SaveButton` is a toggle (`aria-pressed`) on each answer and on every `DocumentResultCard`; on
+  the Saved page, turning it off removes the item. Saved answers render with the same
+  `AnswerCard` via `savedAnswer()` in `components/answerContent.ts`. They have no confidence
+  score, and their disclaimer is a copy of the backend's `DISCLAIMER`, since the saved response
+  doesn't include it: change both together. The home page's right rail lists the three newest
+  saved items.
+- **Citation anchors:** each `AnswerCard` prefixes its `[n]` anchors with `useId()`, because the
+  Saved page shows several answers at once.
 - **Styles:** `components/components.css` defines `--rp-*` tokens on `.researcher`, mapped onto
   `theme.css`, and uses the theme's `.button` and `.badge`.
 - Topic icons are picked by slug in `components/topicIcon.ts`, since the API has no icon field.
