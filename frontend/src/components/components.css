@@ -156,9 +156,12 @@
   border-radius: 999px;
 }
 
+/* The input inside has no outline of its own, so the bar shows the same focus ring as every
+   other control (theme.css :focus-visible). */
 .search-bar:focus-within {
   border-color: var(--rp-accent);
-  outline: 2px solid color-mix(in srgb, var(--rp-blue) 40%, transparent);
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 .search-bar input {
