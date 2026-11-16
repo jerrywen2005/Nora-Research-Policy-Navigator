@@ -71,7 +71,7 @@ Reply with exactly one word: RESEARCH or OTHER."""
 # standards"). This module is the only copy: the frontend shows what the API sends.
 DISCLAIMER = (
     "Nora provides general information, not an official determination. For a formal review, "
-    "contact one of the offices below."
+    "contact one of the offices above."
 )
 REFERRAL_MESSAGE = (
     "Nora couldn't find a confident answer in UNC's research policies, so it won't guess. "
