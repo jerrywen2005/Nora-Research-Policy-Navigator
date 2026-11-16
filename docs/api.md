@@ -239,7 +239,7 @@ Response `200`:
     { "id": 9, "name": "Research Compliance Services", "email": "rcs@unc.edu", "phone": null, "url": null }
   ],
   "confidence": 0.82,
-  "disclaimer": "Nora provides general information, not an official determination. For a formal review, contact one of the offices below.",
+  "disclaimer": "Nora provides general information, not an official determination. For a formal review, contact one of the offices above.",
   "links": []
 }
 ```
@@ -354,7 +354,7 @@ Response `204`. `404` if the item doesn't exist or belongs to another user.
     "contacts": [
       { "id": 9, "name": "Research Compliance Services", "email": "rcs@unc.edu", "phone": null, "url": null }
     ],
-    "disclaimer": "Nora provides general information, not an official determination. For a formal review, contact one of the offices below.",
+    "disclaimer": "Nora provides general information, not an official determination. For a formal review, contact one of the offices above.",
     "links": [],
     "feedback": { "question_id": 41, "helpful": true, "comment": null, "created_at": "2026-11-11T15:02:00Z", "updated_at": "2026-11-11T15:02:00Z" },
     "created_at": "2026-11-11T15:01:12Z"
