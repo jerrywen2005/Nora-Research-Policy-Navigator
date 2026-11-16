@@ -3,7 +3,8 @@
 **Status:** The backend mock provider is **Current** (built 2026-10-12), and so is the
 frontend sign-in. The Shibboleth provider is *Proposed*. UNC SSO (Connect Carolina / Onyen) access
 was requested from David Cowig (Jerry, 2026-10-12) and from ITS (Andy and Anton, 2026-10-21). A
-reply to the auth request has come in; its details still need to be recorded here. SSO is now our
+reply to the auth request has come in, and ITS has said what it needs to register us
+([below](#what-its-needs-to-register-us)). SSO is now our
 only infrastructure dependency: the client's team handles hosting (see
 [deployment.md](deployment.md)).
 
@@ -46,6 +47,21 @@ headers themselves.
 - The backend trusts those headers only from the proxy. The headers must never be reachable
   directly from the internet.
 - Logout goes to the SSO logout URL.
+
+#### What ITS needs to register us
+
+ITS (Nnenna Aneke, replying to Andy's ticket, 2026-11-15) needs these from our SP's metadata. None
+exist yet.
+
+| Item | What it will be | Blocked on |
+|---|---|---|
+| entityID | A URL we choose, by convention `https://<hostname>/shibboleth` | Production hostname (client's team) |
+| ACS URL | Where sso.unc.edu posts the login result. With a standard Shibboleth SP, `https://<hostname>/Shibboleth.sso/SAML2/POST` | Hostname, and how the SP runs |
+| Certificates | Signing and/or encryption keypair generated when the SP is set up (Shibboleth's `shib-keygen` makes self-signed ones). Only the certificate goes to ITS; the private key is an OpenShift secret, never committed | Setting up the SP |
+| Attributes | Already in Andy's ticket. We need eppn (the Onyen), display name and email | Nothing |
+
+Still to decide: how the SP runs on CloudApps, for example a Shibboleth SP (Apache + `mod_shib`)
+container in front of the frontend, or SAML handled in the backend. This decides the ACS path.
 
 ## Endpoints
 

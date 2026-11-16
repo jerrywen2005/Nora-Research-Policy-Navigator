@@ -53,8 +53,8 @@ that data may be stored.
   - What will the route hostname be?
   - How are secrets handled?
 - **UNC SSO.** Requested from David Cowig (Jerry, 2026-10-12) and from ITS (Andy and Anton,
-  2026-10-21). A reply has come back on the auth request; record its details in
-  [auth.md](auth.md). Service provider registration usually needs the app's final hostname, which
-  now comes from the client's team.
+  2026-10-21). ITS needs our SP's entityID, ACS URL, certificates and attributes to register us
+  ([auth.md](auth.md#what-its-needs-to-register-us)). The entityID and ACS URL need the app's final
+  hostname, which comes from the client's team.
 
 Record the answers here and in [decisions.md](decisions.md) when they come in.
