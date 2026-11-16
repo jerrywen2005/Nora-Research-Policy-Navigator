@@ -104,6 +104,8 @@
 .admin-field select,
 .admin-field textarea {
   min-width: 0;
+  /* A select is as wide as its longest option; long tag names pushed it off a phone screen. */
+  max-width: 100%;
   padding: var(--space-2) var(--space-3);
   font: inherit;
   font-weight: 400;
@@ -114,6 +116,8 @@
 }
 
 .admin-fieldset {
+  /* Browsers default fieldsets to min-content, which stopped the tag select from shrinking. */
+  min-width: 0;
   margin: 0 0 var(--space-4);
   padding: 0;
   border: 0;
