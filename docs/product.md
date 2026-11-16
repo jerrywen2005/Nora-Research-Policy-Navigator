@@ -108,7 +108,7 @@ non-functional ones.
 | F3 | **Browse by topic and subtopic:** topic → documents → a document page with summary, owning office and Repository link; selecting a subtopic tag lists every policy with it, across topics, and each document links related policies that share a tag |
 | F4 | **Search:** keyword or phrase search over titles, text, topics and subtopics; ranked active documents with citation and link |
 | F5 | **Ask:** a concise answer from the Repository only, with numbered citations linking to the policy and section |
-| F6 | **Referral:** when the sources can't support a confident answer, none is generated; show the responsible office and contact as the next step |
+| F6 | **Referral:** when the sources can't support a confident answer, none is generated. A research question goes to Research Compliance Services (rcs@unc.edu); a question that isn't about research goes to the University Policy Office, with a link to every UNC policy. An answer lists its cited policies' offices and RCS as contacts (the Link's rule, 2026-11-12) |
 | F7 | **Answer feedback:** helpful / not helpful on every answer |
 | F8 | **FAQs:** admins write and publish FAQs; researchers browse them on an FAQ page and the matching topic page |
 | F9 | **Saved items:** save a question and answer, or a document, and see them on a Saved page |
@@ -121,7 +121,7 @@ non-functional ones.
 | ID | Requirement |
 |---|---|
 | NF1 | **Grounded only:** answers use only active, authoritative Repository documents; off-topic questions are referred |
-| NF2 | **Disclaimer and next step:** every answer shows the Link-approved AI disclaimer, never reads as a determination, and gives a source link or office |
+| NF2 | **Disclaimer and next step:** every answer shows the Link-approved AI disclaimer, never reads as a determination, and gives a source link or office; a referral, which has no answer to qualify, gives the office instead |
 | NF3 | **Measured quality:** the evaluation on the Link's sample questions finds the right policy in the top 5 for at least 90% of answerable questions and refers at least 90% of out-of-scope ones |
 | NF4 | **Concise and plain:** answers of about 150 words or fewer, never raw policy text |
 | NF5 | **Speed:** a typical answer in under 10 s; browse and search in under 1 s |
