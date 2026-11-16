@@ -199,3 +199,23 @@ developing, `npm run coverage` for a report). CI runs it on every PR.
   Carolina Blue for accents such as borders and highlights.
 - Plain CSS files next to the component that uses them (for example `layout/layout.css`).
 - The layout must work down to phone width. The shell switches to a mobile layout below 48rem.
+
+## Accessibility check (NF8)
+
+Anton checked every page on 2026-11-15 in Chrome, signed in as `researcher1` and `admin1`:
+sign-in, home, browse, topic (with and without a tag filter), search, ask, saved, document, tag,
+FAQs, and the admin overview, Policy Library, Content Management, document editor, FAQ list and
+FAQ editor. For each page:
+
+- **375, 768 and 1440 px:** no sideways scrolling (`scrollWidth` vs `clientWidth`), plus a
+  full-page screenshot.
+- **axe-core 4.10** with the `wcag2a`, `wcag2aa`, `wcag21a` and `wcag21aa` rules, which include
+  AA color contrast: no violations.
+- **Keyboard:** Tab through the page; every stop must be visible and show a focus ring.
+- **Brand:** text and links in navy, accents in Carolina Blue, all from `theme.css`.
+
+Fixed during the check: the editor's "Add a tag" select pushed the page 111 px wide at 375 px (a
+fieldset's default `min-width: min-content`), and the search and ask bars' focus ring was faint.
+The check only saw the states that load without input: re-check a new screen, and states such as
+an Ask answer, when they change. Chrome draws its own focus ring on a date input's calendar button,
+which an outline check reports as missing.

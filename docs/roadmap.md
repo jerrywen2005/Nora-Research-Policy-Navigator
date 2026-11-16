@@ -117,7 +117,7 @@ the workflows, so each has one owner who makes sure it's met and checked.
 | NF5 | Response time | Jerry (Ask), Adithi (browse and search) | A, and D's search changes |
 | NF6 | Privacy | Andy | C: aggregate-only analytics queries |
 | NF7 | No silent deletes | Adithi | D: archive instead of delete, a confirmed hard delete |
-| NF8 | Responsive, accessible, on-brand | Each screen's frontend owner; Anton checks every page at the end | All workflows |
+| NF8 | Responsive, accessible, on-brand | Each screen's frontend owner; Anton checks every page at the end | All workflows. Checked 2026-11-15, all 17 pages pass ([frontend.md](frontend.md#accessibility-check-nf8)); re-check new screens |
 | NF9 | Deployable on CloudApps | Andy | Done; keep the images and the deployment doc current |
 | NF10 | Maintainable and handed off | Anton | CI is done; Anton writes the handoff documentation |
 
