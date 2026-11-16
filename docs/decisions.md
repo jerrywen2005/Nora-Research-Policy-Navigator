@@ -12,9 +12,9 @@ an open question is answered, move it into the log.
   anonymized, and for how long? *(clients / ITS)*
 - **AI providers:** which LLM and embedding providers are approved for UNC use? This determines the
   embedding dimension in `document_chunks`. *(clients / ITS)*
-- **SSO:** the integration pattern on CloudApps, which attributes come through (Onyen/eppn, name,
-  email, affiliation), and the access timeline. *(ITS / David Cowig; a reply to the auth request
-  has come in, details to be recorded)*
+- **SSO:** ITS (Nnenna Aneke) will register us once we send our SP metadata: entityID, ACS URL,
+  SP certificates and the attributes to release ([auth.md](auth.md#what-its-needs-to-register-us)).
+  Still open: the final hostname *(client's team)* and how the SP runs on CloudApps *(us)*.
 - **OKD:** Postgres + pgvector availability, outbound API access, image registry, hostname,
   secrets. *(client's team, who now own hosting)*
 - **Repo:** must the repo move to a UNC GitHub organization? *(coach / ITS)*
@@ -39,6 +39,13 @@ an open question is answered, move it into the log.
   users whose role is currently `admin` is easy if wanted. *(Andy / Link)*
 
 ## Log
+
+### 2026-11-15: what ITS needs to register Nora for SSO
+Nnenna Aneke (ITS) replied to Andy's SSO ticket. To set up SSO, ITS needs our Shibboleth SP's
+entityID, its ACS URL, its signing and/or encryption certificates, and the attributes to release
+(already listed in Andy's ticket). We don't have any of these yet: there's no SP, and the first
+two depend on the production hostname. Details: [auth.md](auth.md#what-its-needs-to-register-us).
+*(Andy; recorded by Anton)*
 
 ### 2026-11-12: FAQ frontend (workflow E)
 - **One Markdown renderer.** FAQ answers render with `MarkdownText`, the same component as Ask
